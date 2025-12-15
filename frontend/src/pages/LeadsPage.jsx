@@ -5,6 +5,7 @@ import TableActionButton from "../components/TableActionButton";
 import LeadFormPopup from "../components/LeadFormPopup";
 import LeadInfo from "../components/LeadInfo";
 import Table from "../components/Table";
+import apiService from "../services/api";
 
 export default function LeadsPage({ searchTerm = '' }) {
   const [leadsData, setLeadsData] = useState([]);
@@ -23,32 +24,27 @@ export default function LeadsPage({ searchTerm = '' }) {
 
   const fetchLeads = async () => {
     try {
-      const response = await fetch('/api/leads');
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Fetched leads:', data);
-        const mappedData = data.map(lead => ({
-          id: lead.id,
-          name: lead.contact_name,
-          email: lead.email || '',
-          phone: lead.phone,
-          status: lead.lead_status || 'New Lead',
-          value: '', // Not in DB, so empty
-          date: lead.date,
-          company: lead.company_name || '',
-          address: lead.address || '',
-          leadType: lead.lead_type || '',
-          source: lead.source || '',
-          leadStatus: lead.lead_status || '',
-          lastContactedDate: lead.last_contacted_date || '',
-          leadAssignee: lead.lead_assignee || '',
-          description: lead.description || ''
-        }));
-        console.log('Mapped data:', mappedData);
-        setLeadsData(mappedData);
-      } else {
-        console.error('Failed to fetch leads:', response.status);
-      }
+      const data = await apiService.getLeads();
+      console.log('Fetched leads:', data);
+      const mappedData = data.map(lead => ({
+        id: lead.id,
+        name: lead.contact_name,
+        email: lead.email || '',
+        phone: lead.phone,
+        status: lead.lead_status || 'New Lead',
+        value: '', // Not in DB, so empty
+        date: lead.date,
+        company: lead.company_name || '',
+        address: lead.address || '',
+        leadType: lead.lead_type || '',
+        source: lead.source || '',
+        leadStatus: lead.lead_status || '',
+        lastContactedDate: lead.last_contacted_date || '',
+        leadAssignee: lead.lead_assignee || '',
+        description: lead.description || ''
+      }));
+      console.log('Mapped data:', mappedData);
+      setLeadsData(mappedData);
     } catch (error) {
       console.error('Error fetching leads:', error);
     }
@@ -102,14 +98,8 @@ export default function LeadsPage({ searchTerm = '' }) {
   const handleDeleteRow = async (id) => {
     if (window.confirm('Are you sure you want to delete this lead?')) {
       try {
-        const response = await fetch(`/api/leads/${id}`, {
-          method: 'DELETE'
-        });
-        if (response.ok) {
-          fetchLeads();
-        } else {
-          alert('Failed to delete lead');
-        }
+        await apiService.deleteLead(id);
+        fetchLeads();
       } catch (error) {
         alert('Error deleting lead');
       }

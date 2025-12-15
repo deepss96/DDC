@@ -8,6 +8,7 @@ import ListViewDropdown from "../components/ListViewDropdown";
 import Table from "../components/Table";
 import { useAuth } from "../contexts/AuthContext";
 import { formatDateForDisplay } from "../utils/dateUtils.jsx";
+import apiService from "../services/api";
 
 export default function UsersPage({ searchTerm = '' }) {
   const { user } = useAuth();
@@ -61,15 +62,9 @@ const fetchUsers = async () => {
   try {
     // setLoading(true);
 
-    const response = await fetch('/api/users');
-
-    if (response.ok) {
-      const users = await response.json();
-      setUsersData(users);
-      console.log("Users fetched:", users);
-    } else {
-      console.error("Failed to fetch users");
-    }
+    const users = await apiService.getUsers();
+    setUsersData(users);
+    console.log("Users fetched:", users);
   } catch (error) {
     console.error("Error fetching users:", error);
   } finally {
@@ -106,14 +101,9 @@ const fetchUsers = async () => {
     }
 
     try {
-      const response = await fetch(`/api/users/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        // Immediately remove from UI
-        setUsersData(usersData.filter(user => user.id !== id));
-      }
+      await apiService.deleteUser(id);
+      // Immediately remove from UI
+      setUsersData(usersData.filter(user => user.id !== id));
     } catch (error) {
       console.error('Error deleting user:', error);
     }
@@ -144,29 +134,17 @@ const fetchUsers = async () => {
     try {
       console.log('🔄 DEBUG: Starting delete operation for user ID:', userToDelete.id);
 
-      const response = await fetch(`/api/users/${userToDelete.id}`, {
-        method: 'DELETE',
-      });
+      await apiService.deleteUser(userToDelete.id);
 
-      console.log('🔄 DEBUG: Delete API response status:', response.status);
-
-      if (response.ok) {
-        console.log('✅ DEBUG: Delete successful, removing from UI');
-        // Immediately remove from UI
-        setUsersData(usersData.filter(user => user.id !== userToDelete.id));
-        setShowDeleteConfirm(false);
-        setUserToDelete(null);
-        setDeleteError(null);
-      } else {
-        const errorData = await response.json();
-        console.error('❌ DEBUG: Delete failed with status:', response.status, 'Response:', errorData);
-
-        // Set error to display in popup
-        setDeleteError(errorData.message || errorData.error || 'Unknown error occurred');
-      }
+      console.log('✅ DEBUG: Delete successful, removing from UI');
+      // Immediately remove from UI
+      setUsersData(usersData.filter(user => user.id !== userToDelete.id));
+      setShowDeleteConfirm(false);
+      setUserToDelete(null);
+      setDeleteError(null);
     } catch (error) {
       console.error('❌ DEBUG: Delete operation error:', error);
-      setDeleteError('An error occurred while deleting the user. Check console for details.');
+      setDeleteError(error.message || 'An error occurred while deleting the user. Check console for details.');
     }
   };
 
@@ -179,36 +157,20 @@ const fetchUsers = async () => {
     try {
       console.log('🔄 DEBUG: Starting user creation with data:', newUser);
 
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newUser),
-      });
+      const savedUser = await apiService.createUser(newUser);
+      console.log('✅ DEBUG: User created successfully:', savedUser);
 
-      console.log('🔄 DEBUG: Create user API response status:', response.status);
+      // Add new user and sort by created_at DESC (newest first)
+      const updatedUsers = [...usersData, savedUser].sort((a, b) =>
+        new Date(b.created_at) - new Date(a.created_at)
+      );
+      setUsersData(updatedUsers);
+      console.log('✅ DEBUG: Users list updated, total users:', updatedUsers.length);
 
-      if (response.ok) {
-        const savedUser = await response.json();
-        console.log('✅ DEBUG: User created successfully:', savedUser);
-
-        // Add new user and sort by created_at DESC (newest first)
-        const updatedUsers = [...usersData, savedUser].sort((a, b) =>
-          new Date(b.created_at) - new Date(a.created_at)
-        );
-        setUsersData(updatedUsers);
-        console.log('✅ DEBUG: Users list updated, total users:', updatedUsers.length);
-
-        setIsUserFormOpen(false); // Close the popup on success
-        setIsEditMode(false);
-        setUserToEdit(null);
-        fetchUsers();
-      } else {
-        const errorData = await response.json();
-        console.error('❌ DEBUG: Create user failed with status:', response.status, 'Response:', errorData);
-        throw new Error(errorData.error || `Failed to create user: ${response.status}`);
-      }
+      setIsUserFormOpen(false); // Close the popup on success
+      setIsEditMode(false);
+      setUserToEdit(null);
+      fetchUsers();
     } catch (error) {
       console.error('❌ DEBUG: Create user operation error:', error);
       throw error; // Re-throw to let UserFormPopup handle it
@@ -219,40 +181,24 @@ const fetchUsers = async () => {
     try {
       console.log('🔄 DEBUG: Starting user update for ID:', userToEdit.id, 'with data:', updatedUser);
 
-      const response = await fetch(`/api/users/${userToEdit.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedUser),
-      });
+      const updatedUserData = await apiService.updateUser(userToEdit.id, updatedUser);
+      console.log('✅ DEBUG: User updated successfully:', updatedUserData);
 
-      console.log('🔄 DEBUG: Update user API response status:', response.status);
+      // Update the user in the local state
+      setUsersData(usersData.map(user =>
+        user.id === userToEdit.id ? { ...updatedUserData } : user
+      ));
+      // Refresh the data to ensure consistency
+      fetchUsers();
+      console.log('✅ DEBUG: Users list updated after edit');
 
-      if (response.ok) {
-        const updatedUserData = await response.json();
-        console.log('✅ DEBUG: User updated successfully:', updatedUserData);
+      // Close the popup and reset state
+      setIsUserFormOpen(false);
+      setIsEditMode(false);
+      setUserToEdit(null);
 
-        // Update the user in the local state
-        setUsersData(usersData.map(user =>
-          user.id === userToEdit.id ? { ...updatedUserData } : user
-        ));
-        // Refresh the data to ensure consistency
-        fetchUsers();
-        console.log('✅ DEBUG: Users list updated after edit');
-
-        // Close the popup and reset state
-        setIsUserFormOpen(false);
-        setIsEditMode(false);
-        setUserToEdit(null);
-
-        // Show success message
-        alert(`${updatedUser.first_name} ${updatedUser.last_name} has been updated successfully.`);
-      } else {
-        const errorText = await response.text();
-        console.error('❌ DEBUG: Update user failed with status:', response.status, 'Response:', errorText);
-        alert(`Failed to update user: ${response.status} - ${errorText}`);
-      }
+      // Show success message
+      alert(`${updatedUser.first_name} ${updatedUser.last_name} has been updated successfully.`);
     } catch (error) {
       console.error('❌ DEBUG: Update user operation error:', error);
       alert('An error occurred while updating the user. Check console for details.');
