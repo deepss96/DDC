@@ -1,0 +1,7 @@
+0000000000000000000000000000000000000000 038e969b320bf0990ca206e690c2ad9b57065bb9 deepss96 <111363738+deepss96@users.noreply.github.com> 1764676294 +0530	branch: Created from HEAD
+038e969b320bf0990ca206e690c2ad9b57065bb9 b931b9564417c6015cb5e13944f78eb2d379115e deepss96 <111363738+deepss96@users.noreply.github.com> 1764676558 +0530	commit: New Branch For Pull
+b931b9564417c6015cb5e13944f78eb2d379115e a1faf0fd60535f2c5fa957d3f6cb1e2234c926d6 deepss96 <111363738+deepss96@users.noreply.github.com> 1764676762 +0530	commit: Dashboard improvements: mobile responsiveness and UI updates
+a1faf0fd60535f2c5fa957d3f6cb1e2234c926d6 66959a5214b8d131e9fe9d539842e7353dd69423 deepss96 <111363738+deepss96@users.noreply.github.com> 1764677051 +0530	commit: Downgrade react-router-dom to v6 for compatibility
+66959a5214b8d131e9fe9d539842e7353dd69423 0c59aceafe57199a95e0b82bb5fca500f4e88d75 deepss96 <111363738+deepss96@users.noreply.github.com> 1764678692 +0530	commit: Mobile View
+0c59aceafe57199a95e0b82bb5fca500f4e88d75 4449f384dce739bf9f28a0fd9b7554ca5467e6c5 deepss96 <111363738+deepss96@users.noreply.github.com> 1764679557 +0530	commit: ....
+4449f384dce739bf9f28a0fd9b7554ca5467e6c5 826748a18db1823abc1e3f881cb2f87cbd247206 deepss96 <111363738+deepss96@users.noreply.github.com> 1764761697 +0530	commit: Dashboard UI

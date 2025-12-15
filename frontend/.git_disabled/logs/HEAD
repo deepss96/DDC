@@ -1,0 +1,29 @@
+0000000000000000000000000000000000000000 038e969b320bf0990ca206e690c2ad9b57065bb9 deepss96 <111363738+deepss96@users.noreply.github.com> 1764675202 +0530	clone: from https://github.com/eleva8cxm-admin/ddc.git
+038e969b320bf0990ca206e690c2ad9b57065bb9 2f79fb380596fa651e93a3799b412c122aaab430 deepss96 <111363738+deepss96@users.noreply.github.com> 1764675230 +0530	checkout: moving from main to Deepak/12/02/2025
+2f79fb380596fa651e93a3799b412c122aaab430 61c861639759414c147ca2458bf42d58998f452d deepss96 <111363738+deepss96@users.noreply.github.com> 1764675509 +0530	commit: Dashboard
+61c861639759414c147ca2458bf42d58998f452d 038e969b320bf0990ca206e690c2ad9b57065bb9 deepss96 <111363738+deepss96@users.noreply.github.com> 1764675713 +0530	checkout: moving from Deepak/12/02/2025 to main
+038e969b320bf0990ca206e690c2ad9b57065bb9 61c861639759414c147ca2458bf42d58998f452d deepss96 <111363738+deepss96@users.noreply.github.com> 1764675735 +0530	checkout: moving from main to Deepak/12/02/2025
+61c861639759414c147ca2458bf42d58998f452d 61c861639759414c147ca2458bf42d58998f452d deepss96 <111363738+deepss96@users.noreply.github.com> 1764676091 +0530	reset: moving to HEAD
+61c861639759414c147ca2458bf42d58998f452d 038e969b320bf0990ca206e690c2ad9b57065bb9 deepss96 <111363738+deepss96@users.noreply.github.com> 1764676269 +0530	checkout: moving from Deepak/12/02/2025 to main
+038e969b320bf0990ca206e690c2ad9b57065bb9 038e969b320bf0990ca206e690c2ad9b57065bb9 deepss96 <111363738+deepss96@users.noreply.github.com> 1764676294 +0530	checkout: moving from main to Deepak-dashboard-updates
+038e969b320bf0990ca206e690c2ad9b57065bb9 61c861639759414c147ca2458bf42d58998f452d deepss96 <111363738+deepss96@users.noreply.github.com> 1764676392 +0530	checkout: moving from Deepak-dashboard-updates to Deepak/12/02/2025
+61c861639759414c147ca2458bf42d58998f452d 038e969b320bf0990ca206e690c2ad9b57065bb9 deepss96 <111363738+deepss96@users.noreply.github.com> 1764676480 +0530	checkout: moving from Deepak/12/02/2025 to Deepak-dashboard-updates
+038e969b320bf0990ca206e690c2ad9b57065bb9 b931b9564417c6015cb5e13944f78eb2d379115e deepss96 <111363738+deepss96@users.noreply.github.com> 1764676558 +0530	commit: New Branch For Pull
+b931b9564417c6015cb5e13944f78eb2d379115e b931b9564417c6015cb5e13944f78eb2d379115e deepss96 <111363738+deepss96@users.noreply.github.com> 1764676716 +0530	checkout: moving from Deepak-dashboard-updates to Deepak-dashboard-updates
+b931b9564417c6015cb5e13944f78eb2d379115e a1faf0fd60535f2c5fa957d3f6cb1e2234c926d6 deepss96 <111363738+deepss96@users.noreply.github.com> 1764676762 +0530	commit: Dashboard improvements: mobile responsiveness and UI updates
+a1faf0fd60535f2c5fa957d3f6cb1e2234c926d6 66959a5214b8d131e9fe9d539842e7353dd69423 deepss96 <111363738+deepss96@users.noreply.github.com> 1764677051 +0530	commit: Downgrade react-router-dom to v6 for compatibility
+66959a5214b8d131e9fe9d539842e7353dd69423 0c59aceafe57199a95e0b82bb5fca500f4e88d75 deepss96 <111363738+deepss96@users.noreply.github.com> 1764678692 +0530	commit: Mobile View
+0c59aceafe57199a95e0b82bb5fca500f4e88d75 4449f384dce739bf9f28a0fd9b7554ca5467e6c5 deepss96 <111363738+deepss96@users.noreply.github.com> 1764679557 +0530	commit: ....
+4449f384dce739bf9f28a0fd9b7554ca5467e6c5 826748a18db1823abc1e3f881cb2f87cbd247206 deepss96 <111363738+deepss96@users.noreply.github.com> 1764761697 +0530	commit: Dashboard UI
+826748a18db1823abc1e3f881cb2f87cbd247206 826748a18db1823abc1e3f881cb2f87cbd247206 deepss96 <111363738+deepss96@users.noreply.github.com> 1764764334 +0530	checkout: moving from Deepak-dashboard-updates to Deepak3
+826748a18db1823abc1e3f881cb2f87cbd247206 90c750f44e6375f81e4d73939a6bab17cc825815 deepss96 <111363738+deepss96@users.noreply.github.com> 1764764349 +0530	commit: Updated code
+90c750f44e6375f81e4d73939a6bab17cc825815 90c750f44e6375f81e4d73939a6bab17cc825815 deepss96 <111363738+deepss96@users.noreply.github.com> 1764765125 +0530	checkout: moving from Deepak3 to New-Branch
+90c750f44e6375f81e4d73939a6bab17cc825815 dd1af2e83d5b3039a19431b036036f38a7329750 deepss96 <111363738+deepss96@users.noreply.github.com> 1764765593 +0530	commit: UPdated
+dd1af2e83d5b3039a19431b036036f38a7329750 dd1af2e83d5b3039a19431b036036f38a7329750 deepss96 <111363738+deepss96@users.noreply.github.com> 1764765677 +0530	checkout: moving from New-Branch to NewBranch
+dd1af2e83d5b3039a19431b036036f38a7329750 4590cb870f9023103f346bc2368f230c2684661b deepss96 <111363738+deepss96@users.noreply.github.com> 1764912766 +0530	commit: Filter Button
+4590cb870f9023103f346bc2368f230c2684661b 84c9506be48a801256e5dbe3a760be6ed7e4bc60 deepss96 <111363738+deepss96@users.noreply.github.com> 1764914553 +0530	commit: Dashboard Add Leads
+84c9506be48a801256e5dbe3a760be6ed7e4bc60 c931b00dec72f335dca462133ad13fecb92269a3 deepss96 <111363738+deepss96@users.noreply.github.com> 1764928966 +0530	commit: 05/11/2025 (03:32PM)
+c931b00dec72f335dca462133ad13fecb92269a3 7a277ba205cbe4cb37dcbc901201ea55cda8a760 deepss96 <111363738+deepss96@users.noreply.github.com> 1764936702 +0530	commit: Lead page and Dashboard Page
+7a277ba205cbe4cb37dcbc901201ea55cda8a760 7a277ba205cbe4cb37dcbc901201ea55cda8a760 deepss96 <111363738+deepss96@users.noreply.github.com> 1765024954 +0530	checkout: moving from NewBranch to 12/06/2025
+7a277ba205cbe4cb37dcbc901201ea55cda8a760 314035c5f31b8745199bd9d4e8f73b1316140470 deepss96 <111363738+deepss96@users.noreply.github.com> 1765025143 +0530	commit: Task Page
+314035c5f31b8745199bd9d4e8f73b1316140470 56f8e02fd25d2997571042c08dafe227d19af178 deepss96 <111363738+deepss96@users.noreply.github.com> 1765198528 +0530	commit: Lead Info Ui
