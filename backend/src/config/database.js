@@ -8,9 +8,12 @@ const dbConfig = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 3306,
-  connectionLimit: 10,
-  connectTimeout: 60000,
-  queueLimit: 0
+  connectionLimit: process.env.NODE_ENV === 'production' ? 2 : 10, // Lower limit for production
+  connectTimeout: 60000, // 60 seconds timeout
+  acquireTimeout: 60000,
+  ssl: process.env.NODE_ENV === 'production' ? {
+    rejectUnauthorized: false // Allow self-signed certificates
+  } : false
 };
 
 // Create connection pool
