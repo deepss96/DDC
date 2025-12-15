@@ -8,8 +8,11 @@ const dbConfig = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 3306,
-  connectionLimit: 10,
-  connectTimeout: 60000,
+  connectionLimit: process.env.NODE_ENV === 'production' ? 2 : 10, // Lower limit for production
+  connectTimeout: 30000, // Shorter timeout for serverless
+  acquireTimeout: 30000,
+  timeout: 30000,
+  reconnect: false, // Disable reconnect for serverless
   queueLimit: 0
 };
 
