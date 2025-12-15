@@ -21,37 +21,9 @@ const PORT = config.server.port;
 
 // Middleware
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    // In development, allow localhost
-    if (process.env.NODE_ENV !== 'production') {
-      if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-        return callback(null, true);
-      }
-    }
-
-    // In production, allow the configured frontend URL and common patterns
-    const allowedOrigins = [
-      config.api.frontendUrl,
-      // Allow same domain
-      origin.replace(/^https?:\/\//, '').split(':')[0] === config.server.host ? origin : null,
-      // Allow api subdomain if frontend is on main domain
-      config.api.frontendUrl ? config.api.frontendUrl.replace(/^https?:\/\//, '').replace('www.', 'api.') : null
-    ].filter(Boolean);
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    // Allow all origins in development
-    if (process.env.NODE_ENV !== 'production') {
-      return callback(null, true);
-    }
-
-    return callback(new Error('Not allowed by CORS'));
-  },
+  origin: process.env.NODE_ENV === 'production'
+    ? process.env.FRONTEND_URL || true  // Allow from FRONTEND_URL or all if not set
+    : true, // Allow all in development
   credentials: true
 }));
 app.use(express.json());
