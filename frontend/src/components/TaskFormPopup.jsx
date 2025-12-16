@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FiX, FiCalendar } from "react-icons/fi";
 import { useAuth } from "../contexts/AuthContext";
 import { formatDateForInput, formatDateForDisplay, getCurrentDateForInput, isDateInPast, parseDisplayDate } from "../utils/dateUtils.jsx";
+import apiService from "../services/api";
 
 // InputField component moved outside to prevent re-creation on each render
 const InputField = ({ label, required, type = "text", value, onChange, placeholder, error, ...rest }) => (
@@ -231,14 +232,8 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
   // Fetch next sequential task number
   const fetchNextTaskNumber = async () => {
     try {
-      const response = await fetch('/api/tasks/next-number');
-      if (response.ok) {
-        const data = await response.json();
-        setTaskNumber(data.taskNumber);
-      } else {
-        console.error('Failed to fetch next task number');
-        setTaskNumber("TSK-10001"); // Fallback
-      }
+      const data = await apiService.getNextTaskNumber();
+      setTaskNumber(data.taskNumber);
     } catch (error) {
       console.error('Error fetching next task number:', error);
       setTaskNumber("TSK-10001"); // Fallback
@@ -247,19 +242,13 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users');
-      if (response.ok) {
-        const userData = await response.json();
-        // Store users as objects with id and name
-        const formattedUsers = userData.map(user => ({
-          id: user.id,
-          name: `${user.first_name} ${user.last_name}`
-        }));
-        setUsers(formattedUsers);
-      } else {
-        console.error('Failed to fetch users');
-        setUsers([]); // Empty array if API fails
-      }
+      const userData = await apiService.getUsers();
+      // Store users as objects with id and name
+      const formattedUsers = userData.map(user => ({
+        id: user.id,
+        name: `${user.first_name} ${user.last_name}`
+      }));
+      setUsers(formattedUsers);
     } catch (error) {
       console.error('Error fetching users:', error);
       setUsers([]); // Empty array if API fails
@@ -268,14 +257,8 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
 
   const fetchLeads = async () => {
     try {
-      const response = await fetch('/api/leads');
-      if (response.ok) {
-        const leadData = await response.json();
-        setLeads(leadData);
-      } else {
-        console.error('Failed to fetch leads');
-        setLeads([]); // Empty array if API fails
-      }
+      const leadData = await apiService.getLeads();
+      setLeads(leadData);
     } catch (error) {
       console.error('Error fetching leads:', error);
       setLeads([]); // Empty array if API fails
