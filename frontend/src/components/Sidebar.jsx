@@ -21,7 +21,7 @@ import {
   FiUserPlus,
   FiUserCheck
 } from "react-icons/fi";
-import logo from "../assets/logo-small.jpg";
+import logo from "../assets/logo-small.png";
 import { useTranslation } from "../services/translationService.jsx";
 
 function SidebarSection({ title }) {
@@ -102,7 +102,7 @@ export default function Sidebar({ activeItem, onNavigate }) {
           />
         </div>
         <div className="leading-tight">
-          <div className="text-sm font-semibold">DDC Developer</div>
+          <div className="text-sm font-semibold">Nirmaan Tracker</div>
           <div className="text-[11px] text-gray-400 uppercase tracking-wide">
             Manage all Projects
           </div>

@@ -41,7 +41,7 @@ const LoginSignupPage = () => {
 
     if (formType === 'login') {
       if (!formData.identifier.trim()) {
-        newErrors.identifier = 'Username, Email, or Phone is required';
+        newErrors.identifier = 'Email or Phone is required';
       }
       if (!formData.password) {
         newErrors.password = 'Password is required';
@@ -158,10 +158,10 @@ const LoginSignupPage = () => {
             {/* Modern Logo with Animation */}
             <div className="mb-8">
               <div className="w-24 h-24 mx-auto mb-4 rounded-2xl overflow-hidden shadow-2xl transform hover:scale-105 transition-transform duration-300">
-                <img src={logo} alt="DDC Developer Logo" className="w-full h-full object-cover" />
+                <img src={logo} alt="Nirmaan Tracker Logo" className="w-full h-full object-cover" />
               </div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent mb-2">DDC Developer</h1>
-              <p className="text-gray-700 font-medium">Construction Management Platform</p>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent mb-2">Nirmaan Tracker</h1>
+              <p className="text-gray-700 font-medium text-base">Construction Management Platform</p>
               <p className="text-gray-600 text-sm mt-2">Streamline your construction projects</p>
             </div>
 
@@ -216,17 +216,17 @@ const LoginSignupPage = () => {
               {/* Mobile Logo - shown only on smaller screens */}
               <div className="lg:hidden mb-6">
                 <div className="w-20 h-20 mx-auto mb-4 rounded-2xl overflow-hidden shadow-xl transform hover:scale-105 transition-transform">
-                  <img src={logo} alt="DDC Developer Logo" className="w-full h-full object-cover" />
+                  <img src={logo} alt="Nirmaan Tracker Logo" className="w-full h-full object-cover" />
                 </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent">DDC Developer</h1>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent">Nirmaan Tracker</h1>
               </div>
 
               <h2 className="text-3xl font-bold bg-gradient-to-r from-amber-700 to-orange-600 bg-clip-text text-transparent mb-3">
-                {formType === 'login' && 'Welcome Back'}
+                {formType === 'login' && 'Welcome'}
                 {formType === 'forgot' && 'Reset Password'}
               </h2>
               <p className="text-gray-700 font-medium">
-                {formType === 'login' && 'Sign in to your DDC Developer account'}
+                {formType === 'login' && 'Sign in to your Nirmaan Tracker account'}
                 {formType === 'forgot' && 'Enter your email to reset password'}
               </p>
             </div>
@@ -251,7 +251,7 @@ const LoginSignupPage = () => {
                   {/* Modern Login Form */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Username / Email / Phone
+                      Email / Phone
                     </label>
                     <div className="relative">
                       <FiUser className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -263,7 +263,7 @@ const LoginSignupPage = () => {
                         className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-transparent transition-all duration-300 ${
                           errors.identifier ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
                         }`}
-                        placeholder="Enter username, email, or phone"
+                        placeholder="Enter email or phone"
                       />
                     </div>
                     {errors.identifier && (
@@ -373,45 +373,7 @@ const LoginSignupPage = () => {
               </button>
             </form>
 
-            {/* Professional Form Switcher */}
-            <div className="mt-6 text-center space-y-3">
-              {formType === 'login' && (
-                <>
-                  <p className="text-gray-600 font-medium">
-                    Forgot password?{' '}
-                    <button
-                      onClick={() => {
-                        setFormType('forgot');
-                        resetForm();
-                      }}
-                      className="text-blue-600 hover:text-blue-800 font-semibold transition-colors hover:underline underline-offset-2"
-                    >
-                      Reset Password
-                    </button>
-                  </p>
-                  <p className="text-sm text-gray-500 mt-4">
-                    🔒 Account creation is managed by administrators only
-                  </p>
-                </>
-              )}
 
-              {formType === 'forgot' && (
-                <>
-                  <p className="text-gray-600 font-medium">
-                    Remember your password?{' '}
-                    <button
-                      onClick={() => {
-                        setFormType('login');
-                        resetForm();
-                      }}
-                      className="text-blue-600 hover:text-blue-800 font-semibold transition-colors hover:underline underline-offset-2"
-                    >
-                      Back to Login
-                    </button>
-                  </p>
-                </>
-              )}
-            </div>
           </div>
             </div>
         </div>
