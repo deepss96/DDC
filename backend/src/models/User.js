@@ -45,7 +45,7 @@ class User {
 
   // Get all users (for user management)
   static getAll(callback) {
-    const sql = `SELECT id, first_name, last_name, email, username, role, status, created_at
+    const sql = `SELECT id, first_name, last_name, email, username, password, role, status, created_at
              FROM users ORDER BY created_at DESC`;
     db.query(sql, callback);
   }
