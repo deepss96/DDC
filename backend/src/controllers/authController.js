@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
@@ -28,11 +27,8 @@ class AuthController {
           return res.status(400).json({ error: 'User with this email or username already exists' });
         }
 
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create user
-        const userData = { firstName, lastName, email, username, password: hashedPassword };
+        // Store password in plain text (as requested)
+        const userData = { firstName, lastName, email, username, password };
         User.create(userData, (err, result) => {
           if (err) {
             return res.status(500).json({ error: 'Error creating user' });
@@ -85,9 +81,8 @@ class AuthController {
 
         const user = results[0];
 
-        // Check password
-        const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) {
+        // Check password - plain text comparison only
+        if (password !== user.password) {
           return res.status(401).json({ error: 'Invalid credentials' });
         }
 
@@ -174,11 +169,8 @@ class AuthController {
           return res.status(401).json({ error: 'Invalid or expired token' });
         }
 
-        // Hash new password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        // Update password
-        User.updatePassword(decoded.id, hashedPassword, (err, result) => {
+        // Store new password in plain text
+        User.updatePassword(decoded.id, newPassword, (err, result) => {
           if (err) {
             return res.status(500).json({ error: 'Database error' });
           }
@@ -197,7 +189,7 @@ class AuthController {
 
   // Get user profile (protected route)
   static getProfile(req, res) {
-    User.getById(req.user.id, (err, results) => {
+    User.getFullProfileById(req.user.id, (err, results) => {
       if (err) {
         return res.status(500).json({ error: 'Database error' });
       }

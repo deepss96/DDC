@@ -25,7 +25,7 @@ import MobileBottomNavbar from './MobileBottomNavbar';
 
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, BarChart, Bar, ResponsiveContainer, Legend} from "recharts";
 import {  PieChart, Pie, Cell } from "recharts";
-import logo from "../assets/logo.jpg";
+import logo from "../assets/logo-small.png";
 <style>
   {`
     main::-webkit-scrollbar {

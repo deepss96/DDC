@@ -108,6 +108,10 @@ class ApiService {
     });
   }
 
+  async getProfile() {
+    return this.request('/api/auth/profile');
+  }
+
   // Task endpoints
   async getTasks(params = {}) {
     const queryString = new URLSearchParams(params).toString();

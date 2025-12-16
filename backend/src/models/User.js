@@ -9,6 +9,12 @@ class User {
     db.query(sql, [id], callback);
   }
 
+  // Get full user profile by ID (for profile page)
+  static getFullProfileById(id, callback) {
+    const sql = 'SELECT id, first_name, last_name, email, username, phone, password, role, status, created_at FROM users WHERE id = ?';
+    db.query(sql, [id], callback);
+  }
+
   // Get user by username or email (for login)
   static getByIdentifier(identifier, callback) {
     const sql = 'SELECT * FROM users WHERE username = ? OR email = ?';

@@ -9,6 +9,7 @@ import ClientsPage from './pages/ClientsPage.jsx';
 import TasksPage from './pages/TasksPage.jsx';
 import LoginSignupPage from './pages/LoginSignupPage.jsx';
 import UsersPage from './pages/UsersPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
 import { useTranslation } from './services/translationService.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 
@@ -28,6 +29,7 @@ function AppLayout() {
     if (pathname === '/my-tasks') return 'my-tasks';
     if (pathname === '/projects-management') return 'projects-management';
     if (pathname === '/users-management') return 'users-management';
+    if (pathname === '/profile') return 'profile';
     if (pathname === '/employee-management') return 'employee-management';
     if (pathname === '/site-expenses') return 'site-expenses';
     if (pathname === '/site-received') return 'site-received';
@@ -69,6 +71,8 @@ function AppLayout() {
         return t('Projects Management');
       case 'users-management':
         return t('User Management');
+      case 'profile':
+        return t('Profile');
       case 'employee-management':
         return t('Employee Management');
       case 'site-expenses':
@@ -100,6 +104,8 @@ function AppLayout() {
         return t('Oversee all your projects');
       case 'users-management':
         return t('Manage system users');
+      case 'profile':
+        return t('View and manage your profile information');
       case 'employee-management':
         return t('Manage your team effectively');
       case 'site-expenses':
@@ -216,6 +222,7 @@ function AppLayout() {
               {/* Placeholder routes for other pages */}
               <Route path="/clients-management" element={<ClientsPage searchTerm={searchTerm} />} />
               <Route path="/my-tasks" element={<TasksPage searchTerm={searchTerm} />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/projects-management" element={
                 <div className="flex-1 flex flex-col min-w-0">
                   <div className="flex-1 flex overflow-hidden">

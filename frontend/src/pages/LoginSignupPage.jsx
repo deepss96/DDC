@@ -70,10 +70,17 @@ const LoginSignupPage = () => {
 
     try {
       if (formType === 'login') {
+        console.log('Attempting login with:', {
+          identifier: formData.identifier,
+          password: formData.password
+        });
+
         const data = await apiService.login({
           identifier: formData.identifier,
           password: formData.password
         });
+
+        console.log('Login response:', data);
 
         // Use auth context to handle login
         login(data.token, data.user);
