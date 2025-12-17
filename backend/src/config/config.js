@@ -9,10 +9,10 @@ const config = {
 
   // Database Configuration
   database: {
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    name: process.env.DB_NAME || 'ddc_developer'
+    host: process.env.DB_HOST || 'srv947.hstgr.io',
+    user: process.env.DB_USER || 'u779658787_ddnirmaan_user',
+    password: process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : 'P0wer@2025',
+    name: process.env.DB_NAME || 'u779658787_ddc_nirmaan_db'
   },
 
   // JWT Configuration
@@ -23,8 +23,8 @@ const config = {
 
   // API Base URLs
   api: {
-    baseUrl: process.env.API_BASE_URL || 'http://localhost:5000',
-    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5174'
+    baseUrl: process.env.API_BASE_URL || 'https://nirmaan-track-backend.onrender.com',
+    frontendUrl: process.env.FRONTEND_URL || 'https://nirmaan-track-frontend.onrender.com'
   }
 };
 
