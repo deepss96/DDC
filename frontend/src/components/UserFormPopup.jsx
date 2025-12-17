@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FiX } from "react-icons/fi";
 
 // InputField component moved outside to prevent re-creation on each render
@@ -17,9 +17,11 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
         height: 'var(--input-height)',
         padding: 'var(--input-padding)',
         paddingTop: '16px', // Extra top padding to accommodate the label
+        paddingLeft: '12px', // Extra left padding to accommodate the label
         fontSize: 'var(--placeholder-font-size)',
         fontFamily: 'var(--font-family)',
         fontWeight: 'normal',
+        lineHeight: '24px',
         border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
         borderRadius: 'var(--input-border-radius)',
         backgroundColor: 'var(--input-bg-color)',
@@ -39,11 +41,11 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
   </div>
 );
 
-  const SelectField = ({ label, options = [], value, onChange, placeholder }) => {
+  const SelectField = ({ label, required, options = [], value, onChange, placeholder }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const selectRef = React.useRef(null);
+    const selectRef = useRef(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
       const handleClickOutside = (e) => {
         if (isOpen && selectRef.current && !selectRef.current.contains(e.target)) {
           setIsOpen(false);
@@ -54,14 +56,14 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
     }, [isOpen]);
 
     const handleSelect = (option) => {
-      onChange(option);
+      onChange(option); // This updates the parent state
       setIsOpen(false);
     };
 
     return (
       <div ref={selectRef} className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
         <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
-          {label}
+          {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
         </label>
         <div
           onClick={() => setIsOpen(!isOpen)}
@@ -70,12 +72,15 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
             height: 'var(--input-height)',
             padding: 'var(--input-padding)',
             paddingTop: '16px', // Extra top padding to accommodate the label
-            fontSize: 'var(--input-font-size)',
+            paddingLeft: '12px', // Consistent left padding
+            fontSize: 'var(--placeholder-font-size)',
             fontFamily: 'var(--font-family)',
+            fontWeight: 'normal',
+            lineHeight: '24px',
             border: '1px solid var(--input-border-color)',
             borderRadius: 'var(--input-border-radius)',
             backgroundColor: 'var(--input-bg-color)',
-            color: value ? 'var(--input-text-color)' : 'var(--input-placeholder-color)',
+            color: 'var(--input-text-color)',
             outline: 'none',
             cursor: 'pointer',
             display: 'flex',
@@ -90,6 +95,7 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
             color: value ? 'var(--input-text-color)' : 'var(--input-placeholder-color)',
             fontSize: 'var(--placeholder-font-size)',
             fontFamily: 'var(--font-family)',
+            lineHeight: '24px',
           }}>
             {value || placeholder}
           </span>
@@ -103,21 +109,23 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
           </svg>
         </div>
         {isOpen && (
-          <div className="absolute top-full left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-1 w-full">
+          <div className="absolute top-full left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto mt-1 w-full">
             {options.map((option, index) => (
               <div
                 key={index}
                 onClick={() => handleSelect(option)}
                 style={{
                   padding: '4px 12px',
-                  fontSize: 'var(--input-font-size)',
+                  fontSize: 'var(--placeholder-font-size)',
                   fontFamily: 'var(--font-family)',
-                  color: option === value ? 'var(--input-placeholder-color)' : 'var(--input-text-color)',
+                  fontWeight: 'normal',
+                  color: option === value ? 'var(--input-text-color)' : 'var(--input-text-color)',
                   cursor: 'pointer',
-                  backgroundColor: option === value ? '#f3f4f6' : '#f8fafc',
+                  backgroundColor: option === value ? '#f3f4f6' : '#ffffff',
+                  borderBottom: index < options.length - 1 ? '1px solid #f1f5f9' : 'none',
                 }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#e2e8f0'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = option === value ? '#f3f4f6' : '#f8fafc'}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#f8fafc'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = option === value ? '#f3f4f6' : '#ffffff'}
               >
                 {option}
               </div>
@@ -128,15 +136,71 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
     );
   };
 
+  // Phone Number Field Component
+  const PhoneField = ({ label, required, value, onChange, placeholder, error }) => {
+    const handlePhoneChange = (e) => {
+      let input = e.target.value.replace(/\D/g, ''); // Remove non-digits
+      onChange({ target: { value: input } });
+    };
+
+    const displayValue = value && value.startsWith('91') && value.length === 12 ? value.slice(2) : value;
+
+    return (
+      <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+        <div className="relative">
+          <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
+            {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
+          </label>
+          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium z-10" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--placeholder-font-size)' }}>
+            +91
+          </span>
+          <input
+            type="text"
+            value={displayValue}
+            onChange={handlePhoneChange}
+            placeholder={placeholder}
+            maxLength={10} // 10 digits for phone number
+            style={{
+              width: '100%',
+              height: 'var(--input-height)',
+              padding: 'var(--input-padding)',
+              paddingTop: '16px',
+              paddingLeft: '50px', // Make room for +91 prefix
+              fontSize: 'var(--placeholder-font-size)',
+              fontFamily: 'var(--font-family)',
+              fontWeight: 'normal',
+              lineHeight: '24px',
+              border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
+              borderRadius: 'var(--input-border-radius)',
+              backgroundColor: 'var(--input-bg-color)',
+              color: 'var(--input-text-color)',
+              outline: 'none',
+              transition: 'border-color 0.2s',
+            }}
+            onFocus={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-focus-border-color)'}
+            onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
+          />
+        </div>
+        {error && (
+          <p style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)', fontSize: 'var(--error-font-size)', marginTop: '4px' }}>
+            {error}
+          </p>
+        )}
+      </div>
+    );
+  };
+
 export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
-    const [username, setUsername] = useState("");
+    const [phone, setPhone] = useState("");
     const [role, setRole] = useState("");
     const [status, setStatus] = useState("Active");
     const [showSuccessMessage, setShowSuccessMessage] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
+    const [showErrorMessage, setShowErrorMessage] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     // Populate form when editing
     useEffect(() => {
@@ -144,7 +208,7 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
             setFirstName(editUser.first_name || editUser.firstName || "");
             setLastName(editUser.last_name || editUser.lastName || "");
             setEmail(editUser.email || "");
-            setUsername(editUser.username || "");
+            setPhone(editUser.phone || "");
             setRole(editUser.role || "");
             setStatus(editUser.status || "Active");
         } else {
@@ -156,30 +220,52 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
         setFirstName("");
         setLastName("");
         setEmail("");
-        setUsername("");
+        setPhone("");
         setRole("");
         setStatus("Active");
     };
 
     const handleSave = async () => {
         if (!firstName.trim()) {
-            alert('First name is required');
-            return;
-        }
-        if (!lastName.trim()) {
-            alert('Last name is required');
+            setErrorMessage('First name is required');
+            setShowErrorMessage(true);
+            setTimeout(() => setShowErrorMessage(false), 3000);
             return;
         }
         if (!email.trim()) {
-            alert('Email is required');
+            setErrorMessage('Email is required');
+            setShowErrorMessage(true);
+            setTimeout(() => setShowErrorMessage(false), 3000);
             return;
         }
-        if (!username.trim()) {
-            alert('Username is required');
+        if (!phone.trim()) {
+            setErrorMessage('Phone number is required');
+            setShowErrorMessage(true);
+            setTimeout(() => setShowErrorMessage(false), 3000);
             return;
         }
         if (!role) {
-            alert('Please select a role');
+            setErrorMessage('Please select a role');
+            setShowErrorMessage(true);
+            setTimeout(() => setShowErrorMessage(false), 3000);
+            return;
+        }
+        if (!status) {
+            setErrorMessage('Please select a status');
+            setShowErrorMessage(true);
+            setTimeout(() => setShowErrorMessage(false), 3000);
+            return;
+        }
+
+        // Ensure phone number has 91 prefix for database storage
+        let phoneNumber = phone;
+        if (!phoneNumber.startsWith('91')) {
+            phoneNumber = '91' + phoneNumber;
+        }
+        if (phoneNumber.length !== 12) {
+            setErrorMessage('Please enter a valid 10-digit phone number');
+            setShowErrorMessage(true);
+            setTimeout(() => setShowErrorMessage(false), 3000);
             return;
         }
 
@@ -188,7 +274,7 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                 first_name: firstName,
                 last_name: lastName,
                 email,
-                username,
+                phone: phoneNumber,
                 role,
                 status
             };
@@ -209,7 +295,9 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
             }
         } catch (error) {
             console.error('Error saving user:', error);
-            alert('Error saving user. Please try again.');
+            setErrorMessage('Error saving user. Please try again.');
+            setShowErrorMessage(true);
+            setTimeout(() => setShowErrorMessage(false), 3000);
         }
     };
 
@@ -223,6 +311,15 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                     <div className="fixed top-4 right-4 z-[1200] bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
                         <p className="text-sm font-medium" style={{ fontFamily: 'var(--font-family)' }}>
                             {successMessage}
+                        </p>
+                    </div>
+                )}
+
+                {/* Error Message */}
+                {showErrorMessage && (
+                    <div className="fixed top-4 right-4 z-[1200] bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
+                        <p className="text-sm font-medium" style={{ fontFamily: 'var(--font-family)' }}>
+                            {errorMessage}
                         </p>
                     </div>
                 )}
@@ -246,8 +343,8 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                         Save
                     </button>
                 </div>
-                <div className="p-4 sm:p-6 flex-1 overflow-y-auto rounded-b-xl">
-                    <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 'var(--form-gap)' }}>
+                <div className="p-4 sm:p-6 pb-8 flex-1 overflow-y-auto rounded-b-xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 pb-6" style={{ gap: 'var(--form-gap)' }}>
                         <div>
                             <InputField
                                 label="FIRST NAME"
@@ -260,7 +357,6 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                         <div>
                             <InputField
                                 label="LAST NAME"
-                                required
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                                 placeholder="Enter last name"
@@ -269,6 +365,7 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                         <div>
                             <SelectField
                                 label="ROLE"
+                                required
                                 options={["Admin", "HR", "Site Manager", "Office Staff"]}
                                 value={role}
                                 onChange={setRole}
@@ -278,6 +375,7 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                         <div>
                             <SelectField
                                 label="STATUS"
+                                required
                                 options={["Active", "Inactive"]}
                                 value={status}
                                 onChange={setStatus}
@@ -295,25 +393,17 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                             />
                         </div>
                         <div>
-                            <InputField
-                                label="USERNAME"
+                            <PhoneField
+                                label="PHONE NUMBER"
                                 required
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                placeholder="Enter username"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                placeholder="Enter 10-digit phone number"
                             />
                         </div>
                     </div>
 
-                    {/* Info message for new users - moved to bottom */}
-                    {!editUser && (
-                        <div className="mt-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p className="text-xs sm:text-sm text-blue-700">
-                                <strong>Note:</strong> A temporary password will be generated automatically.
-                                You'll see the login credentials after saving.
-                            </p>
-                        </div>
-                    )}
+
                 </div>
             </div>
         </div>

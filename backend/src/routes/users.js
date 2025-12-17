@@ -1,20 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const usersController = require('../controllers/usersController');
+const { verifyToken } = require('../middlewares/auth');
 
-// GET all users
-router.get('/', usersController.getAllUsers);
-
-// GET user by ID
-router.get('/:id', usersController.getUserById);
-
-// POST create new user
-router.post('/', usersController.createUser);
-
-// PUT update user
-router.put('/:id', usersController.updateUser);
-
-// DELETE user
-router.delete('/:id', usersController.deleteUser);
+// User routes - all require authentication
+router.get('/', verifyToken, usersController.getAllUsers);
+router.get('/:id', verifyToken, usersController.getUserById);
+router.post('/', verifyToken, usersController.createUser);
+router.put('/:id', verifyToken, usersController.updateUser);
+router.delete('/:id', verifyToken, usersController.deleteUser);
 
 module.exports = router;

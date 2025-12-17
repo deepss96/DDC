@@ -27,7 +27,7 @@ import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, BarChart, Bar, R
 import {  PieChart, Pie, Cell } from "recharts";
 import logo from "../assets/logo-small.png";
 <style>
-  {`
+  {`              
     main::-webkit-scrollbar {
       display: none;
     }
@@ -187,93 +187,14 @@ export default function Dashboard() {
              
 
               {/* BUSINESS OPERATIONS CARDS */}
-  <SectionCard title="">
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-[13px]">
-    <div className="flex items-center gap-3 p-4 rounded-lg shadow-sm border  rounded-lg border border-grey-300 hover:shadow-md transition relative">
-      <div className="p-3 square-full bg-orange-100 shadow-md text-orange-500 rounded-lg border border-orange-300">
-        <FiFolder size={20} />
-      </div>
-      <div>
-          <div className="text-base font-bold">50+</div>
-        <div className="text-sm font-medium text-gray-500">Total Projects</div>
-
-      </div>
-    </div>
-
-    <div className="flex items-center gap-3 p-4 rounded-lg shadow-sm border   rounded-lg border border-grey-300 hover:shadow-md transition relative">
-      <div className="p-3 square-full bg-green-100 shadow-md text-green-500 rounded-lg border border-green-300">
-        <FiUsers size={20} />
-      </div>
-      <div>
-          <div className="text-base font-bold">10+</div>
-        <div className="text-sm font-medium text-gray-500">Total Clients</div>
-
-      </div>
-    </div>
-
-    <div className="flex items-center gap-3 p-4  rounded-lg shadow-sm border  rounded-lg border border-grey-300 hover:shadow-md transition relative ">
-      <div className="p-3 square-full bg-blue-100 shadow-md text-blue-500 rounded-lg border border-blue-300">
-        <FiUserX size={20} />
-      </div>
-      <div>
-          <div className="text-base font-bold">100+</div>
-        <div className="text-sm font-small text-gray-500">Total Employees</div>
-
-      </div>
-
-    </div>
-
-  </div>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[13px] mt-4">
-     <div className="flex items-center gap-3 p-4  rounded-lg shadow-sm border  rounded-lg border border-grey-300 hover:shadow-md transition relative ">
-      <div className="p-3 square-full bg-red-100 shadow-md text-red-500 rounded-lg border border-red-300">
-        < FiCheckSquare size={20} />
-      </div>
-      <div>
-          <div className="text-base font-bold">10+</div>
-        <div className="text-sm font-small text-gray-500">Pending Task</div>
-
-      </div>
-
-     </div>
-  </div>
-</SectionCard>
+  
 
 
 
-              {/* REVENUE PROJECTIONS */}
-              {/* <SectionCard title="Revenue Projections">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-[12px]">
-                  <SmallProjectionCard
-                    heading="Total Receivable Amount"
-                    value="₹0.00"
-                    change="100% vs Last month"
-                  />
-                  <SmallProjectionCard
-                    heading="Total Payable Amount"
-                  value="₹0.00"
-                    change="100% vs Last month"
-                  />
-                  <SmallProjectionCard
-                    heading="Net Position"
-                    value="₹0.00"
-                    change="0% vs Last month"
-                  />
-                </div>
-              </SectionCard> */}
-              
-
-              {/* QUICK ACCESS */}
-            {/* TODAY TASK + PROJECT SUMMARY (SIDE BY SIDE) */}
+           
 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
 
-  {/* LEFT — TODAY TASK */}
-
-
-    {/* Header */}
-    
-
-    {/* TASK LIST */}
+  
 <div className="bg-white rounded-xl p-4 shadow-sm h-[323px] overflow-y-auto overflow-x-auto md:overflow-x-visible">
 
 

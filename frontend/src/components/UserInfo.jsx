@@ -1,16 +1,54 @@
-import React from "react";
-import { FiMail, FiUser, FiCalendar, FiShield } from "react-icons/fi";
+import React, { useState } from "react";
+import { FiFileText, FiUser } from "react-icons/fi";
+
+// Add wave animation for back button
+const waveStyles = `
+  @keyframes wave {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+    75% { transform: translateX(-3px); }
+  }
+`;
+
+// Inject wave animation styles
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement("style");
+  styleSheet.type = "text/css";
+  styleSheet.innerText = waveStyles;
+  document.head.appendChild(styleSheet);
+}
+
+// DisplayField component for consistent styling
+const DisplayField = ({ label, value, icon: Icon, fullWidth = false }) => (
+  <div className={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg ${fullWidth ? 'md:col-span-2' : ''}`}>
+    {Icon && <Icon size={16} className="text-gray-500" />}
+    <div className="flex-1">
+      <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+        {label}
+      </label>
+      <p className="text-sm text-gray-900 font-medium">{value || 'N/A'}</p>
+    </div>
+  </div>
+);
 
 const UserInfo = ({ selectedUser, onClose }) => {
     if (!selectedUser) return null;
 
+    const [activeTab, setActiveTab] = useState("overview");
+
+    const getInitials = (firstName, lastName) => {
+        const first = firstName ? firstName.charAt(0).toUpperCase() : '';
+        const last = lastName ? lastName.charAt(0).toUpperCase() : '';
+        return first + last || 'U';
+    };
+
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
+        return new Date(dateString).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
     };
 
@@ -20,128 +58,162 @@ const UserInfo = ({ selectedUser, onClose }) => {
             case "HR": return "bg-blue-100 text-blue-700 border-blue-200";
             case "Site Head": return "bg-orange-100 text-orange-700 border-orange-200";
             case "Field": return "bg-green-100 text-green-700 border-green-200";
+            case "Office Staff": return "bg-indigo-100 text-indigo-700 border-indigo-200";
             default: return "bg-gray-100 text-gray-700 border-gray-200";
         }
     };
 
     const getStatusColor = (status) => {
         switch (status) {
-            case "Active": return "bg-green-100 text-green-700 border-green-200";
+            case "Active": return "bg-light-green-bg text-green-text border-green-200";
             case "Inactive": return "bg-red-100 text-red-700 border-red-200";
-            default: return "bg-gray-100 text-gray-700 border-gray-200";
+            default: return "bg-light-gray-bg text-gray-700 border-gray-200";
         }
     };
 
+    const tabs = [
+        { id: "overview", label: "Overview", icon: FiFileText },
+    ];
+
     return (
-        <div className="bg-white rounded-xl border border-gray-400 pb-4">
-            <div className="flex items-center justify-between mb-0 px-4 sm:px-2 pt-2 pb-2 border-b border-gray-200">
-                <div className="flex items-center gap-6">
-                    <nav className="flex bg-gray-100 rounded-lg p-1">
+        <div className="bg-white rounded-xl overflow-hidden h-full flex flex-col relative">
+            {/* Tab Navigation - Top */}
+            <div className="border-b-[2px] border-primary bg-white">
+                <nav className="flex justify-between items-center">
+                    <div className="flex">
                         <button
-                            className="px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 bg-white text-blue-700 shadow-sm"
+                            onClick={onClose}
+                            className="flex items-center justify-center px-2 sm:px-3 py-1 text-sm font-medium text-white hover:text-gray-100 bg-gray-400 hover:bg-gray-450 transition-all duration-300"
+                            title="Go back"
                         >
-                            Overview
+                            <svg
+                                className="w-5 h-5 sm:w-6 sm:h-6 drop-shadow-md animate-pulse"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                style={{
+                                    animation: 'wave 2.5s ease-in-out infinite'
+                                }}
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 19l-7-7 7-7"
+                                />
+                            </svg>
                         </button>
-                    </nav>
+                        {tabs.map((tab) => {
+                            const Icon = tab.icon;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-1 text-xs sm:text-sm font-medium transition-all duration-200 ${
+                                        activeTab === tab.id
+                                            ? "text-white bg-primary"
+                                            : "text-gray-500 hover:text-gray-700"
+                                    }`}
+                                >
+                                    <Icon size={14} className="sm:w-4 sm:h-4" />
+                                    <span className="text-xs sm:text-sm">{tab.label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </nav>
+            </div>
+
+            {/* Header with Profile Picture */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-light-gray-bg gap-2 sm:gap-0">
+                <div className="flex items-center gap-4">
+                    {/* Profile Picture */}
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
+                        {getInitials(selectedUser.first_name, selectedUser.last_name)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+                            {selectedUser.first_name} {selectedUser.last_name}
+                        </h2>
+                        <p className="text-sm text-gray-600">@{selectedUser.username || 'username'}</p>
+                    </div>
                 </div>
-                <div className="flex items-center justify-end gap-2 w-full sm:w-auto py-0">
-                    <button
-                        onClick={onClose}
-                        className="flex items-center gap-1 pl-2 pr-2 pt-1.5 pb-1.5 text-white text-sm font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-gray-400 active:shadow-md transition-all shadow-sm whitespace-nowrap"
-                        style={{
-                            backgroundColor: 'var(--primary-color)',
-                            minWidth: 'fit-content'
-                        }}
-                    >
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        Back
-                    </button>
+                <div className="flex items-center gap-2">
+                    <span className="text-xs sm:text-sm text-gray-500">
+                        Role: {selectedUser.role}
+                    </span>
                 </div>
             </div>
 
-            {/* OVERVIEW CONTENT */}
-            <div className="p-6">
-                {/* User Basic Info */}
-                <div className="text-center mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900">{selectedUser.firstName} {selectedUser.lastName}</h3>
-                    <div className="flex items-center justify-center gap-2 mt-2">
-                        <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getRoleColor(selectedUser.role)}`}>
-                            {selectedUser.role}
-                        </span>
-                        <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(selectedUser.status)}`}>
-                            {selectedUser.status}
-                        </span>
-                    </div>
-                </div>
-
-                {/* User Information Grid */}
-                <div className="grid grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                        <div className="bg-gray-50 rounded-lg py-2 px-4 border border-gray-200">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">FIRST NAME</span>
-                                <span className="text-sm font-medium text-gray-900">{selectedUser.firstName}</span>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-lg py-2 px-4 border border-gray-200">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">LAST NAME</span>
-                                <span className="text-sm font-medium text-gray-900">{selectedUser.lastName}</span>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-lg py-2 px-4 border border-gray-200">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">EMAIL</span>
-                                <span className="text-sm font-medium text-gray-900">{selectedUser.email}</span>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-lg py-2 px-4 border border-gray-200">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">USERNAME</span>
-                                <span className="text-sm font-medium text-gray-900">@{selectedUser.username}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="bg-gray-50 rounded-lg py-2 px-4 border border-gray-200">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">ROLE</span>
-                                <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${getRoleColor(selectedUser.role)}`}>
-                                    {selectedUser.role}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-lg py-2 px-4 border border-gray-200">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">STATUS</span>
-                                <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(selectedUser.status)}`}>
-                                    {selectedUser.status}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-lg py-2 px-4 border border-gray-200">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">CREATED DATE</span>
-                                <span className="text-sm font-medium text-gray-900">{formatDate(selectedUser.createdAt)}</span>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-lg py-2 px-4 border border-gray-200">
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">USER ID</span>
-                                <span className="text-sm font-medium text-gray-900">#{selectedUser.id}</span>
+            {/* Tab Content */}
+            <div className="flex-1 overflow-hidden">
+                {activeTab === "overview" && (
+                    <div className="p-4 sm:p-5 md:p-6 overflow-auto h-full">
+                        {/* User Information Grid - Compact and Well Organized */}
+                        <div className="max-w-5xl mx-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <DisplayField
+                                    label="FIRST NAME"
+                                    value={selectedUser.first_name}
+                                    icon={FiUser}
+                                />
+                                <DisplayField
+                                    label="LAST NAME"
+                                    value={selectedUser.last_name}
+                                    icon={FiUser}
+                                />
+                                <DisplayField
+                                    label="EMAIL"
+                                    value={selectedUser.email}
+                                    icon={() => <span className="text-gray-500">@</span>}
+                                />
+                                <DisplayField
+                                    label="PHONE NUMBER"
+                                    value={selectedUser.phone ? `+${selectedUser.phone.slice(0, 2)} ${selectedUser.phone.slice(2)}` : "Not Available"}
+                                    icon={() => <span className="text-gray-500">📞</span>}
+                                />
+                                <DisplayField
+                                    label="PASSWORD"
+                                    value={selectedUser.password || "Not Available"}
+                                    icon={() => <span className="text-gray-500">🔒</span>}
+                                />
+                                <DisplayField
+                                    label="ROLE"
+                                    value={
+                                        <span
+                                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getRoleColor(
+                                                selectedUser.role
+                                            )}`}
+                                            style={{ fontFamily: 'var(--font-family)' }}
+                                        >
+                                            {selectedUser.role}
+                                        </span>
+                                    }
+                                    icon={() => <span className="text-gray-500">👤</span>}
+                                />
+                                <DisplayField
+                                    label="STATUS"
+                                    value={
+                                        <span
+                                            className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                                                selectedUser.status
+                                            )}`}
+                                            style={{ fontFamily: 'var(--font-family)' }}
+                                        >
+                                            {selectedUser.status}
+                                        </span>
+                                    }
+                                    icon={() => <span className="text-gray-500">📊</span>}
+                                />
+                                <DisplayField
+                                    label="REGISTRATION DATE"
+                                    value={formatDate(selectedUser.created_at)}
+                                    icon={() => <span className="text-gray-500">📅</span>}
+                                />
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

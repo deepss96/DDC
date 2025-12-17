@@ -4,7 +4,7 @@ import { FiUserPlus, FiMail, FiPhone, FiCalendar, FiEdit2, FiTrash2, FiSearch, F
 import TableActionButton from "../components/TableActionButton";
 import TaskFormPopup from "../components/TaskFormPopup";
 import TaskInfo from "../components/TaskInfo";
-import ListViewDropdown from "../components/ListViewDropdown";
+
 import Table from "../components/Table";
 import { useAuth } from "../contexts/AuthContext";
 import { formatDateForDisplay } from "../utils/dateUtils.jsx";
@@ -23,6 +23,7 @@ export default function TasksPage({ searchTerm = '' }) {
   const [selectedDateFilter, setSelectedDateFilter] = useState('Today');
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
   const [isDateFilterPopupOpen, setIsDateFilterPopupOpen] = useState(false);
+  const [isViewDropdownOpen, setIsViewDropdownOpen] = useState(false);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
@@ -94,6 +95,23 @@ export default function TasksPage({ searchTerm = '' }) {
       document.removeEventListener('mousedown', handleClickOutsideDate);
     };
   }, [isDateFilterPopupOpen]);
+
+  // Handle clicks outside the view dropdown to close it
+  useEffect(() => {
+    const handleClickOutsideView = (event) => {
+      if (!event.target.closest('.view-dropdown')) {
+        setIsViewDropdownOpen(false);
+      }
+    };
+
+    if (isViewDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutsideView);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutsideView);
+    };
+  }, [isViewDropdownOpen]);
 
   // ⬇️ Reusable function to fetch tasks
 
@@ -337,17 +355,212 @@ const fetchTasks = async () => {
                 {/* FIXED FILTER HEADER */}
                 <div className="sticky top-0 z-10 bg-white rounded-t-xl border-b border-gray-200 shadow-sm flex-shrink-0">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-3 sm:px-6 pt-2 pb-2">
-                    <div className="hidden sm:flex items-center gap-3 mb-3 sm:mb-0">
-                      <ListViewDropdown
-                        views={taskViews}
-                        currentViewId={currentViewId}
-                        onChange={setCurrentViewId}
-                        onPinToggle={(id) => {
-                          setTaskViews(views => views.map(v => v.id === id ? { ...v, pinned: !v.pinned } : v));
-                        }}
-                      />
+                    {/* Mobile: All filters in one row */}
+                    <div className="flex items-center justify-end gap-2 w-full py-0 flex-wrap sm:hidden">
+                      {/* View Filter */}
+                      <div className="relative flex-shrink-0">
+                        <button
+                          onClick={() => setIsViewDropdownOpen(!isViewDropdownOpen)}
+                          className="flex items-center gap-0 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm"
+                          style={{ height: '28px', width: '90px' }}
+                          title="Select view"
+                        >
+                          <div className="flex items-center justify-center w-5 h-full bg-gray-100 rounded-l-lg border-r border-gray-300">
+                            <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                          </div>
+                          <span className="text-center font-medium" style={{ fontWeight: '500', fontSize: '10px', padding: '0 4px' }}>
+                            {currentViewId === 1 ? "All Tasks" : currentViewId === 2 ? "My Tasks" : "All Tasks"}
+                          </span>
+                        </button>
+                        {isViewDropdownOpen && (
+                          <div className="absolute top-full mt-1 left-0 z-50 bg-white border border-gray-200 rounded-md shadow-lg w-24 py-1">
+                            {taskViews.map((view) => (
+                              <button
+                                key={view.id}
+                                onClick={() => {
+                                  setCurrentViewId(view.id);
+                                  setIsViewDropdownOpen(false);
+                                }}
+                                className={`w-full flex items-center justify-between px-2 py-1.5 text-left text-xs hover:bg-blue-50 transition-colors ${
+                                  currentViewId === view.id
+                                    ? "bg-blue-50 text-blue-600 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                <span>{view.id === 1 ? "All Tasks" : view.id === 2 ? "My Tasks" : view.name}</span>
+                                {currentViewId === view.id && (
+                                  <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Date Filter */}
+                      <div className="relative flex-shrink-0">
+                        <button
+                          onClick={() => setIsDateFilterPopupOpen(!isDateFilterPopupOpen)}
+                          className="flex items-center gap-0 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm"
+                          style={{ height: '28px', fontSize: '10px' }}
+                          title="Filter by date"
+                        >
+                          <div className="flex items-center justify-center w-5 h-full bg-gray-100 rounded-l-lg border-r border-gray-300">
+                            <FiCalendar size={10} />
+                          </div>
+                          <span className="truncate" style={{ fontWeight: '400', padding: '0 3px' }}>
+                            {selectedDateFilter === "All" ? "All Tasks" :
+                             selectedDateFilter === "Today" ? "Today's Task" :
+                             selectedDateFilter === "This Week" ? "This Week Task" :
+                             selectedDateFilter === "This Month" ? "This Month Task" : "All Tasks"}
+                          </span>
+                        </button>
+                        {isDateFilterPopupOpen && (
+                          <div className="date-filter-dropdown absolute top-full mt-1 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-32 py-1">
+                            {[
+                              { value: "All", label: "All Tasks" },
+                              { value: "Today", label: "Today's Task" },
+                              { value: "This Week", label: "This Week Task" },
+                              { value: "This Month", label: "This Month Task" }
+                            ].map((option) => (
+                              <button
+                                key={option.value}
+                                onClick={() => {
+                                  setSelectedDateFilter(option.value);
+                                  setIsDateFilterPopupOpen(false);
+                                }}
+                                className={`w-full flex items-center justify-between px-2 py-1 text-left text-xs hover:bg-gray-50 transition-colors ${
+                                  selectedDateFilter === option.value
+                                    ? "text-blue-600 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                <span>{option.label}</span>
+                                {selectedDateFilter === option.value && (
+                                  <FiCheck className="text-blue-600" size={12} />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Status Filter */}
+                      <div className="relative flex-shrink-0">
+                        <button
+                          onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
+                          className="flex items-center gap-0 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm"
+                          style={{ height: '28px', fontSize: '10px' }}
+                          title="Filter by status"
+                        >
+                          <div className="flex items-center justify-center w-5 h-full bg-gray-100 rounded-l-lg border-r border-gray-300">
+                            <FiFilter size={10} />
+                          </div>
+                          <span className="hidden" style={{ fontWeight: '400', padding: '0 3px' }}>
+                            Status
+                          </span>
+                        </button>
+                        {isFilterPopupOpen && (
+                          <div ref={filterDropdownRef} className="absolute top-full mt-1 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-32 py-1">
+                            {[
+                              { value: "All", label: "All Status" },
+                              { value: "New", label: "New" },
+                              { value: "Working", label: "Working" },
+                              { value: "Completed", label: "Completed" },
+                              { value: "On Hold", label: "On Hold" },
+                              { value: "Cancelled", label: "Cancelled" }
+                            ].map((option) => (
+                              <button
+                                key={option.value}
+                                onClick={() => {
+                                  setSelectedStatus(option.value);
+                                  setIsFilterPopupOpen(false);
+                                }}
+                                className={`w-full flex items-center justify-between px-2 py-1 text-left text-xs hover:bg-gray-50 transition-colors ${
+                                  selectedStatus === option.value
+                                    ? "text-blue-600 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                <span>{option.label}</span>
+                                {selectedStatus === option.value && (
+                                  <FiCheck className="text-blue-600" size={12} />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* New Task Button */}
+                      <div className="flex-shrink-0">
+                        <button
+                          onClick={() => setIsTaskFormOpen(true)}
+                          className="flex items-center justify-center px-2 py-1.5 text-white text-sm font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all shadow-sm"
+                          style={{
+                            backgroundColor: 'var(--primary-color)',
+                            borderColor: 'var(--primary-color)',
+                            height: '28px',
+                            fontSize: '10px'
+                          }}
+                        >
+                          <FiPlus size={12} color="#ffffff" />
+                          <span className="hidden" style={{ fontWeight: '400', lineHeight: '18px', marginLeft: '2px' }}>New</span>
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-end gap-1 sm:gap-2 w-full sm:w-auto py-0 flex-wrap">
+
+                    {/* Desktop: Left Side - View Filter */}
+                    <div className="hidden sm:flex items-center gap-3 mb-3 sm:mb-0">
+                      <div className="relative">
+                        <button
+                          onClick={() => setIsViewDropdownOpen(!isViewDropdownOpen)}
+                          className="flex items-center gap-0 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm"
+                          style={{ height: '30px' }}
+                          title="Select view"
+                        >
+                          <div className="flex items-center justify-center w-7 h-full bg-gray-100 rounded-l-lg border-r border-gray-300">
+                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                          </div>
+                          <span className="truncate" style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px', padding: '0 8px' }}>
+                            {currentViewId === 1 ? "All Tasks" : currentViewId === 2 ? "My Tasks" : "All Tasks"}
+                          </span>
+                        </button>
+                        {isViewDropdownOpen && (
+                          <div className="absolute top-full mt-2 left-0 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-40 py-1">
+                            {taskViews.map((view) => (
+                              <button
+                                key={view.id}
+                                onClick={() => {
+                                  setCurrentViewId(view.id);
+                                  setIsViewDropdownOpen(false);
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-xs hover:bg-gray-50 transition-colors ${
+                                  currentViewId === view.id
+                                    ? "text-blue-600 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                <span>{view.id === 1 ? "All Tasks" : view.id === 2 ? "My Tasks" : view.name}</span>
+                                {currentViewId === view.id && (
+                                  <FiCheck className="text-blue-600" size={14} />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Desktop: Right Side - Other Filters */}
+                    <div className="hidden sm:flex items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto py-0 flex-wrap">
+                      {/* Date Filter */}
                       <div className="relative">
                         <button
                           onClick={() => setIsDateFilterPopupOpen(!isDateFilterPopupOpen)}
@@ -358,7 +571,7 @@ const fetchTasks = async () => {
                           <div className="flex items-center justify-center w-7 h-full bg-gray-100 rounded-l-lg border-r border-gray-300">
                             <FiCalendar size={14} />
                           </div>
-                          <span style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px', padding: '0 8px' }}>
+                          <span className="truncate" style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px', padding: '0 8px' }}>
                             {selectedDateFilter === "All" ? "All Tasks" :
                              selectedDateFilter === "Today" ? "Today's Task" :
                              selectedDateFilter === "This Week" ? "This Week Task" :
@@ -394,6 +607,8 @@ const fetchTasks = async () => {
                           </div>
                         )}
                       </div>
+
+                      {/* Status Filter */}
                       <div className="relative">
                         <button
                           onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
@@ -404,7 +619,7 @@ const fetchTasks = async () => {
                           <div className="flex items-center justify-center w-7 h-full bg-gray-100 rounded-l-lg border-r border-gray-300">
                             <FiFilter size={14} />
                           </div>
-                          <span style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px', padding: '0 8px' }}>
+                          <span className="hidden sm:inline" style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px', padding: '0 8px' }}>
                             {selectedStatus === "All" ? "All Status" :
                              selectedStatus === "New" ? "New" :
                              selectedStatus === "Working" ? "Working" :
@@ -444,6 +659,8 @@ const fetchTasks = async () => {
                           </div>
                         )}
                       </div>
+
+                      {/* New Task Button */}
                       <button
                         onClick={() => setIsTaskFormOpen(true)}
                         className="flex items-center gap-1 px-2 py-1.5 text-white text-sm font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all shadow-sm"
@@ -453,7 +670,7 @@ const fetchTasks = async () => {
                         }}
                       >
                         <FiPlus size={17} color="#ffffff" />
-                        <span style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px' }}>New</span>
+                        <span className="hidden sm:inline" style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px' }}>New</span>
                       </button>
                     </div>
                   </div>
@@ -473,7 +690,7 @@ const fetchTasks = async () => {
                       <div className="space-y-2">
                         {filteredTasks.map((task) => (
                           <div key={task.id} className="bg-white rounded-lg border border-gray-200 p-3 pb-1 shadow-sm hover:shadow-md transition-shadow">
-                            {/* Row 1: Name and Status with Actions */}
+                            {/* Row 1: Name and Status */}
                             <div className="flex justify-between items-center mb-3">
                               <div className="flex-1 min-w-0 flex items-center gap-3">
                                 <h3
@@ -484,21 +701,10 @@ const fetchTasks = async () => {
                                   {task.name}
                                 </h3>
                               </div>
-                              <div className="flex gap-2 ml-3">
-                                <TableActionButton
-                                  icon={FiEdit2}
-                                  type="edit"
-                                  title="Edit"
-                                  onClick={() => handleEditRow(task.id)}
-                                  mobileSize={true}
-                                />
-                                <TableActionButton
-                                  icon={FiTrash2}
-                                  type="delete"
-                                  title="Delete"
-                                  onClick={() => handleDeleteRow(task.id)}
-                                  mobileSize={true}
-                                />
+                              <div className="flex items-center ml-3">
+                                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(task.status)}`}>
+                                  {task.status}
+                                </span>
                               </div>
                             </div>
 
@@ -514,11 +720,13 @@ const fetchTasks = async () => {
                               </div>
                             </div>
 
-                            {/* Row 3: Create Date and Due Date */}
+                            {/* Row 3: Priority and Due Date */}
                             <div className="flex justify-between items-center text-xs text-gray-600">
                               <div className="flex items-center gap-2">
-                                <FiCalendar className="text-green-600" size={14} />
-                                <span>Created: {renderTaskCell('createdDate', task)}</span>
+                                <span className="font-medium">Priority:</span>
+                                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getPriorityColor(task.priority)}`}>
+                                  {task.priority}
+                                </span>
                               </div>
                               <div className="flex items-center gap-2">
                                 <FiCalendar className="text-orange-500" size={14} />
@@ -534,11 +742,22 @@ const fetchTasks = async () => {
                               </div>
                             </div>
 
-                            {/* Row 4: Status */}
-                            <div className="flex justify-center items-center mt-2">
-                              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(task.status)}`}>
-                                {task.status}
-                              </span>
+                            {/* Row 4: Action Buttons */}
+                            <div className="flex justify-center items-center mt-2 gap-2">
+                              <TableActionButton
+                                icon={FiEdit2}
+                                type="edit"
+                                title="Edit"
+                                onClick={() => handleEditRow(task.id)}
+                                mobileSize={true}
+                              />
+                              <TableActionButton
+                                icon={FiTrash2}
+                                type="delete"
+                                title="Delete"
+                                onClick={() => handleDeleteRow(task.id)}
+                                mobileSize={true}
+                              />
                             </div>
                           </div>
                         ))}

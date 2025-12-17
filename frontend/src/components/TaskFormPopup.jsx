@@ -345,7 +345,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
     onClose();
   };
 
-  const SelectField = ({ label, options = [], value, onChange, placeholder, searchable = false }) => {
+  const SelectField = ({ label, options = [], value, onChange, placeholder, searchable = false, disabled = false }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchText, setSearchText] = useState("");
     const selectRef = useRef(null);
@@ -425,7 +425,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
           />
         ) : (
           <div
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={disabled ? undefined : () => setIsOpen(!isOpen)}
             style={{
               width: '100%',
               height: 'var(--input-height)',
@@ -435,14 +435,15 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
               fontFamily: 'var(--font-family)',
               border: `1px solid var(--input-border-color)`,
               borderRadius: 'var(--input-border-radius)',
-              backgroundColor: 'var(--input-bg-color)',
+              backgroundColor: disabled ? '#f9fafb' : 'var(--input-bg-color)',
               color: value ? 'var(--input-text-color)' : 'var(--input-placeholder-color)',
               outline: 'none',
-              cursor: 'pointer',
+              cursor: disabled ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               transition: 'border-color 0.2s',
+              opacity: disabled ? 0.6 : 1,
             }}
           >
             <span style={{
@@ -631,7 +632,10 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
             <div className="md:col-span-1">
               <SelectField
                 label="RELATED TO"
-                options={["Lead", "Project", "Self"]}
+                options={
+                  // ["Lead", "Project", "Self"] - commented out for now
+                  []
+                }
                 value={relatedTo}
                 onChange={(value) => {
                   setRelatedTo(value);

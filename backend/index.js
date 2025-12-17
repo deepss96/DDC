@@ -26,7 +26,8 @@ app.use(cors({
     : true, // Allow all in development
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -34,7 +35,8 @@ app.use('/api/leads', leadRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/comments', commentRoutes);
-app.use('/api/notifications', notificationRoutes);
+app.use('/api/notifications', notificationRoutes); 
+
 console.log('Comment routes registered at /api/comments');
 console.log('Notification routes registered at /api/notifications');
 

@@ -299,27 +299,29 @@ const TaskInfo = ({ selectedTask, onClose }) => {
       <div className={`flex-1 overflow-hidden ${activeTab === "comments" ? "pb-20" : ""}`}>
         {activeTab === "overview" && (
           <div className="p-4 sm:p-6 overflow-auto h-full">
-            {/* Task Information Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-              <div className="space-y-4">
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                      Task Name
-                    </span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {selectedTask.name}
-                    </span>
-                  </div>
+            {/* Mobile View - Vertical Card Stack */}
+            <div className="block sm:hidden space-y-3">
+              {/* Task Name Card */}
+              <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                <div className="flex flex-col space-y-2">
+                  <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                    Task Name
+                  </span>
+                  <span className="text-sm font-medium text-gray-900 break-words">
+                    {selectedTask.name}
+                  </span>
                 </div>
+              </div>
 
+              {/* Status + Priority Row */}
+              <div className="grid grid-cols-2 gap-3">
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col space-y-2">
                     <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                       Status
                     </span>
                     <span
-                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getStatusColor(
                         selectedTask.status
                       )}`}
                     >
@@ -329,12 +331,12 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                 </div>
 
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col space-y-2">
                     <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                       Priority
                     </span>
                     <span
-                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(
+                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getPriorityColor(
                         selectedTask.priority
                       )}`}
                     >
@@ -342,83 +344,236 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                     </span>
                   </div>
                 </div>
+              </div>
 
+              {/* Assigned By + Assigned To Row */}
+              <div className="grid grid-cols-2 gap-3">
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col space-y-2">
                     <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                       Assigned By
                     </span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-gray-900 break-words">
                       {selectedTask.assignByName || selectedTask.assignBy}
                     </span>
                   </div>
                 </div>
 
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col space-y-2">
                     <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                       Assigned To
                     </span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-gray-900 break-words">
                       {selectedTask.assignToName || selectedTask.assignTo}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                      Project Name
-                    </span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {selectedTask.projectName || "N/A"}
-                    </span>
-                  </div>
-                </div>
+              {/* Project Name + Lead Name Row - Only show if they have values */}
+              {(selectedTask.projectName && selectedTask.projectName !== "N/A") ||
+               (selectedTask.leadName && selectedTask.leadName !== "N/A") ? (
+                <div className="grid grid-cols-2 gap-3">
+                  {selectedTask.projectName && selectedTask.projectName !== "N/A" && (
+                    <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                      <div className="flex flex-col space-y-2">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Project Name
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 break-words">
+                          {selectedTask.projectName}
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                      Lead Name
-                    </span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {selectedTask.leadName || "N/A"}
-                    </span>
-                  </div>
+                  {selectedTask.leadName && selectedTask.leadName !== "N/A" && (
+                    <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                      <div className="flex flex-col space-y-2">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Lead Name
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 break-words">
+                          {selectedTask.leadName}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
+              ) : null}
 
+              {/* Due Date + Created Date Row */}
+              <div className="grid grid-cols-2 gap-3">
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col space-y-2">
                     <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                       Due Date
                     </span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-gray-900 break-words">
                       {formatDate(selectedTask.dueDate)}
                     </span>
                   </div>
                 </div>
 
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col space-y-2">
                     <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                       Created Date
                     </span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-gray-900 break-words">
                       {formatDate(selectedTask.createdDate)}
                     </span>
                   </div>
                 </div>
+              </div>
 
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex justify-between items-start">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium mr-4">
-                      Description
-                    </span>
-                    <span className="text-sm text-gray-900 flex-1">
-                      {selectedTask.description || "N/A"}
-                    </span>
+              {/* Description Card - Full Width */}
+              <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                <div className="flex flex-col space-y-2">
+                  <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                    Description
+                  </span>
+                  <span className="text-sm text-gray-900 break-words">
+                    {selectedTask.description || "N/A"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop/Tablet View - Custom Grid Layout */}
+            <div className="hidden sm:block">
+              <div className="space-y-4 sm:space-y-6">
+                {/* Row 1: Task Name + Description (side by side) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Task Name
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {selectedTask.name}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-start">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium mr-4">
+                        Description
+                      </span>
+                      <span className="text-sm text-gray-900 flex-1">
+                        {selectedTask.description || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 2: Status + Priority */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Status
+                      </span>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                          selectedTask.status
+                        )}`}
+                      >
+                        {selectedTask.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Priority
+                      </span>
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(
+                          selectedTask.priority
+                        )}`}
+                      >
+                        {selectedTask.priority}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 3: Assigned By + Assigned To */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Assigned By
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {selectedTask.assignByName || selectedTask.assignBy}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Assigned To
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {selectedTask.assignToName || selectedTask.assignTo}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 4: Project Name + Lead Name */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Project Name
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {selectedTask.projectName || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Lead Name
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {selectedTask.leadName || "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 5: Due Date + Created Date */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Due Date
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {formatDate(selectedTask.dueDate)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Created Date
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {formatDate(selectedTask.createdDate)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

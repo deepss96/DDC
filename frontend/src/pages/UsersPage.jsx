@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FiUserPlus, FiMail, FiPhone, FiCalendar, FiEdit, FiTrash2, FiSearch, FiPlus, FiSliders, FiList, FiUpload, FiFilter, FiCheck } from "react-icons/fi";
+import { FiUserPlus, FiMail, FiPhone, FiCalendar, FiEdit, FiTrash2, FiSearch, FiPlus, FiSliders, FiList, FiUpload, FiFilter, FiCheck, FiUser } from "react-icons/fi";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import TableActionButton from "../components/TableActionButton";
 import UserFormPopup from "../components/UserFormPopup";
@@ -31,6 +31,8 @@ export default function UsersPage({ searchTerm = '' }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const filterDropdownRef = useRef(null);
 
   useEffect(() => {
@@ -157,20 +159,19 @@ const fetchUsers = async () => {
     try {
       console.log('🔄 DEBUG: Starting user creation with data:', newUser);
 
-      const savedUser = await apiService.createUser(newUser);
-      console.log('✅ DEBUG: User created successfully:', savedUser);
+      const result = await apiService.createUser(newUser);
+      console.log('✅ DEBUG: User created successfully:', result);
 
-      // Add new user and sort by created_at DESC (newest first)
-      const updatedUsers = [...usersData, savedUser].sort((a, b) =>
-        new Date(b.created_at) - new Date(a.created_at)
-      );
-      setUsersData(updatedUsers);
-      console.log('✅ DEBUG: Users list updated, total users:', updatedUsers.length);
+      // Show credentials to admin
+      const { credentials } = result;
+      console.log(`User created successfully!\n\nLogin Credentials:\nEmail: ${credentials.email}\nPhone: +${credentials.phone.slice(0, 2)} ${credentials.phone.slice(2)}\nTemporary Password: ${credentials.temporaryPassword}\n\nPlease share these credentials with the user.`);
+
+      // Refresh the users list
+      fetchUsers();
 
       setIsUserFormOpen(false); // Close the popup on success
       setIsEditMode(false);
       setUserToEdit(null);
-      fetchUsers();
     } catch (error) {
       console.error('❌ DEBUG: Create user operation error:', error);
       throw error; // Re-throw to let UserFormPopup handle it
@@ -198,7 +199,14 @@ const fetchUsers = async () => {
       setUserToEdit(null);
 
       // Show success message
-      alert(`${updatedUser.first_name} ${updatedUser.last_name} has been updated successfully.`);
+      setSuccessMessage(`${updatedUser.first_name} ${updatedUser.last_name} has been updated successfully!`);
+      setShowSuccessMessage(true);
+
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        setSuccessMessage("");
+      }, 3000);
     } catch (error) {
       console.error('❌ DEBUG: Update user operation error:', error);
       alert('An error occurred while updating the user. Check console for details.');
@@ -230,10 +238,9 @@ const fetchUsers = async () => {
   const userColumns = [
     { key: 'name', title: 'Full Name', width: '25%' },
     { key: 'email', title: 'Email', width: '25%' },
-    { key: 'username', title: 'Username', width: '15%' },
+    { key: 'phone', title: 'Phone Number', width: '20%' },
     { key: 'role', title: 'Role', width: '15%' },
-    { key: 'status', title: 'Status', width: '12%' },
-    { key: 'created_at', title: 'Created Date', width: '18%' },
+    { key: 'status', title: 'Status', width: '15%' },
     { key: 'actions', title: 'Actions', align: 'center', width: '0%' }
   ];
 
@@ -258,8 +265,8 @@ const fetchUsers = async () => {
         );
       case 'email':
         return <span style={{ fontFamily: 'var(--font-family)' }}>{user.email}</span>;
-      case 'username':
-        return <span style={{ fontFamily: 'var(--font-family)' }}>{user.username}</span>;
+      case 'phone':
+        return <span style={{ fontFamily: 'var(--font-family)' }}>{user.phone ? `+${user.phone.slice(0, 2)} ${user.phone.slice(2)}` : ''}</span>;
       case 'role':
         return <span style={{ fontFamily: 'var(--font-family)' }}>{user.role}</span>;
       case 'status':
@@ -268,8 +275,6 @@ const fetchUsers = async () => {
             {user.status}
           </span>
         );
-      case 'created_at':
-        return <span style={{ fontFamily: 'var(--font-family)' }}>{formatDate(user.created_at)}</span>;
       default:
         return <span style={{ fontFamily: 'var(--font-family)' }}>{user[key]}</span>;
     }
@@ -277,6 +282,16 @@ const fetchUsers = async () => {
 
   return (
     <div className="flex-1 flex flex-col   " >
+
+      {/* Success Message Toast */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 right-4 z-[1200] bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+          <p className="text-sm font-medium" style={{ fontFamily: 'var(--font-family)' }}>
+            {successMessage}
+          </p>
+        </div>
+      )}
+
       <div className="flex-1 flex  ">
         <main className="flex-1 overflow-hidden sm:overflow-auto px-4 sm:px-6 py-4 space-y-4 md:pb-4 pb-24 ">
 
@@ -342,17 +357,19 @@ const fetchUsers = async () => {
                         </div>
                       )}
                     </div>
-                    <button
-                      onClick={() => setIsUserFormOpen(true)}
-                      className="flex items-center gap-1 px-2 py-1.5 text-white text-sm font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all shadow-sm"
-                      style={{
-                        backgroundColor: 'var(--primary-color)',
-                        borderColor: 'var(--primary-color)'
-                      }}
-                    >
-                      <FiPlus size={17} color="#ffffff" />
-                      <span style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px' }}>New</span>
-                    </button>
+                    {user?.role?.toLowerCase() === 'admin' && (
+                      <button
+                        onClick={() => setIsUserFormOpen(true)}
+                        className="flex items-center gap-1 px-2 py-1.5 text-white text-sm font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all shadow-sm"
+                        style={{
+                          backgroundColor: 'var(--primary-color)',
+                          borderColor: 'var(--primary-color)'
+                        }}
+                      >
+                        <FiPlus size={17} color="#ffffff" />
+                        <span style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px' }}>New</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -367,7 +384,7 @@ const fetchUsers = async () => {
                   ) : (
                     <div className="space-y-2 px-2">
                       {filteredUsers.map((user) => (
-                        <div key={user.id} className="bg-white rounded-lg border border-gray-200 p-3 pb-1 shadow-sm hover:shadow-md transition-shadow" style={{ fontFamily: 'var(--font-family)' }}>
+                        <div key={`mobile-user-${user.id}`} className="bg-white rounded-lg border border-gray-200 p-3 pb-1 shadow-sm hover:shadow-md transition-shadow" style={{ fontFamily: 'var(--font-family)' }}>
                           {/* Row 1: Name and Status with Actions */}
                           <div className="flex justify-between items-center mb-3">
                             <div className="flex-1 min-w-0 flex items-center gap-3">
@@ -391,27 +408,29 @@ const fetchUsers = async () => {
                             </div>
                           </div>
 
-                          {/* Row 2: Email and Username */}
+                          {/* Row 2: Email and Phone */}
                           <div className="flex justify-between items-center mb-2 text-xs text-gray-600" style={{ fontFamily: 'var(--font-family)' }}>
                             <div className="flex items-center gap-2 flex-1 min-w-0">
-                              <span className="text-purple-600 font-medium" style={{ fontFamily: 'var(--font-family)' }}>✉️</span>
+                              <div className="w-4 h-4 bg-purple-100 rounded-full flex items-center justify-center">
+                                <FiMail size={10} className="text-purple-600" />
+                              </div>
                               <span className="font-medium truncate" style={{ fontFamily: 'var(--font-family)' }}>{user.email}</span>
                             </div>
                             <div className="flex items-center gap-2 ml-3">
-                              <span className="text-blue-600 font-medium" style={{ fontFamily: 'var(--font-family)' }}>👤</span>
-                              <span className="truncate" style={{ fontFamily: 'var(--font-family)' }}>{user.username}</span>
+                              <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
+                                <FiPhone size={10} className="text-blue-600" />
+                              </div>
+                              <span className="truncate" style={{ fontFamily: 'var(--font-family)' }}>{user.phone ? `+${user.phone.slice(0, 2)} ${user.phone.slice(2)}` : ''}</span>
                             </div>
                           </div>
 
-                          {/* Row 3: Role and Created Date */}
-                          <div className="flex justify-between items-center text-xs text-gray-600" style={{ fontFamily: 'var(--font-family)' }}>
+                          {/* Row 3: Role */}
+                          <div className="flex justify-center items-center text-xs text-gray-600 mb-2" style={{ fontFamily: 'var(--font-family)' }}>
                             <div className="flex items-center gap-2">
-                              <span className="text-green-600 font-medium" style={{ fontFamily: 'var(--font-family)' }}>🏷️</span>
+                              <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center">
+                                <FiUser size={10} className="text-green-600" />
+                              </div>
                               <span style={{ fontFamily: 'var(--font-family)' }}>Role: {user.role}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-orange-500 font-medium" style={{ fontFamily: 'var(--font-family)' }}>📅</span>
-                              <span style={{ fontFamily: 'var(--font-family)' }}>Created: {formatDate(user.created_at)}</span>
                             </div>
                           </div>
 
@@ -454,8 +473,7 @@ const fetchUsers = async () => {
           setUserToEdit(null);
         }}
         onSubmit={isEditMode ? handleUpdateUser : handleCreateUser}
-        isEdit={isEditMode}
-        userToEdit={userToEdit}
+        editUser={userToEdit}
       />
 
       {/* Custom Delete Confirmation Dialog */}

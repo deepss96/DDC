@@ -270,7 +270,7 @@ const LoginSignupPage = () => {
                         className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-transparent transition-all duration-300 ${
                           errors.identifier ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
                         }`}
-                        placeholder="Enter email or phone"
+                        placeholder="Enter email, username, or 10-digit phone"
                       />
                     </div>
                     {errors.identifier && (

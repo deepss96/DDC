@@ -1,4 +1,4 @@
-const db = require('../config/database');
+ const db = require('../config/database');
 
 class User {
   // === AUTHENTICATION METHODS ===
@@ -11,14 +11,29 @@ class User {
 
   // Get full user profile by ID (for profile page)
   static getFullProfileById(id, callback) {
-    const sql = 'SELECT id, first_name, last_name, email, username, phone, password, role, status, created_at FROM users WHERE id = ?';
+    const sql = 'SELECT id, first_name, last_name, email, username, phone, password, role, status, profile_image, created_at FROM users WHERE id = ?';
     db.query(sql, [id], callback);
   }
 
-  // Get user by username or email (for login)
+  // Get user by username, email, or phone (for login)
   static getByIdentifier(identifier, callback) {
-    const sql = 'SELECT * FROM users WHERE username = ? OR email = ?';
-    db.query(sql, [identifier, identifier], callback);
+    // Check if identifier looks like a phone number (10 digits)
+    const isPhoneNumber = /^\d{10}$/.test(identifier);
+
+    let sql;
+    let values;
+
+    if (isPhoneNumber) {
+      // If it's a 10-digit number, check both with and without +91 prefix
+      sql = 'SELECT * FROM users WHERE username = ? OR email = ? OR phone = ? OR phone = ?';
+      values = [identifier, identifier, identifier, `91${identifier}`];
+    } else {
+      // For username/email, check all three fields
+      sql = 'SELECT * FROM users WHERE username = ? OR email = ? OR phone = ?';
+      values = [identifier, identifier, identifier];
+    }
+
+    db.query(sql, values, callback);
   }
 
   // Check if user exists (for auth)
@@ -45,16 +60,32 @@ class User {
 
   // Get all users (for user management)
   static getAll(callback) {
-    const sql = `SELECT id, first_name, last_name, email, username, password, role, status, created_at
+    const sql = `SELECT id, first_name, last_name, email, phone, username, password, role, status, created_at
              FROM users ORDER BY created_at DESC`;
     db.query(sql, callback);
   }
 
-  // Get user by email or username for login (management version with more fields)
+  // Get user by email, username, or phone for login (management version with more fields)
   static getByEmailOrUsername(identifier, callback) {
-    const sql = `SELECT id, first_name, last_name, email, username, password, role, status, is_temp_password
-             FROM users WHERE email = ? OR username = ?`;
-    db.query(sql, [identifier, identifier], callback);
+    // Check if identifier looks like a phone number (10 digits)
+    const isPhoneNumber = /^\d{10}$/.test(identifier);
+
+    let sql;
+    let values;
+
+    if (isPhoneNumber) {
+      // If it's a 10-digit number, check both with and without +91 prefix
+      sql = `SELECT id, first_name, last_name, email, username, password, role, status, is_temp_password
+             FROM users WHERE email = ? OR username = ? OR phone = ? OR phone = ?`;
+      values = [identifier, identifier, identifier, `91${identifier}`];
+    } else {
+      // For username/email, check all three fields
+      sql = `SELECT id, first_name, last_name, email, username, password, role, status, is_temp_password
+             FROM users WHERE email = ? OR username = ? OR phone = ?`;
+      values = [identifier, identifier, identifier];
+    }
+
+    db.query(sql, values, callback);
   }
 
   // Create new user - plain text password (management version)
@@ -64,20 +95,20 @@ class User {
     // Generate a unique phone number if not provided
     const phoneNumber = phone || `+91-${Date.now().toString().slice(-10)}`;
 
-    const sql = `INSERT INTO users (first_name, last_name, email, phone, username, password, role, status)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-    const values = [first_name, last_name, email, phoneNumber, username, password, role || 'Field', status || 'Active'];
+    const sql = `INSERT INTO users (first_name, last_name, email, phone, username, password, role, status, is_temp_password)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const values = [first_name, last_name, email, phoneNumber, username, password, role || 'Field', status || 'Active', 1];
     db.query(sql, values, callback);
   }
 
   // Update user - plain text password (management version)
   static update(id, userData, callback) {
-    const { first_name, last_name, email, username, role, status } = userData;
+    const { first_name, last_name, email, phone, role, status, profile_image } = userData;
 
-    // Update without changing password (password cannot be changed from edit)
-    const sql = `UPDATE users SET first_name = ?, last_name = ?, email = ?, username = ?, role = ?, status = ?
+    // Update user
+    const sql = `UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?, role = ?, status = ?, profile_image = ?
              WHERE id = ?`;
-    const values = [first_name, last_name, email, username, role, status, id];
+    const values = [first_name, last_name, email, phone, role, status, profile_image, id];
 
     db.query(sql, values, callback);
   }
@@ -105,6 +136,19 @@ class User {
   static checkUsernameExists(username, excludeId, callback) {
     let sql = 'SELECT id FROM users WHERE username = ?';
     let values = [username];
+
+    if (excludeId) {
+      sql += ' AND id != ?';
+      values.push(excludeId);
+    }
+
+    db.query(sql, values, callback);
+  }
+
+  // Check if phone exists
+  static checkPhoneExists(phone, excludeId, callback) {
+    let sql = 'SELECT id FROM users WHERE phone = ?';
+    let values = [phone];
 
     if (excludeId) {
       sql += ' AND id != ?';

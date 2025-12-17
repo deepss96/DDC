@@ -7,10 +7,10 @@
       "path": "dashboard"
     },
     {
-      "key": "leads",
-      "label": "Leads",
+      "key": "users",
+      "label": "Users",
       "icon": "Users",
-      "path": "lead-management"
+      "path": "users-management"
     },
     {
       "key": "clients",

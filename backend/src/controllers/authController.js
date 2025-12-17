@@ -75,7 +75,16 @@ class AuthController {
           return res.status(500).json({ error: 'Database error' });
         }
 
+        console.log('Login attempt - Identifier:', identifier);
+        console.log('Login attempt - Found users:', results.length);
+        if (results.length > 0) {
+          console.log('Login attempt - User found:', results[0].id, results[0].username, results[0].phone);
+          console.log('Login attempt - Stored password:', results[0].password);
+          console.log('Login attempt - Provided password:', password);
+        }
+
         if (results.length === 0) {
+          console.log('Login attempt - No user found with identifier:', identifier);
           return res.status(401).json({ error: 'Invalid credentials' });
         }
 
@@ -83,6 +92,7 @@ class AuthController {
 
         // Check password - plain text comparison only
         if (password !== user.password) {
+          console.log('Login attempt - Password mismatch');
           return res.status(401).json({ error: 'Invalid credentials' });
         }
 
@@ -93,6 +103,10 @@ class AuthController {
           { expiresIn: '7d' }
         );
 
+        const isTempPassword = user.is_temp_password === 1 || user.is_temp_password === true;
+        console.log('LOGIN DEBUG: User is_temp_password from DB:', user.is_temp_password);
+        console.log('LOGIN DEBUG: Computed isTempPassword:', isTempPassword);
+
         res.json({
           message: 'Login successful',
           token,
@@ -101,7 +115,8 @@ class AuthController {
             firstName: user.first_name,
             lastName: user.last_name,
             email: user.email,
-            username: user.username
+            username: user.username,
+            isTempPassword: isTempPassword
           }
         });
       });
@@ -181,6 +196,48 @@ class AuthController {
 
           res.json({ message: 'Password reset successfully' });
         });
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Server error' });
+    }
+  }
+
+  // Change password (for temp password users)
+  static changePassword(req, res) {
+    try {
+      const { userId, newPassword } = req.body;
+
+      if (!userId || !newPassword) {
+        return res.status(400).json({ error: 'User ID and new password are required' });
+      }
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+      }
+
+      // Update password and set is_temp_password to 0
+      User.updatePassword(userId, newPassword, (err, result) => {
+        if (err) {
+          return res.status(500).json({ error: 'Database error' });
+        }
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Also update is_temp_password to 0
+        const db = require('../config/database');
+        db.query(
+          'UPDATE users SET is_temp_password = 0 WHERE id = ?',
+          [userId],
+          (err, result) => {
+            if (err) {
+              console.error('Error updating temp password flag:', err);
+              // Don't fail the request if this update fails
+            }
+            res.json({ message: 'Password changed successfully' });
+          }
+        );
       });
     } catch (error) {
       res.status(500).json({ error: 'Server error' });

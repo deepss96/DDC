@@ -17,7 +17,7 @@ class TaskController {
         LEFT JOIN users u1 ON t.assignBy = u1.id
         LEFT JOIN users u2 ON t.assignTo = u2.id
         WHERE t.assignBy = ? OR t.assignTo = ?
-        ORDER BY t.createdDate ASC
+        ORDER BY t.createdDate DESC
       `;
 
       db.query(sql, [user_id, user_id], (err, results) => {
@@ -39,8 +39,36 @@ class TaskController {
         res.json(formattedResults);
       });
     } else {
-      // No tasks if user is not logged in (no user_id provided)
-      res.json([]);
+      // No user_id provided - return ALL tasks (for admin)
+      const sql = `
+        SELECT
+          t.*,
+          CONCAT(u1.first_name, ' ', u1.last_name) as assignByName,
+          CONCAT(u2.first_name, ' ', u2.last_name) as assignToName
+        FROM tasks t
+        LEFT JOIN users u1 ON t.assignBy = u1.id
+        LEFT JOIN users u2 ON t.assignTo = u2.id
+        ORDER BY t.createdDate DESC
+      `;
+
+      db.query(sql, (err, results) => {
+        if (err) {
+          return res.status(500).json({ error: err.message });
+        }
+
+        // Ensure dates are properly formatted for consistent frontend handling
+        const formattedResults = results.map(task => {
+          if (task.createdDate) {
+            task.createdDate = new Date(task.createdDate).toISOString();
+          }
+          if (task.dueDate) {
+            task.dueDate = new Date(task.dueDate).toISOString();
+          }
+          return task;
+        });
+
+        res.json(formattedResults);
+      });
     }
   }
 

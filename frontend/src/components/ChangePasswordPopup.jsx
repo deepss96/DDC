@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { FiLock, FiEye, FiEyeOff, FiShield } from "react-icons/fi";
+import React, { useState, useEffect } from "react";
+import { FiLock, FiEye, FiEyeOff, FiShield, FiCheckCircle } from "react-icons/fi";
 
 export default function ChangePasswordPopup({ user, onPasswordChanged }) {
     const [newPassword, setNewPassword] = useState("");
@@ -7,18 +7,47 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
+
+    // Auto-hide success message after 3 seconds
+    useEffect(() => {
+        if (success) {
+            const timer = setTimeout(() => {
+                setSuccess("");
+                if (onPasswordChanged) {
+                    onPasswordChanged();
+                }
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [success, onPasswordChanged]);
+
+    const validatePassword = (password) => {
+        if (!password) {
+            return "Password is required";
+        }
+        if (password.length < 6) {
+            return "Password must be at least 6 characters long";
+        }
+        if (password.includes(' ')) {
+            return "Password cannot contain spaces";
+        }
+        return null;
+    };
 
     const handleChangePassword = async () => {
         setError("");
+        setSuccess("");
 
-        if (!newPassword) {
-            setError("Please enter a new password");
+        const passwordError = validatePassword(newPassword);
+        if (passwordError) {
+            setError(passwordError);
             return;
         }
 
-        if (newPassword.length < 6) {
-            setError("Password must be at least 6 characters");
+        if (!confirmPassword) {
+            setError("Please confirm your password");
             return;
         }
 
@@ -46,11 +75,9 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
                 storedUser.isTempPassword = false;
                 localStorage.setItem("user", JSON.stringify(storedUser));
 
-                if (onPasswordChanged) {
-                    onPasswordChanged();
-                }
+                setSuccess("Password changed successfully! You can now access your account.");
             } else {
-                setError(data.error || "Failed to change password");
+                setError(data.error || "Failed to change password. Please try again.");
             }
         } catch (err) {
             console.error("Error changing password:", err);
@@ -64,7 +91,7 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
         <>
             {/* Blur backdrop */}
             <div
-                className="fixed inset-0 z-40"
+                className="fixed inset-0 z-[1001] pointer-events-none"
                 style={{
                     backdropFilter: 'blur(6px)',
                     backgroundColor: 'rgba(0, 0, 0, 0.4)'
@@ -72,7 +99,7 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
             />
 
             {/* Password Change Card - positioned at center */}
-            <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+            <div className="fixed inset-0 flex items-center justify-center z-[1002] p-4">
                 <div
                     className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
                     style={{
@@ -109,6 +136,15 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
                         {error && (
                             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                                 <p className="text-sm text-red-700" style={{ fontFamily: 'var(--font-family)' }}>{error}</p>
+                            </div>
+                        )}
+
+                        {success && (
+                            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <div className="flex items-center gap-2">
+                                    <FiCheckCircle className="text-green-600" size={16} />
+                                    <p className="text-sm text-green-700" style={{ fontFamily: 'var(--font-family)' }}>{success}</p>
+                                </div>
                             </div>
                         )}
 

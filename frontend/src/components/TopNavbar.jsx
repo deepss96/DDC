@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FiSearch, FiUser, FiLogOut, FiChevronDown } from "react-icons/fi";
 import LanguageSelector from "./LanguageSelector";
 import NotificationDropdown from "./NotificationDropdown";
@@ -9,6 +9,7 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
   const [searchTerm, setSearchTerm] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const { user, logout } = useAuth();
+  const userMenuRef = useRef(null);
 
   const handleLogout = () => {
     logout();
@@ -30,6 +31,28 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
     }
   };
 
+  // Handle clicks outside the user menu to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Don't close if clicking on dropdown menu items
+      if (event.target.closest('.user-dropdown-menu')) {
+        return;
+      }
+
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
+
   return (
     <div className="top-navbar-container">
       {/* TOP BAR - DESKTOP */}
@@ -40,27 +63,38 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="top-navbar-search">
+          {/* <div className="top-navbar-search">
             <FiSearch size={14} />
             <input
               placeholder="Search"
               value={searchTerm}
               onChange={handleSearchChange}
             />
-          </div>
+          </div> */}
           <NotificationDropdown />
 
           {/* LANGUAGE SELECTOR COMPONENT */}
-          <LanguageSelector title={title} subtitle={subtitle} />
+          {/* <LanguageSelector title={title} subtitle={subtitle} /> */}
 
           {/* USER MENU */}
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowUserMenu(!showUserMenu);
+              }}
               className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <div className="top-navbar-avatar">
-                {getInitials(user?.firstName, user?.lastName)}
+                {user?.profile_image ? (
+                  <img
+                    src={user.profile_image}
+                    alt="Profile"
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  getInitials(user?.firstName, user?.lastName)
+                )}
               </div>
               <div className="hidden md:flex flex-col items-start">
                 <span className="text-sm font-medium text-gray-900">
@@ -88,7 +122,8 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                 </div>
 
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     // Navigate to profile page
                     window.location.href = '/profile';
                     setShowUserMenu(false);
@@ -100,7 +135,10 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                 </button>
 
                 <button
-                  onClick={handleLogout}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLogout();
+                  }}
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   <FiLogOut size={16} />
@@ -122,16 +160,35 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
           <NotificationDropdown />
 
           {/* LANGUAGE SELECTOR COMPONENT - MOBILE */}
-          <LanguageSelector title={title} subtitle={subtitle} />
+          {/* <LanguageSelector title={title} subtitle={subtitle} /> */}
 
           {/* USER MENU - MOBILE */}
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <button
-              onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowUserMenu(!showUserMenu);
+              }}
+              className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <div className="top-navbar-avatar">
-                {getInitials(user?.firstName, user?.lastName)}
+                {user?.profile_image ? (
+                  <img
+                    src={user.profile_image}
+                    alt="Profile"
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  getInitials(user?.firstName, user?.lastName)
+                )}
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="text-xs font-medium text-gray-900 leading-tight">
+                  {user?.firstName} {user?.lastName}
+                </span>
+                <span className="text-[10px] text-gray-500 leading-tight">
+                  @{user?.username}
+                </span>
               </div>
               <FiChevronDown
                 size={14}
@@ -150,7 +207,8 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                 </div>
 
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     // Navigate to profile page
                     window.location.href = '/profile';
                     setShowUserMenu(false);
@@ -162,7 +220,10 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                 </button>
 
                 <button
-                  onClick={handleLogout}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLogout();
+                  }}
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   <FiLogOut size={16} />

@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 
 import sidebarConfig from "../Jsonfiles/sidebarjson.json";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 // Map JSON icon names -> lucide components
 const ICON_MAP = {
@@ -83,6 +84,7 @@ const BottomIcon = ({ label, icon, onClick, active = false }) => (
 
 export default function MobileBottomNavbar({ activePage, onNavigate, onMenuToggle }) {
   const [isGridOpen, setIsGridOpen] = useState(false);
+  const { user } = useAuth();
 
   const createIcon = (name, color) => {
     const C = ICON_MAP[name];
@@ -98,12 +100,20 @@ export default function MobileBottomNavbar({ activePage, onNavigate, onMenuToggl
 
   const mainItems = useMemo(
     () =>
-      (sidebarConfig.items || []).map((it) => ({
-        ...it,
-        label: localize(it.label),
-        _iconEl: createIcon(it.icon, it.color),
-      })),
-    []
+      (sidebarConfig.items || [])
+        .filter((item) => {
+          // Hide Users menu for non-admin users
+          if (item.key === 'users' && user?.role !== 'Admin') {
+            return false;
+          }
+          return true;
+        })
+        .map((it) => ({
+          ...it,
+          label: localize(it.label),
+          _iconEl: createIcon(it.icon, it.color),
+        })),
+    [user?.role]
   );
 
   const footerItems = useMemo(
@@ -118,7 +128,18 @@ export default function MobileBottomNavbar({ activePage, onNavigate, onMenuToggl
     []
   );
 
-  const GRID_ITEMS = [...mainItems, ...footerItems];
+  // Create custom order for grid menu: Dashboard, Leads, Clients, Projects, My Tasks, Settings, Inventory
+  const customGridItems = [
+    mainItems[0], // Dashboard
+    { key: 'leads', label: 'Leads', path: 'lead-management', _iconEl: createIcon('Users') }, // Leads
+    mainItems[1], // Clients
+    mainItems[3], // Projects
+    mainItems[2], // My Tasks
+    mainItems[5], // Settings
+    ...footerItems.filter(item => item.key !== 'reports' && item.key !== 'settings') // Inventory (exclude duplicate Reports and Settings)
+  ];
+
+  const GRID_ITEMS = customGridItems;
 
   // Centralized navigation -> parent
   const go = (itemOrKey) => {
@@ -194,10 +215,10 @@ export default function MobileBottomNavbar({ activePage, onNavigate, onMenuToggl
 
               <div className="flex items-center justify-center flex-1">
                 <BottomIcon
-                  label={localize(mainItems[1]?.label) || "Leads"}
+                  label="Leads"
                   icon={mainItems[1]?._iconEl || <Users />}
-                  onClick={() => go(mainItems[1])}
-                  active={activePage === (mainItems[1]?.path || 'lead-management')}
+                  onClick={() => go('lead-management')}
+                  active={activePage === 'lead-management'}
                 />
               </div>
 
@@ -218,19 +239,19 @@ export default function MobileBottomNavbar({ activePage, onNavigate, onMenuToggl
               {/* Right navigation buttons */}
               <div className="flex items-center justify-center flex-1">
                 <BottomIcon
-                  label={localize(mainItems[2]?.label) || "Clients"}
-                  icon={mainItems[2]?._iconEl || <UserCheck />}
-                  onClick={() => go(mainItems[2])}
-                  active={activePage === (mainItems[2]?.path || 'clients-management')}
+                  label={localize(mainItems[3]?.label) || "Projects"}
+                  icon={mainItems[3]?._iconEl || <Folder />}
+                  onClick={() => go(mainItems[3])}
+                  active={activePage === (mainItems[3]?.path || 'projects-management')}
                 />
               </div>
 
               <div className="flex items-center justify-center flex-1">
                 <BottomIcon
-                  label={localize(mainItems[3]?.label) || "Projects"}
-                  icon={mainItems[3]?._iconEl || <Folder />}
-                  onClick={() => go(mainItems[3])}
-                  active={activePage === (mainItems[3]?.path || 'projects-management')}
+                  label="My Tasks"
+                  icon={mainItems[2]?._iconEl || <ClipboardList />}
+                  onClick={() => go(mainItems[2])}
+                  active={activePage === (mainItems[2]?.path || 'my-tasks')}
                 />
               </div>
 

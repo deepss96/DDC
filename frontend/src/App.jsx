@@ -10,6 +10,7 @@ import TasksPage from './pages/TasksPage.jsx';
 import LoginSignupPage from './pages/LoginSignupPage.jsx';
 import UsersPage from './pages/UsersPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import ChangePasswordPopup from './components/ChangePasswordPopup.jsx';
 import { useTranslation } from './services/translationService.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 
@@ -41,12 +42,7 @@ function AppLayout() {
 
   const [currentPage, setCurrentPage] = useState(getCurrentPageFromPath(location.pathname));
 
-  // Redirect to auth if not authenticated
-  React.useEffect(() => {
-    if (!loading && !isAuthenticated()) {
-      navigate('/auth');
-    }
-  }, [isAuthenticated, loading, navigate]);
+
 
   const handleNavigate = (path) => {
     setCurrentPage(path);
@@ -251,14 +247,46 @@ function AppLayout() {
   );
 }
 
+function AppContent() {
+  const { isAuthenticated, loading, user, showPasswordChange, hidePasswordChange } = useAuth();
+
+  // Show loading screen while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If not authenticated, show login page
+  if (!isAuthenticated()) {
+    return <LoginSignupPage />;
+  }
+
+  // If authenticated, show the main app
+  return (
+    <>
+      <AppLayout />
+      {/* Password Change Popup - shows on top of everything */}
+      {showPasswordChange && (
+        <ChangePasswordPopup
+          user={user}
+          onPasswordChanged={hidePasswordChange}
+        />
+      )}
+    </>
+  );
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <Routes>
-          <Route path="/auth" element={<LoginSignupPage />} />
-          <Route path="/*" element={<AppLayout />} />
-        </Routes>
+        <AppContent />
       </Router>
     </AuthProvider>
   );

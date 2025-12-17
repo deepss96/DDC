@@ -69,7 +69,7 @@ export default function Table({
               <tr>
                 {columns.map((column, index) => (
                   <th
-                    key={column.key}
+                    key={`header-${column.key}-${index}`}
                     style={{
                       color: "#181D27",
                       fontSize: "13px",
@@ -98,7 +98,7 @@ export default function Table({
                 >
                   {columns.map((column, colIndex) => (
                     <td
-                      key={column.key}
+                      key={`cell-${item[keyField]}-${column.key}`}
                       style={{
                         color: "#6B7280",
                         fontSize: "13px",

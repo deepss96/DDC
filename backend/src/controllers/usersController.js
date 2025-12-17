@@ -41,19 +41,32 @@ exports.getUserById = (req, res) => {
 
 // Create new user with auto-generated temporary password
 exports.createUser = async (req, res) => {
-    const { first_name, last_name, email, username, role, status } = req.body;
+    const { first_name, last_name, email, phone, role, status } = req.body;
+    console.log("FULL REQUEST BODY:", req.body);
+    console.log("ROLE RECEIVED:", role, "TYPE:", typeof role, "LENGTH:", role ? role.length : 'undefined');
 
-    if (!first_name || !last_name) {
-        return res.status(400).json({ error: 'First name and last name are required' });
+    if (!first_name) {
+        return res.status(400).json({ error: 'First name is required' });
     }
 
     if (!email) {
         return res.status(400).json({ error: 'Email is required' });
     }
 
-    if (!username) {
-        return res.status(400).json({ error: 'Username is required' });
+    if (!phone || phone.length !== 12) {
+        return res.status(400).json({ error: 'Please enter a valid 10-digit phone number' });
     }
+
+    if (!role) {
+        return res.status(400).json({ error: 'Role is required' });
+    }
+
+    if (!status) {
+        return res.status(400).json({ error: 'Status is required' });
+    }
+
+    // Generate username from email (part before @)
+    const username = email.split('@')[0];
 
     // Generate temporary password automatically
     const tempPassword = generateTempPassword(8);
@@ -80,24 +93,36 @@ exports.createUser = async (req, res) => {
                 return res.status(400).json({ error: 'Username already exists' });
             }
 
-            // Create user with temporary password
-            const userData = { first_name, last_name, email, username, password: tempPassword, role, status };
-
-            User.createManagement(userData, (err, result) => {
+            // Check if phone already exists
+            User.checkPhoneExists(phone, null, (err, results) => {
                 if (err) {
-                    console.error('Error creating user:', err);
+                    console.error('Error checking phone:', err);
                     return res.status(500).json({ error: 'Failed to create user' });
                 }
 
-                // Return temporary password so admin can share with user
-                res.status(201).json({
-                    message: 'User created successfully',
-                    id: result.insertId,
-                    credentials: {
-                        email: email,
-                        username: username,
-                        temporaryPassword: tempPassword
+                if (results.length > 0) {
+                    return res.status(400).json({ error: 'Phone number already exists' });
+                }
+
+                // Create user with temporary password
+                const userData = { first_name, last_name, email, phone, username, password: tempPassword, role, status };
+
+                User.createManagement(userData, (err, result) => {
+                    if (err) {
+                        console.error('Error creating user:', err);
+                        return res.status(500).json({ error: 'Failed to create user' });
                     }
+
+                    // Return temporary password so admin can share with user
+                    res.status(201).json({
+                        message: 'User created successfully',
+                        id: result.insertId,
+                        credentials: {
+                            email: email,
+                            phone: phone,
+                            temporaryPassword: tempPassword
+                        }
+                    });
                 });
             });
         });
@@ -107,10 +132,18 @@ exports.createUser = async (req, res) => {
 // Update user
 exports.updateUser = async (req, res) => {
     const { id } = req.params;
-    const { first_name, last_name, email, username, password, role, status } = req.body;
+    const { first_name, last_name, email, phone, role, status, profile_image } = req.body;
 
-    if (!first_name || !last_name) {
-        return res.status(400).json({ error: 'First name and last name are required' });
+    if (!first_name) {
+        return res.status(400).json({ error: 'First name is required' });
+    }
+
+    if (!role) {
+        return res.status(400).json({ error: 'Role is required' });
+    }
+
+    if (!status) {
+        return res.status(400).json({ error: 'Status is required' });
     }
 
     // Check if email already exists (excluding current user)
@@ -124,19 +157,19 @@ exports.updateUser = async (req, res) => {
             return res.status(400).json({ error: 'Email already exists' });
         }
 
-        // Check if username already exists (excluding current user)
-        User.checkUsernameExists(username, id, (err, results) => {
+        // Check if phone already exists (excluding current user)
+        User.checkPhoneExists(phone, id, (err, results) => {
             if (err) {
-                console.error('Error checking username:', err);
+                console.error('Error checking phone:', err);
                 return res.status(500).json({ error: 'Failed to update user' });
             }
 
             if (results.length > 0) {
-                return res.status(400).json({ error: 'Username already exists' });
+                return res.status(400).json({ error: 'Phone number already exists' });
             }
 
             // Update user
-            const userData = { first_name, last_name, email, username, password, role, status };
+            const userData = { first_name, last_name, email, phone, role, status, profile_image };
 
             User.update(id, userData, (err, result) => {
                 if (err) {

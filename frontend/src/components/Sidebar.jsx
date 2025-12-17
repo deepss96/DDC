@@ -23,6 +23,7 @@ import {
 } from "react-icons/fi";
 import logo from "../assets/logo-small.png";
 import { useTranslation } from "../services/translationService.jsx";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 function SidebarSection({ title }) {
   return (
@@ -72,6 +73,7 @@ function SidebarItem({ icon, label, active, onClick }) {
 
 export default function Sidebar({ activeItem, onNavigate }) {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const handleNavigate = (path) => {
     if (onNavigate) {
@@ -118,7 +120,7 @@ export default function Sidebar({ activeItem, onNavigate }) {
           active={activeItem === "dashboard"}
           onClick={() => handleNavigate("dashboard")}
         />
-        <SidebarItem
+        {/* <SidebarItem
           icon={<FiUserPlus size={15} />}
           label={t('Lead Management')}
           active={activeItem === "lead-management"}
@@ -135,19 +137,21 @@ export default function Sidebar({ activeItem, onNavigate }) {
           label={t('Projects Management')}
           active={activeItem === "projects-management"}
           onClick={() => handleNavigate("projects-management")}
-        />
-        <SidebarItem
-          icon={<FiUser size={15} />}
-          label={t('User Management')}
-          active={activeItem === "users-management"}
-          onClick={() => handleNavigate("users-management")}
-        />
-        <SidebarItem
+        /> */}
+        {user?.role?.toLowerCase() === 'admin' && (
+          <SidebarItem
+            icon={<FiUser size={15} />}
+            label={t('User Management')}
+            active={activeItem === "users-management"}
+            onClick={() => handleNavigate("users-management")}
+          />
+        )}
+        {/* <SidebarItem
           icon={<FiUserCheck size={15} />}
           label={t('Employee Management')}
           active={activeItem === "employee-management"}
           onClick={() => handleNavigate("employee-management")}
-        />
+        /> */}
         <SidebarItem
           icon={<FiCheckSquare size={15} />}
           label={t('Tasks')}
@@ -155,7 +159,7 @@ export default function Sidebar({ activeItem, onNavigate }) {
           onClick={() => handleNavigate("my-tasks")}
         />
 
-        <SidebarSection title={t('ACCOUNTING')} />
+        {/* <SidebarSection title={t('ACCOUNTING')} />
         <SidebarItem
           icon={<FiTruck size={15} />}
           label={t('Site Expenses')}
@@ -189,7 +193,7 @@ export default function Sidebar({ activeItem, onNavigate }) {
           label={t('Help & Support')}
           active={activeItem === "help-support"}
           onClick={() => handleNavigate("help-support")}
-        />
+        /> */}
       </div>
 
       {/* Footer small strip */}
