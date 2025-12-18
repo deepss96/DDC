@@ -56,33 +56,33 @@ function AppLayout() {
   const getPageTitle = () => {
     switch (currentPage) {
       case 'dashboard':
-        return t('Dashboard');
+        return 'Dashboard';
       case 'lead-management':
-        return t('Lead Management');
+        return 'Leads';
       case 'clients-management':
-        return t('Clients Management');
+        return 'Clients';
       case 'my-tasks':
-        return t('My Tasks');
+        return 'Tasks';
       case 'projects-management':
-        return t('Projects Management');
+        return 'Projects';
       case 'users-management':
-        return t('User Management');
+        return 'Users';
       case 'profile':
-        return t('Profile');
+        return 'Profile';
       case 'employee-management':
-        return t('Employee Management');
+        return 'Employees';
       case 'site-expenses':
-        return t('Site Expenses');
+        return 'Site Expenses';
       case 'site-received':
-        return t('Site Received');
+        return 'Site Received';
       case 'reports':
-        return t('Reports');
+        return 'Reports';
       case 'settings':
-        return t('Settings');
+        return 'Settings';
       case 'help-support':
-        return t('Help & Support');
+        return 'Help & Support';
       default:
-        return t('Dashboard');
+        return 'Dashboard';
     }
   };
 
@@ -158,14 +158,14 @@ function AppLayout() {
                   className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg hover:bg-gray-100"
                 >
                   <span className="text-primary">👥</span>
-                  <span className="text-gray-700 font-medium">Lead Management</span>
+                  <span className="text-gray-700 font-medium">Leads</span>
                 </button>
                 <button
                   onClick={() => { handleNavigate('clients-management'); setMobileMenuOpen(false); }}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg hover:bg-gray-100"
                 >
                   <span className="text-primary">🤝</span>
-                  <span className="text-gray-700 font-medium">Clients Management</span>
+                  <span className="text-gray-700 font-medium">Clients</span>
                 </button>
 
                 <button
@@ -173,14 +173,14 @@ function AppLayout() {
                   className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg hover:bg-gray-100"
                 >
                   <span className="text-primary">📁</span>
-                  <span className="text-gray-700 font-medium">Projects Management</span>
+                  <span className="text-gray-700 font-medium">Projects</span>
                 </button>
                 <button
                   onClick={() => { handleNavigate('users-management'); setMobileMenuOpen(false); }}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg hover:bg-gray-100"
                 >
                   <span className="text-primary">👤</span>
-                  <span className="text-gray-700 font-medium">User Management</span>
+                  <span className="text-gray-700 font-medium">Users</span>
                 </button>
               </div>
             </div>

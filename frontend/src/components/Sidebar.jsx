@@ -140,7 +140,7 @@ export default function Sidebar({ activeItem, onNavigate }) {
         {user?.role?.toLowerCase() === 'admin' && (
           <SidebarItem
             icon={<FiUser size={15} />}
-            label={t('User Management')}
+            label="Users"
             active={activeItem === "users-management"}
             onClick={() => handleNavigate("users-management")}
           />
