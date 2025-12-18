@@ -19,7 +19,6 @@ const dbConfig = {
 
   connectionLimit: process.env.NODE_ENV === 'production' ? 2 : 10, // Lower limit for production
   connectTimeout: 60000, // 60 seconds timeout
-  acquireTimeout: 60000,
   ssl: process.env.NODE_ENV === 'production' ? {
     rejectUnauthorized: false // Allow self-signed certificates
   } : false

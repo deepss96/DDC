@@ -15,7 +15,7 @@ class User {
     db.query(sql, [id], callback);
   }
 
-  // Get user by username, email, or phone (for login)
+  // Get user by email or phone (for login)
   static getByIdentifier(identifier, callback) {
     // Check if identifier looks like a phone number (10 digits)
     const isPhoneNumber = /^\d{10}$/.test(identifier);
@@ -25,12 +25,12 @@ class User {
 
     if (isPhoneNumber) {
       // If it's a 10-digit number, check both with and without +91 prefix
-      sql = 'SELECT * FROM users WHERE username = ? OR email = ? OR phone = ? OR phone = ?';
-      values = [identifier, identifier, identifier, `91${identifier}`];
+      sql = 'SELECT * FROM users WHERE phone = ? OR phone = ?';
+      values = [identifier, `91${identifier}`];
     } else {
-      // For username/email, check all three fields
-      sql = 'SELECT * FROM users WHERE username = ? OR email = ? OR phone = ?';
-      values = [identifier, identifier, identifier];
+      // Assume it's email, check email and phone (in case phone is stored as email format, but unlikely)
+      sql = 'SELECT * FROM users WHERE email = ? OR phone = ?';
+      values = [identifier, identifier];
     }
 
     db.query(sql, values, callback);

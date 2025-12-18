@@ -22,7 +22,7 @@ const PORT = config.server.port;
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? process.env.FRONTEND_URL || true  // Allow from FRONTEND_URL or all if not set
+    ? ['https://nirmaan-track-frontend.onrender.com', 'https://nirmaan-track-backend.onrender.com']  // Allow specific origins in production
     : true, // Allow all in development
   credentials: true
 }));
@@ -43,6 +43,25 @@ console.log('Notification routes registered at /api/notifications');
 // Health check route
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
+});
+
+// Database health check route
+app.get('/api/health/db', (req, res) => {
+  db.query('SELECT 1 as test', (err, results) => {
+    if (err) {
+      console.error('Database health check failed:', err);
+      return res.status(500).json({
+        status: 'ERROR',
+        message: 'Database connection failed',
+        error: err.message
+      });
+    }
+    res.json({
+      status: 'OK',
+      message: 'Database connection successful',
+      test: results[0]
+    });
+  });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
