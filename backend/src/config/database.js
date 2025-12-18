@@ -11,9 +11,7 @@ const dbConfig = {
 
   connectionLimit: process.env.NODE_ENV === 'production' ? 2 : 10, // Lower limit for production
   connectTimeout: 60000, // 60 seconds timeout
-  ssl: process.env.NODE_ENV === 'production' ? {
-    rejectUnauthorized: false // Allow self-signed certificates
-  } : false
+  ssl: false // Disable SSL for all environments (required for free database hosts)
 };
 
 // Create connection pool
