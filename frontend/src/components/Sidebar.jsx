@@ -113,7 +113,6 @@ export default function Sidebar({ activeItem, onNavigate }) {
 
       {/* Sidebar scroll */}
       <div className="flex-1 overflow-auto text-[13px] pb-4 hover:text-primary">
-        <SidebarSection title={t('MANAGEMENT')} />
         <SidebarItem
           icon={<FiHome size={15} />}
           label={t('Dashboard')}

@@ -246,14 +246,7 @@ export default function MobileBottomNavbar({ activePage, onNavigate, onMenuToggl
                 />
               </div>
 
-              <div className="flex items-center justify-center flex-1">
-                <BottomIcon
-                  label="My Tasks"
-                  icon={mainItems[2]?._iconEl || <ClipboardList />}
-                  onClick={() => go(mainItems[2])}
-                  active={activePage === (mainItems[2]?.path || 'my-tasks')}
-                />
-              </div>
+
 
             </div>
           </div>

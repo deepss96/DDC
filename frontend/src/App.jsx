@@ -167,13 +167,7 @@ function AppLayout() {
                   <span className="text-primary">🤝</span>
                   <span className="text-gray-700 font-medium">Clients Management</span>
                 </button>
-                <button
-                  onClick={() => { handleNavigate('my-tasks'); setMobileMenuOpen(false); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg hover:bg-gray-100"
-                >
-                  <span className="text-primary">✅</span>
-                  <span className="text-gray-700 font-medium">My Tasks</span>
-                </button>
+
                 <button
                   onClick={() => { handleNavigate('projects-management'); setMobileMenuOpen(false); }}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left rounded-lg hover:bg-gray-100"
