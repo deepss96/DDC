@@ -217,6 +217,14 @@ const fetchTasks = async () => {
       setTasksData(tasksData.filter(task => task.id !== id));
     } catch (error) {
       console.error('Error deleting task:', error);
+      console.error('Error response:', error.response);
+
+      // Handle admin-only access error
+      if (error.response?.status === 403) {
+        alert('Access denied: Only administrators can delete tasks. Regular users can only create tasks.');
+      } else {
+        alert('An error occurred while deleting the task. Please try again.');
+      }
     }
   };
 

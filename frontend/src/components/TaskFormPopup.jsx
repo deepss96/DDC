@@ -180,6 +180,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
   const [relatedTo, setRelatedTo] = useState("");
   const [createdDate, setCreatedDate] = useState(getCurrentDateForInput());
   const [assignTo, setAssignTo] = useState("");
+  const [assignBy, setAssignBy] = useState("");
   const [priority, setPriority] = useState("");
   const [status, setStatus] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -205,6 +206,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
         setCreatedDate(formattedCreatedDate || getCurrentDateForInput());
         // For edit mode, store the user ID
         setAssignTo(taskToEdit.assignTo || "");
+        setAssignBy(taskToEdit.assignBy || ""); // Set the actual assigner from database
         setPriority(taskToEdit.priority || "");
         setStatus(taskToEdit.status || "");
         setDueDate(formattedDueDate || "");
@@ -312,7 +314,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
       leadId: leadId || "",
       relatedTo: relatedTo || "",
       assignTo: assignTo, // Already a user ID
-      assignBy: user?.id || 1, // Current logged-in user as assignBy
+      assignBy: user?.role?.toLowerCase() === 'admin' ? (assignBy || user?.id || 1) : (user?.id || 1), // Admin can select, others use current user
       priority: priority,
       status: status,
       dueDate: dueDate,
@@ -586,13 +588,27 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
 
             {/* Row 2: ASSIGNED BY | ASSIGNED TO */}
             <div className="md:col-span-1">
-              <InputField
-                label="ASSIGNED BY"
-                required
-                value={user ? `${user.firstName} ${user.lastName}` : "Admin"}
-                readOnly
-                placeholder="Current user"
-              />
+              {user?.role?.toLowerCase() === 'admin' ? (
+                <SelectField
+                  label="ASSIGNED BY*"
+                  options={users.map(user => user.name)}
+                  value={users.find(u => u.id === parseInt(assignBy || user?.id))?.name || ""}
+                  onChange={(name) => {
+                    const selectedUser = users.find(u => u.name === name);
+                    setAssignBy(selectedUser ? selectedUser.id : user?.id || 1);
+                  }}
+                  placeholder="Select assigned by"
+                  searchable={true}
+                />
+              ) : (
+                <InputField
+                  label="ASSIGNED BY"
+                  required
+                  value={user ? `${user.firstName} ${user.lastName}` : "Admin"}
+                  readOnly
+                  placeholder="Current user"
+                />
+              )}
             </div>
             <div className="md:col-span-1">
               <SelectField

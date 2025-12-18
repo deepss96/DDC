@@ -22,7 +22,7 @@ const PORT = config.server.port;
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? ['https://nirmaan-track-frontend.onrender.com', 'https://nirmaan-track-backend.onrender.com']  // Allow specific origins in production
+    ? process.env.CORS_ALLOWED_ORIGINS ? process.env.CORS_ALLOWED_ORIGINS.split(',') : []
     : true, // Allow all in development
   credentials: true
 }));
@@ -64,6 +64,6 @@ app.get('/api/health/db', (req, res) => {
   });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, config.server.host, () => {
   console.log(`Server running on port ${PORT}`);
 });

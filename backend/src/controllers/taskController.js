@@ -147,9 +147,18 @@ class TaskController {
     });
   }
 
-  // Delete task
+  // Delete task (Admin only)
   static deleteTask(req, res) {
     const { id } = req.params;
+    const currentUser = req.user;
+
+    // Check if current user is admin
+    if (!currentUser || currentUser.role?.toLowerCase() !== 'admin') {
+      return res.status(403).json({
+        error: 'Access denied',
+        message: 'Only administrators can delete tasks. Regular users can only create tasks.'
+      });
+    }
 
     Task.delete(id, (err, result) => {
       if (err) {

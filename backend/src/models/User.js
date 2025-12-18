@@ -11,7 +11,7 @@ class User {
 
   // Get full user profile by ID (for profile page)
   static getFullProfileById(id, callback) {
-    const sql = 'SELECT id, first_name, last_name, email, username, phone, password, role, status, profile_image, created_at FROM users WHERE id = ?';
+    const sql = 'SELECT id, first_name, last_name, email, username, phone, password, role, status, profile_image, created_at, is_temp_password FROM users WHERE id = ?';
     db.query(sql, [id], callback);
   }
 
@@ -60,7 +60,7 @@ class User {
 
   // Get all users (for user management)
   static getAll(callback) {
-    const sql = `SELECT id, first_name, last_name, email, phone, username, password, role, status, created_at
+    const sql = `SELECT id, first_name, last_name, email, phone, username, password, role, status, created_at, is_temp_password
              FROM users ORDER BY created_at DESC`;
     db.query(sql, callback);
   }
@@ -105,18 +105,93 @@ class User {
   static update(id, userData, callback) {
     const { first_name, last_name, email, phone, role, status, profile_image } = userData;
 
-    // Update user
-    const sql = `UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?, role = ?, status = ?, profile_image = ?
-             WHERE id = ?`;
-    const values = [first_name, last_name, email, phone, role, status, profile_image, id];
+    // Check for any pending tasks related to this user (assigned to or assigned by)
+    this.checkTaskRelationships(id, (err, relationships) => {
+      if (err) return callback(err, null);
 
-    db.query(sql, values, callback);
+      const { assignedTo, assignedBy } = relationships;
+
+      // If user has any incomplete tasks (assigned to them or assigned by them), prevent deactivation
+      if (status === 'Inactive' && (assignedTo.length > 0 || assignedBy.length > 0)) {
+        const error = new Error('Cannot deactivate user with pending tasks');
+        error.taskDetails = { assignedTo, assignedBy };
+        return callback(error, null);
+      }
+
+      // Proceed with update
+      const sql = `UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?, role = ?, status = ?, profile_image = ?
+               WHERE id = ?`;
+      const values = [first_name, last_name, email, phone, role, status, profile_image, id];
+      db.query(sql, values, callback);
+    });
   }
 
-  // Delete user
-  static delete(id, callback) {
-    const sql = 'DELETE FROM users WHERE id = ?';
+  // Check only tasks assigned TO this user (for deactivation validation)
+  static checkAssignedToTasks(id, callback) {
+    const sql = `
+      SELECT t.id, t.name, t.status, t.dueDate,
+             CONCAT(u.first_name, ' ', u.last_name) as assignedBy
+      FROM tasks t
+      LEFT JOIN users u ON t.assignBy = u.id
+      WHERE t.assignTo = ? AND t.status != 'Completed'
+    `;
     db.query(sql, [id], callback);
+  }
+
+  // Check if user has assigned tasks or is assigned tasks
+  static checkTaskRelationships(id, callback) {
+    // Check tasks assigned TO this user (pending/incomplete)
+    const assignedToSql = `
+      SELECT t.id, t.name, t.status, t.dueDate,
+             CONCAT(u.first_name, ' ', u.last_name) as assignedBy
+      FROM tasks t
+      LEFT JOIN users u ON t.assignBy = u.id
+      WHERE t.assignTo = ? AND t.status != 'Completed'
+    `;
+
+    // Check tasks assigned BY this user (pending/incomplete)
+    const assignedBySql = `
+      SELECT t.id, t.name, t.status, t.dueDate,
+             CONCAT(u.first_name, ' ', u.last_name) as assignedTo
+      FROM tasks t
+      LEFT JOIN users u ON t.assignTo = u.id
+      WHERE t.assignBy = ? AND t.status != 'Completed'
+    `;
+
+    // Run both queries
+    db.query(assignedToSql, [id], (err1, assignedToResults) => {
+      if (err1) return callback(err1, null);
+
+      db.query(assignedBySql, [id], (err2, assignedByResults) => {
+        if (err2) return callback(err2, null);
+
+        const taskRelationships = {
+          assignedTo: assignedToResults || [],
+          assignedBy: assignedByResults || []
+        };
+
+        callback(null, taskRelationships);
+      });
+    });
+  }
+
+  // Delete user (with task validation)
+  static delete(id, callback) {
+    // Check only tasks assigned TO this user (can reassign tasks assigned BY this user)
+    this.checkAssignedToTasks(id, (err, assignedToTasks) => {
+      if (err) return callback(err, null);
+
+      if (assignedToTasks.length > 0) {
+        // User has pending tasks assigned to them, cannot delete
+        const error = new Error('Cannot delete user with pending assigned tasks');
+        error.taskDetails = { assignedTo: assignedToTasks, assignedBy: [] };
+        return callback(error, null);
+      }
+
+      // No pending tasks assigned to user, safe to delete
+      const sql = 'DELETE FROM users WHERE id = ?';
+      db.query(sql, [id], callback);
+    });
   }
 
   // Check if email exists

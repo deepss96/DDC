@@ -248,7 +248,16 @@ function AppLayout() {
 }
 
 function AppContent() {
-  const { isAuthenticated, loading, user, showPasswordChange, hidePasswordChange } = useAuth();
+  const { isAuthenticated, loading, user, showPasswordChange, hidePasswordChange, requiresPasswordChange, isLoggingOutTempUser } = useAuth();
+  const navigate = useNavigate();
+
+  // Handle password change completion - hide popup and redirect to profile
+  const handlePasswordChanged = () => {
+    hidePasswordChange();
+    navigate('/profile');
+  };
+
+  // Note: Removed beforeunload listener to prevent JS confirm popup
 
   // Show loading screen while checking authentication
   if (loading) {
@@ -262,24 +271,26 @@ function AppContent() {
     );
   }
 
+  // If user requires password change and it's not during initial load, show app with blocking password change popup
+  if (requiresPasswordChange() && showPasswordChange) {
+    return (
+      <>
+        <AppLayout />
+        <ChangePasswordPopup
+          user={user}
+          onPasswordChanged={handlePasswordChanged}
+        />
+      </>
+    );
+  }
+
   // If not authenticated, show login page
   if (!isAuthenticated()) {
     return <LoginSignupPage />;
   }
 
   // If authenticated, show the main app
-  return (
-    <>
-      <AppLayout />
-      {/* Password Change Popup - shows on top of everything */}
-      {showPasswordChange && (
-        <ChangePasswordPopup
-          user={user}
-          onPasswordChanged={hidePasswordChange}
-        />
-      )}
-    </>
-  );
+  return <AppLayout />;
 }
 
 export default function App() {

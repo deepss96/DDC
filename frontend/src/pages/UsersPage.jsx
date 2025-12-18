@@ -123,6 +123,7 @@ const fetchUsers = async () => {
   const handleDeleteRow = (id) => {
     const user = usersData.find(u => u.id === id);
     if (user) {
+      // Show custom delete confirmation dialog directly
       setUserToDelete(user);
       setShowDeleteConfirm(true);
     }
@@ -146,7 +147,33 @@ const fetchUsers = async () => {
       setDeleteError(null);
     } catch (error) {
       console.error('❌ DEBUG: Delete operation error:', error);
-      setDeleteError(error.message || 'An error occurred while deleting the user. Check console for details.');
+      console.error('Error response:', error.response);
+      console.error('Error response data:', error.response?.data);
+
+      // Handle task validation errors with detailed information
+      if (error.response?.data?.taskDetails) {
+        console.log('Task validation error detected for delete');
+        const { assignedTo } = error.response.data.taskDetails;
+        let taskMessage = error.response.data.message || 'Cannot delete this user because they have pending tasks.';
+
+        // Add task details
+        const taskList = [];
+        if (assignedTo && assignedTo.length > 0) {
+          taskList.push(...assignedTo.map(task => `"${task.name}" (assigned by ${task.assignedBy})`));
+        }
+
+        if (taskList.length > 0) {
+          taskMessage += `\n\nPlease complete these tasks or reassign them to another user first: ${taskList.join(', ')}`;
+        }
+
+        console.log('Setting delete task error message:', taskMessage);
+        setDeleteError(taskMessage);
+      } else {
+        // Handle other errors
+        const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message || 'An error occurred while deleting the user. Check console for details.';
+        console.log('Setting delete generic error message:', errorMsg);
+        setDeleteError(errorMsg);
+      }
     }
   };
 
@@ -182,16 +209,16 @@ const fetchUsers = async () => {
     try {
       console.log('🔄 DEBUG: Starting user update for ID:', userToEdit.id, 'with data:', updatedUser);
 
-      const updatedUserData = await apiService.updateUser(userToEdit.id, updatedUser);
-      console.log('✅ DEBUG: User updated successfully:', updatedUserData);
+      const result = await apiService.updateUser(userToEdit.id, updatedUser);
+      console.log('✅ DEBUG: User updated successfully:', result);
 
       // Update the user in the local state
       setUsersData(usersData.map(user =>
-        user.id === userToEdit.id ? { ...updatedUserData } : user
+        user.id === userToEdit.id ? { ...user, ...updatedUser } : user
       ));
+
       // Refresh the data to ensure consistency
       fetchUsers();
-      console.log('✅ DEBUG: Users list updated after edit');
 
       // Close the popup and reset state
       setIsUserFormOpen(false);
@@ -207,9 +234,12 @@ const fetchUsers = async () => {
         setShowSuccessMessage(false);
         setSuccessMessage("");
       }, 3000);
+
+      return result;
     } catch (error) {
       console.error('❌ DEBUG: Update user operation error:', error);
-      alert('An error occurred while updating the user. Check console for details.');
+      // Re-throw the error so UserFormPopup can handle it
+      throw error;
     }
   };
 
@@ -497,12 +527,21 @@ const fetchUsers = async () => {
             <div className="mb-6">
               {deleteError ? (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-700 font-medium" style={{ fontFamily: 'var(--font-family)' }}>
-                    Cannot Delete User
-                  </p>
-                  <p className="text-red-600 text-sm mt-1" style={{ fontFamily: 'var(--font-family)' }}>
-                    {deleteError}
-                  </p>
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-red-800 mb-1" style={{ fontFamily: 'var(--font-family)' }}>
+                        Unable to Delete User
+                      </h4>
+                      <div className="text-sm text-red-700 whitespace-pre-line" style={{ fontFamily: 'var(--font-family)' }}>
+                        {deleteError}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <p className="text-gray-700" style={{ fontFamily: 'var(--font-family)' }}>

@@ -174,6 +174,42 @@ exports.updateUser = async (req, res) => {
             User.update(id, userData, (err, result) => {
                 if (err) {
                     console.error('Error updating user:', err);
+                    console.error('Error message:', err.message);
+                    console.error('Error taskDetails:', err.taskDetails);
+
+                    // Check if it's a task validation error
+                    if (err.message && err.message.includes('Cannot deactivate user with pending tasks')) {
+                        console.log('Task validation error detected in controller');
+                        const { assignedTo, assignedBy } = err.taskDetails || { assignedTo: [], assignedBy: [] };
+
+                        let errorMessage = 'Cannot deactivate this user because they have pending tasks. ';
+                        const taskNames = [];
+
+                        if (assignedTo.length > 0) {
+                            taskNames.push(...assignedTo.map(task => `"${task.name}" (assigned by ${task.assignedBy})`));
+                        }
+
+                        if (assignedBy.length > 0) {
+                            taskNames.push(...assignedBy.map(task => `"${task.name}" (assigned to ${task.assignedTo})`));
+                        }
+
+                        if (taskNames.length > 0) {
+                            errorMessage += `Please complete or reassign these tasks first: ${taskNames.join(', ')}`;
+                        }
+
+                        console.log('Sending task validation error response:', {
+                            error: 'Cannot deactivate user',
+                            message: errorMessage,
+                            taskDetails: { assignedTo, assignedBy }
+                        });
+
+                        return res.status(400).json({
+                            error: 'Cannot deactivate user',
+                            message: errorMessage,
+                            taskDetails: { assignedTo, assignedBy }
+                        });
+                    }
+
                     return res.status(500).json({ error: 'Failed to update user' });
                 }
 
@@ -194,6 +230,28 @@ exports.deleteUser = (req, res) => {
     User.delete(id, (err, result) => {
         if (err) {
             console.error('Error deleting user:', err);
+
+            // Check if it's a task validation error
+            if (err.message && err.message.includes('Cannot delete user with pending assigned tasks')) {
+                const { assignedTo } = err.taskDetails || { assignedTo: [] };
+
+                let errorMessage = 'Cannot delete this user because they have pending tasks assigned to them. ';
+                const taskNames = [];
+
+                if (assignedTo.length > 0) {
+                    taskNames.push(...assignedTo.map(task => `"${task.name}" (assigned by ${task.assignedBy})`));
+                }
+
+                if (taskNames.length > 0) {
+                    errorMessage += `Please complete these tasks or reassign them to another user first: ${taskNames.join(', ')}`;
+                }
+
+                return res.status(400).json({
+                    error: 'Cannot delete user',
+                    message: errorMessage,
+                    taskDetails: { assignedTo, assignedBy: [] }
+                });
+            }
 
             // Check if it's a foreign key constraint error
             if (err.code === 'ER_ROW_IS_REFERENCED_2' || err.errno === 1451) {

@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [isLoggingOutTempUser, setIsLoggingOutTempUser] = useState(false);
 
   // Check for existing token and user data on app start
   useEffect(() => {
@@ -27,8 +28,17 @@ export const AuthProvider = ({ children }) => {
         const userData = JSON.parse(storedUser);
         setToken(storedToken);
         setUser(userData);
+
+        // If user has temp password during initial load, don't show popup yet
+        // fetchFullProfile will handle logout if needed
+        if (!userData.isTempPassword) {
+          // Only show password change popup if user doesn't have temp password
+          // (this shouldn't happen, but safety check)
+          setShowPasswordChange(false);
+        }
+
         // Fetch full profile to ensure we have complete user data including role
-        fetchFullProfile(storedToken);
+        fetchFullProfile(storedToken, true);
       } catch (error) {
         // Invalid stored data, clear it
         localStorage.removeItem('token');
@@ -38,7 +48,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const fetchFullProfile = async (authToken) => {
+  const fetchFullProfile = async (authToken, isInitialLoad = false) => {
     try {
       // Temporarily set the token for the API call
       const originalToken = localStorage.getItem('token');
@@ -46,7 +56,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', authToken);
       }
 
-      console.log('AUTH DEBUG: Fetching full profile');
+      console.log('AUTH DEBUG: Fetching full profile, isInitialLoad:', isInitialLoad);
       const response = await apiService.getProfile();
       console.log('AUTH DEBUG: Profile response:', response);
 
@@ -69,7 +79,24 @@ export const AuthProvider = ({ children }) => {
 
       // Check if user needs to change password
       if (fullUserData.isTempPassword) {
-        setShowPasswordChange(true);
+        // If this is initial app load and user still has temp password, they refreshed without changing
+        if (isInitialLoad) {
+          console.log('TEMP PASSWORD: User refreshed without changing password, logging out');
+          setIsLoggingOutTempUser(true);
+          setToken(null);
+          setUser(null);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setIsLoggingOutTempUser(false);
+          return;
+        } else {
+          // This is after login, show password change popup
+          console.log('TEMP PASSWORD: Showing password change popup after login');
+          setShowPasswordChange(true);
+        }
+      } else {
+        // User has changed password, hide any password change popup
+        setShowPasswordChange(false);
       }
     } catch (error) {
       console.error('Error fetching full profile:', error);
@@ -124,7 +151,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isAuthenticated = () => {
-    return !!token && !!user;
+    return !!token && !!user && !user.isTempPassword;
+  };
+
+  const requiresPasswordChange = () => {
+    // Don't show password change popup during initial load if user has temp password
+    // This prevents the popup from showing briefly before logout during refresh
+    if (loading && !!user && !!user.isTempPassword) {
+      return false;
+    }
+    return !!token && !!user && !!user.isTempPassword;
   };
 
   const value = {
@@ -136,7 +172,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateUser,
     hidePasswordChange,
-    isAuthenticated
+    isAuthenticated,
+    requiresPasswordChange
   };
 
   return (

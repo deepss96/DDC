@@ -36,11 +36,12 @@ class ApiService {
       const response = await fetch(url, defaultOptions);
 
       if (!response.ok) {
-        // Try to get error message from response
+        // Try to get error data from response
         let errorMessage = `HTTP error! status: ${response.status}`;
+        let errorData = null;
 
         try {
-          const errorData = await response.json();
+          errorData = await response.json();
           if (errorData.error) {
             errorMessage = errorData.error;
           }
@@ -76,7 +77,10 @@ class ApiService {
           }
         }
 
-        throw new Error(errorMessage);
+        // Create error with response data attached
+        const error = new Error(errorMessage);
+        error.response = { data: errorData, status: response.status };
+        throw error;
       }
 
       return await response.json();

@@ -6,7 +6,7 @@ import apiService from '../services/api';
 import logo from '../assets/logo-big.png';
 
 const LoginSignupPage = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, requiresPasswordChange } = useAuth();
   const navigate = useNavigate();
   const [formType, setFormType] = useState('login'); // 'login', 'forgot'
   const [showPassword, setShowPassword] = useState(false);
@@ -68,6 +68,9 @@ const LoginSignupPage = () => {
 
     setLoading(true);
 
+    // Add 2 second delay before processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
     try {
       if (formType === 'login') {
         console.log('Attempting login with:', {
@@ -84,11 +87,17 @@ const LoginSignupPage = () => {
 
         // Use auth context to handle login
         login(data.token, data.user);
-        setMessage('Login successful! Redirecting...');
-        // Redirect to dashboard after successful login
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1500);
+
+        // Check if user needs to change password
+        if (data.user.isTempPassword) {
+          setMessage('Login successful! Please change your password to continue.');
+        } else {
+          setMessage('Login successful! Redirecting...');
+          // Redirect to dashboard after successful login
+          setTimeout(() => {
+            navigate('/dashboard');
+          }, 1500);
+        }
       } else if (formType === 'forgot') {
         const data = await apiService.forgotPassword({
           email: formData.resetEmail
@@ -270,7 +279,7 @@ const LoginSignupPage = () => {
                         className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-transparent transition-all duration-300 ${
                           errors.identifier ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
                         }`}
-                        placeholder="Enter email, username, or 10-digit phone"
+                        placeholder="Email/phone or username"
                       />
                     </div>
                     {errors.identifier && (
@@ -369,7 +378,7 @@ const LoginSignupPage = () => {
                 {loading ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    <span>Processing...</span>
+                    <span>Sign in ......</span>
                   </>
                 ) : (
                   <>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FiFileText, FiUser } from "react-icons/fi";
+import { FiFileText, FiUser, FiMail, FiPhone, FiLock, FiShield, FiActivity, FiCalendar } from "react-icons/fi";
 
 // Add wave animation for back button
 const waveStyles = `
@@ -165,17 +165,17 @@ const UserInfo = ({ selectedUser, onClose }) => {
                                 <DisplayField
                                     label="EMAIL"
                                     value={selectedUser.email}
-                                    icon={() => <span className="text-gray-500">@</span>}
+                                    icon={FiMail}
                                 />
                                 <DisplayField
                                     label="PHONE NUMBER"
                                     value={selectedUser.phone ? `+${selectedUser.phone.slice(0, 2)} ${selectedUser.phone.slice(2)}` : "Not Available"}
-                                    icon={() => <span className="text-gray-500">📞</span>}
+                                    icon={FiPhone}
                                 />
                                 <DisplayField
                                     label="PASSWORD"
                                     value={selectedUser.password || "Not Available"}
-                                    icon={() => <span className="text-gray-500">🔒</span>}
+                                    icon={FiLock}
                                 />
                                 <DisplayField
                                     label="ROLE"
@@ -189,7 +189,7 @@ const UserInfo = ({ selectedUser, onClose }) => {
                                             {selectedUser.role}
                                         </span>
                                     }
-                                    icon={() => <span className="text-gray-500">👤</span>}
+                                    icon={FiShield}
                                 />
                                 <DisplayField
                                     label="STATUS"
@@ -203,12 +203,12 @@ const UserInfo = ({ selectedUser, onClose }) => {
                                             {selectedUser.status}
                                         </span>
                                     }
-                                    icon={() => <span className="text-gray-500">📊</span>}
+                                    icon={FiActivity}
                                 />
                                 <DisplayField
                                     label="REGISTRATION DATE"
                                     value={formatDate(selectedUser.created_at)}
-                                    icon={() => <span className="text-gray-500">📅</span>}
+                                    icon={FiCalendar}
                                 />
                             </div>
                         </div>
