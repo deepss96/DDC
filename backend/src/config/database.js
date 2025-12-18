@@ -10,7 +10,7 @@ const dbConfig = {
   port: process.env.DB_PORT,
 
   connectionLimit: process.env.NODE_ENV === 'production' ? 2 : 10, // Lower limit for production
-  connectTimeout: 60000, // 60 seconds timeout
+  connectTimeout: 10000, // 10 seconds timeout
   ssl: false // Disable SSL for all environments (required for free database hosts)
 };
 
