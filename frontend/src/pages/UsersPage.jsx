@@ -423,7 +423,17 @@ const fetchUsers = async () => {
                           {/* Row 1: Name and Status */}
                           <div className="flex justify-between items-center mb-3">
                             <div className="flex-1 min-w-0 flex items-center gap-3">
-                              <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors" style={{ fontFamily: 'var(--font-family)' }}>{`${user.first_name} ${user.last_name}`}</h3>
+                              <h3
+                                className="text-sm font-semibold hover:underline transition-colors cursor-pointer"
+                                style={{
+                                  fontFamily: 'var(--font-family)',
+                                  color: 'var(--primary-color)'
+                                }}
+                                onMouseEnter={(e) => e.target.style.color = 'var(--secondary-color)'}
+                                onMouseLeave={(e) => e.target.style.color = 'var(--primary-color)'}
+                              >
+                                {`${user.first_name} ${user.last_name}`}
+                              </h3>
                               <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(user.status)}`} style={{ fontFamily: 'var(--font-family)' }}>
                                 {user.status}
                               </span>
