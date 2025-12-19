@@ -6,18 +6,7 @@ import Table from "../components/Table";
 import ClientFormPopup from "../components/ClientFormPopup";
 
 export default function ClientsPage({ searchTerm = '' }) {
-  const initialClients = [
-    { id: 1, name: "Rajesh Kumar", email: "rajesh.kumar@gmail.com", phone: "+91 98765 43210", status: "Active", company: "ABC Construction", date: "2024-01-15" },
-    { id: 2, name: "Priya Sharma", email: "priya.sharma@gmail.com", phone: "+91 98765 43211", status: "Active", company: "XYZ Builders", date: "2024-01-10" },
-    { id: 3, name: "Amit Patel", email: "amit.patel@gmail.com", phone: "+91 98765 43212", status: "Inactive", company: "BuildTech Solutions", date: "2024-01-08" },
-    { id: 4, name: "Sneha Singh", email: "sneha.singh@gmail.com", phone: "+91 98765 43213", status: "Active", company: "Modern Homes", date: "2024-01-05" },
-    { id: 5, name: "Vikram Gupta", email: "vikram.gupta@gmail.com", phone: "+91 98765 43214", status: "Active", company: "Elite Contractors", date: "2024-01-03" },
-    { id: 6, name: "Anjali Verma", email: "anjali.verma@gmail.com", phone: "+91 98765 43215", status: "Inactive", company: "Prime Realty", date: "2024-01-12" },
-    { id: 7, name: "Rahul Jain", email: "rahul.jain@gmail.com", phone: "+91 98765 43216", status: "Active", company: "City Developers", date: "2024-01-09" },
-    { id: 8, name: "Meera Reddy", email: "meera.reddy@gmail.com", phone: "+91 98765 43217", status: "Active", company: "Green Build", date: "2024-01-07" },
-  ];
-
-  const [clientsData, setClientsData] = useState(initialClients);
+  const [clientsData, setClientsData] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
   const [isClientFormOpen, setIsClientFormOpen] = useState(false);
