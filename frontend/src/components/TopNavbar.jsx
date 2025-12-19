@@ -156,7 +156,7 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
           <h1 className="top-navbar-title text-sm">{title}</h1>
           {/* Subtitle hidden on mobile for cleaner look */}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <NotificationDropdown />
 
           {/* LANGUAGE SELECTOR COMPONENT - MOBILE */}
