@@ -414,11 +414,16 @@ const fetchUsers = async () => {
                   ) : (
                     <div className="space-y-2 px-2">
                       {filteredUsers.map((user) => (
-                        <div key={`mobile-user-${user.id}`} className="bg-white rounded-lg border border-gray-200 p-3 pb-1 shadow-sm hover:shadow-md transition-shadow" style={{ fontFamily: 'var(--font-family)' }}>
+                        <div
+                          key={`mobile-user-${user.id}`}
+                          className="bg-white rounded-lg border border-gray-200 p-3 pb-1 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                          style={{ fontFamily: 'var(--font-family)' }}
+                          onClick={() => setSelectedUser(user)}
+                        >
                           {/* Row 1: Name and Status */}
                           <div className="flex justify-between items-center mb-3">
                             <div className="flex-1 min-w-0 flex items-center gap-3">
-                              <h3 className="text-sm font-semibold text-gray-900" style={{ fontFamily: 'var(--font-family)' }}>{`${user.first_name} ${user.last_name}`}</h3>
+                              <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors" style={{ fontFamily: 'var(--font-family)' }}>{`${user.first_name} ${user.last_name}`}</h3>
                               <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(user.status)}`} style={{ fontFamily: 'var(--font-family)' }}>
                                 {user.status}
                               </span>
@@ -449,7 +454,7 @@ const fetchUsers = async () => {
                               </div>
                               <span style={{ fontFamily: 'var(--font-family)' }}>Role: {user.role}</span>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                               <TableActionButton
                                 icon={FaPencilAlt}
                                 type="edit"
