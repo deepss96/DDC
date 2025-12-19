@@ -429,7 +429,7 @@ const fetchUsers = async () => {
                                   fontFamily: 'var(--font-family)',
                                   color: 'var(--primary-color)'
                                 }}
-                                onMouseEnter={(e) => e.target.style.color = 'var(--secondary-color)'}
+                                onMouseEnter={(e) => e.target.style.color = '#1d4ed8'}
                                 onMouseLeave={(e) => e.target.style.color = 'var(--primary-color)'}
                               >
                                 {`${user.first_name} ${user.last_name}`}
