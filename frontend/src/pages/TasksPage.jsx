@@ -698,14 +698,17 @@ const fetchTasks = async () => {
                     ) : (
                       <div className="space-y-2">
                         {filteredTasks.map((task) => (
-                          <div key={task.id} className="bg-white rounded-lg border border-gray-200 p-3 pb-1 shadow-sm hover:shadow-md transition-shadow">
+                          <div
+                            key={task.id}
+                            className="bg-white rounded-lg border border-gray-200 p-3 pb-1 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                            onClick={() => setSelectedTask(task)}
+                          >
                             {/* Row 1: Name and Status */}
                             <div className="flex justify-between items-center mb-3">
                               <div className="flex-1 min-w-0 flex items-center gap-3">
                                 <h3
                                   className="text-sm font-semibold text-blue-600 hover:text-blue-800 cursor-pointer hover:underline "
                                   title={task.description}
-                                  onClick={() => setSelectedTask(task)}
                                 >
                                   {task.name}
                                 </h3>
@@ -752,7 +755,7 @@ const fetchTasks = async () => {
                             </div>
 
                             {/* Row 4: Action Buttons */}
-                            <div className="flex justify-center items-center mt-2 gap-2">
+                            <div className="flex justify-center items-center mt-2 gap-2" onClick={(e) => e.stopPropagation()}>
                               <TableActionButton
                                 icon={FiEdit2}
                                 type="edit"
