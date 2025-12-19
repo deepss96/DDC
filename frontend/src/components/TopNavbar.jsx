@@ -156,8 +156,8 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
           <h1 className="top-navbar-title text-sm">{title}</h1>
           {/* Subtitle hidden on mobile for cleaner look */}
         </div>
-        <div className="flex items-center gap-2">
-          <NotificationDropdown />
+        <div className="flex items-center gap-1">
+          <NotificationDropdown size={16} />
 
           {/* LANGUAGE SELECTOR COMPONENT - MOBILE */}
           {/* <LanguageSelector title={title} subtitle={subtitle} /> */}
@@ -169,7 +169,7 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                 e.stopPropagation();
                 setShowUserMenu(!showUserMenu);
               }}
-              className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-1 p-1 rounded-lg hover:bg-gray-100 transition-colors"
             >
               <div className="top-navbar-avatar">
                 {user?.profile_image ? (
@@ -183,10 +183,10 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                 )}
               </div>
               <div className="flex flex-col items-start">
-                <span className="text-xs font-medium text-gray-900 leading-tight">
+                <span className="text-xs font-medium text-gray-900 leading-tight truncate max-w-[80px]">
                   {user?.firstName} {user?.lastName}
                 </span>
-                <span className="text-[10px] text-gray-500 leading-tight">
+                <span className="text-[10px] text-gray-500 leading-tight truncate max-w-[80px]">
                   @{user?.username}
                 </span>
               </div>
