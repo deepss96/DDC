@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FiLock, FiEye, FiEyeOff, FiShield, FiCheckCircle } from "react-icons/fi";
 import apiService from "../services/api";
 
 export default function ChangePasswordPopup({ user, onPasswordChanged }) {
+    const navigate = useNavigate();
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -10,19 +12,6 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
     const [loading, setLoading] = useState(false);
-
-    // Auto-hide success message after 3 seconds
-    useEffect(() => {
-        if (success) {
-            const timer = setTimeout(() => {
-                setSuccess("");
-                if (onPasswordChanged) {
-                    onPasswordChanged();
-                }
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [success, onPasswordChanged]);
 
     const validatePassword = (password) => {
         if (!password) {
@@ -69,7 +58,11 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
             storedUser.isTempPassword = false;
             localStorage.setItem("user", JSON.stringify(storedUser));
 
-            setSuccess("Password changed successfully! You can now access your account.");
+            // Close popup and navigate to profile page immediately
+            if (onPasswordChanged) {
+                onPasswordChanged();
+            }
+            navigate('/profile');
         } catch (err) {
             console.error("Error changing password:", err);
             setError(err.message || "Failed to change password. Please try again.");
