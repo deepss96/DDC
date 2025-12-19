@@ -124,8 +124,8 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    // Navigate to profile page
-                    window.location.href = '/profile';
+                    // Navigate to profile page using hash routing
+                    window.location.href = '/#/profile';
                     setShowUserMenu(false);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
@@ -209,8 +209,8 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    // Navigate to profile page
-                    window.location.href = '/profile';
+                    // Navigate to profile page using hash routing
+                    window.location.href = '/#/profile';
                     setShowUserMenu(false);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
