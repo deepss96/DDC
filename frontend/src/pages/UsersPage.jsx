@@ -4,7 +4,7 @@ import { FaPencilAlt, FaTrash } from "react-icons/fa";
 import TableActionButton from "../components/TableActionButton";
 import UserFormPopup from "../components/UserFormPopup";
 import UserInfo from "../components/UserInfo";
-import ListViewDropdown from "../components/ListViewDropdown";
+
 import Table from "../components/Table";
 import { useAuth } from "../contexts/AuthContext";
 import { formatDateForDisplay } from "../utils/dateUtils.jsx";
@@ -21,12 +21,7 @@ export default function UsersPage({ searchTerm = '' }) {
   const [isUserFormOpen, setIsUserFormOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
-  const [userViews, setUserViews] = useState([
-    { id: 1, name: "All Users", pinned: true },
-    { id: 2, name: "Active Users", pinned: false },
-    { id: 3, name: "Inactive Users", pinned: false }
-  ]);
-  const [currentViewId, setCurrentViewId] = useState(1);
+
   const [selectedUser, setSelectedUser] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
@@ -44,6 +39,11 @@ export default function UsersPage({ searchTerm = '' }) {
   // Handle clicks outside the filter dropdown to close it
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Don't close if clicking on dropdown options or the filter button itself
+      if (event.target.closest('[data-dropdown-option]') || event.target.closest('[data-filter-button]')) {
+        return;
+      }
+
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
         setIsFilterPopupOpen(false);
       }
@@ -84,16 +84,7 @@ const fetchUsers = async () => {
 
     const matchesStatus = selectedStatus === 'All' || user.status === selectedStatus;
 
-    // View-based filtering
-    let matchesView = true;
-    if (currentViewId === 2) { // Active Users
-      matchesView = user.status === 'Active';
-    } else if (currentViewId === 3) { // Inactive Users
-      matchesView = user.status === 'Inactive';
-    }
-    // currentViewId === 1 is "All Users" - no additional filtering
-
-    return matchesSearch && matchesStatus && matchesView;
+    return matchesSearch && matchesStatus;
   });
 
   const handleDeleteUser = async (id) => {
@@ -311,18 +302,19 @@ const fetchUsers = async () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col hero-section">
-      <div className="flex-1 flex">
-        <main className="flex-1 overflow-hidden px-4 sm:px-6 py-4 space-y-4 md:pb-4 pb-24">
+    <div className="flex-1 flex flex-col">
 
-          {/* Success Message Toast */}
-          {showSuccessMessage && (
-            <div className="fixed top-4 right-4 z-[1200] bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
-              <p className="text-sm font-medium" style={{ fontFamily: 'var(--font-family)' }}>
-                {successMessage}
-              </p>
-            </div>
-          )}
+      {/* Success Message Toast */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 right-4 z-[1200] bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+          <p className="text-sm font-medium" style={{ fontFamily: 'var(--font-family)' }}>
+            {successMessage}
+          </p>
+        </div>
+      )}
+
+      <div className="flex-1 flex">
+        <main className="flex-1 overflow-hidden px-4 sm:px-6 py-4 space-y-4 md:pb-4 pb-24 ">
 
           {/* USERS TABLE */}
           <div className="bg-white rounded-xl border borderr flex flex-col overflow-hidden" style={{ height: window.innerWidth < 640 ? 'calc(100vh - 180px)' : 'calc(100vh - 90px)' }}>
@@ -333,81 +325,148 @@ const fetchUsers = async () => {
                 {/* FIXED FILTER HEADER */}
                 <div className="sticky top-0 z-10 bg-white rounded-t-xl border-b border-gray-200 shadow-sm flex-shrink-0">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-3 sm:px-6 pt-2 pb-2">
-                  <div className="hidden sm:flex items-center gap-3 mb-3 sm:mb-0">
-                    <ListViewDropdown
-                      views={userViews}
-                      currentViewId={currentViewId}
-                      onChange={setCurrentViewId}
-                      onPinToggle={(id) => {
-                        setUserViews(views => views.map(v => v.id === id ? { ...v, pinned: !v.pinned } : v));
-                      }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-end gap-2 w-full sm:w-auto py-0">
-                    <div className="relative">
-                      <button
-                        onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
-                        className="flex items-center gap-0 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm"
-                        style={{ height: '30px' }}
-                        title="Filter by status"
-                      >
-                        <div className="flex items-center justify-center w-7 h-full bg-gray-100 rounded-l-lg border-r border-gray-300">
-                          <FiFilter size={14} />
-                        </div>
-                        <span style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px', padding: '0 8px', fontFamily: 'var(--font-family)' }}>
-                          {selectedStatus === "All" ? "All Status" :
-                           selectedStatus === "Active" ? "Active" :
-                           selectedStatus === "Inactive" ? "Inactive" : "All Status"}
-                        </span>
-                      </button>
-                      {isFilterPopupOpen && (
-                        <div ref={filterDropdownRef} className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-40 py-1">
-                          {[
-                            { value: "All", label: "All Status" },
-                            { value: "Active", label: "Active" },
-                            { value: "Inactive", label: "Inactive" }
-                          ].map((option) => (
-                            <button
-                              key={option.value}
-                              onClick={() => {
-                                setSelectedStatus(option.value);
-                                setIsFilterPopupOpen(false);
-                              }}
-                              className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-xs hover:bg-gray-50 transition-colors ${
-                                selectedStatus === option.value
-                                  ? "text-blue-600 font-medium"
-                                  : "text-gray-700"
-                              }`}
-                            >
-                              <span>{option.label}</span>
-                              {selectedStatus === option.value && (
-                                <FiCheck className="text-blue-600" size={14} />
-                              )}
-                            </button>
-                          ))}
-                        </div>
+                    {/* Mobile: All filters in one row */}
+                    <div className="flex items-center justify-end gap-2 w-full py-0 flex-wrap sm:hidden ml-auto">
+                      {/* Status Filter - Mobile version with Active/Inactive options only */}
+                      <div className="relative flex-shrink-0">
+                        <button
+                          data-filter-button="true"
+                          onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
+                          className="flex items-center gap-0 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm"
+                          style={{ height: '30px' }}
+                          title="Filter by status"
+                        >
+                          <div className="flex items-center justify-center w-7 h-full bg-gray-100 rounded-l-lg border-r border-gray-300">
+                            <FiFilter size={14} />
+                          </div>
+                          <span style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px', padding: '0 8px', fontFamily: 'var(--font-family)' }}>
+                            {selectedStatus === "Active" ? "Active" :
+                             selectedStatus === "Inactive" ? "Inactive" : "Active"}
+                          </span>
+                        </button>
+                        {isFilterPopupOpen && (
+                          <div ref={filterDropdownRef} className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-40 py-1">
+                            {[
+                              { value: "Active", label: "Active" },
+                              { value: "Inactive", label: "Inactive" }
+                            ].map((option) => (
+                              <button
+                                key={option.value}
+                                data-dropdown-option="true"
+                                onClick={() => {
+                                  setSelectedStatus(option.value);
+                                  setIsFilterPopupOpen(false);
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-xs hover:bg-gray-50 transition-colors ${
+                                  selectedStatus === option.value
+                                    ? "text-blue-600 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                <span>{option.label}</span>
+                                {selectedStatus === option.value && (
+                                  <FiCheck className="text-blue-600" size={14} />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* New User Button */}
+                      <div className="flex-shrink-0">
+                        {user?.role?.toLowerCase() === 'admin' && (
+                          <button
+                            onClick={() => setIsUserFormOpen(true)}
+                            className="flex items-center gap-1 px-2 py-1.5 text-white text-sm font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all shadow-sm"
+                            style={{
+                              backgroundColor: 'var(--primary-color)',
+                              borderColor: 'var(--primary-color)'
+                            }}
+                          >
+                            <FiPlus size={17} color="#ffffff" />
+                            <span className="hidden sm:inline" style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px' }}>New</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Desktop: Left Side - Title */}
+                    <div className="hidden sm:flex items-center gap-3 mb-3 sm:mb-0">
+                      <h2 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'var(--font-family)' }}>Users</h2>
+                    </div>
+
+                    {/* Desktop: Right Side - All Filters and New Button */}
+                    <div className="hidden sm:flex items-center justify-end gap-2 sm:gap-3 py-0 flex-wrap">
+                      {/* Status Filter */}
+                      <div className="relative">
+                        <button
+                          onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
+                          className="flex items-center gap-0 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm"
+                          style={{ height: '30px' }}
+                          title="Filter by status"
+                        >
+                          <div className="flex items-center justify-center w-7 h-full bg-gray-100 rounded-l-lg border-r border-gray-300">
+                            <FiFilter size={14} />
+                          </div>
+                          <span className="hidden sm:inline" style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px', padding: '0 8px', fontFamily: 'var(--font-family)' }}>
+                            {selectedStatus === "All" ? "All Status" :
+                             selectedStatus === "Active" ? "Active" :
+                             selectedStatus === "Inactive" ? "Inactive" : "All Status"}
+                          </span>
+                        </button>
+                        {isFilterPopupOpen && (
+                          <div ref={filterDropdownRef} className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-40 py-1">
+                            {[
+                              { value: "All", label: "All Status" },
+                              { value: "Active", label: "Active" },
+                              { value: "Inactive", label: "Inactive" }
+                            ].map((option) => (
+                              <button
+                                key={option.value}
+                                onClick={() => {
+                                  setSelectedStatus(option.value);
+                                  setIsFilterPopupOpen(false);
+                                }}
+                                className={`w-full flex items-center justify-between px-3 py-1.5 text-left text-xs hover:bg-gray-50 transition-colors ${
+                                  selectedStatus === option.value
+                                    ? "text-blue-600 font-medium"
+                                    : "text-gray-700"
+                                }`}
+                              >
+                                <span>{option.label}</span>
+                                {selectedStatus === option.value && (
+                                  <FiCheck className="text-blue-600" size={14} />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* New User Button */}
+                      {user?.role?.toLowerCase() === 'admin' && (
+                        <button
+                          onClick={() => setIsUserFormOpen(true)}
+                          className="flex items-center gap-1 px-2 py-1.5 text-white text-sm font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all shadow-sm"
+                          style={{
+                            backgroundColor: 'var(--primary-color)',
+                            borderColor: 'var(--primary-color)'
+                          }}
+                        >
+                          <FiPlus size={17} color="#ffffff" />
+                          <span className="hidden sm:inline" style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px' }}>New</span>
+                        </button>
                       )}
                     </div>
-                    {user?.role?.toLowerCase() === 'admin' && (
-                      <button
-                        onClick={() => setIsUserFormOpen(true)}
-                        className="flex items-center gap-1 px-2 py-1.5 text-white text-sm font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all shadow-sm"
-                        style={{
-                          backgroundColor: 'var(--primary-color)',
-                          borderColor: 'var(--primary-color)'
-                        }}
-                      >
-                        <FiPlus size={17} color="#ffffff" />
-                        <span style={{ fontWeight: '400', fontSize: '12px', lineHeight: '18px' }}>New</span>
-                      </button>
-                    )}
                   </div>
                 </div>
 
                 {/* SCROLLABLE CONTENT AREA */}
                 <div className="flex-1 overflow-auto">
-                  {/* MOBILE CARD VIEW */}
-                  <div className="block sm:hidden mt-4" style={{ fontFamily: 'var(--font-family)' }}>
+
+                {/* MOBILE CARD VIEW */}
+                <div className="block sm:hidden mt-4" style={{ fontFamily: 'var(--font-family)' }}>
                   {filteredUsers.length === 0 ? (
                     <div className="text-center py-12 px-4">
                       <FiUserPlus className="mx-auto h-12 w-12 text-gray-400" />
@@ -488,21 +547,21 @@ const fetchUsers = async () => {
                       ))}
                     </div>
                   )}
-                  </div>
+                </div>
 
-                  {/* DESKTOP TABLE VIEW */}
-                  <Table
-                    data={filteredUsers}
-                    columns={userColumns}
-                    loading={loading}
-                    emptyMessage="No users found"
-                    emptyDescription="Get started by adding a new user."
-                    onEdit={handleEditRow}
-                    onDelete={handleDeleteRow}
-                    renderCell={renderUserCell}
-                    loadingMessage="Loading users..."
-                    keyField="id"
-                  />
+                {/* DESKTOP TABLE VIEW */}
+                <Table
+                  data={filteredUsers}
+                  columns={userColumns}
+                  loading={loading}
+                  emptyMessage="No users found"
+                  emptyDescription="Get started by adding a new user."
+                  onEdit={handleEditRow}
+                  onDelete={handleDeleteRow}
+                  renderCell={renderUserCell}
+                  loadingMessage="Loading users..."
+                  keyField="id"
+                />
                 </div>
               </>
             )}
