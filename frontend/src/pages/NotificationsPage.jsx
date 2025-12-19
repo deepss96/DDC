@@ -10,6 +10,7 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, read, unread
+  const [deletedTasks, setDeletedTasks] = useState(new Set()); // Track which task IDs are deleted
 
   // Fetch notifications
   const fetchNotifications = async () => {
@@ -58,13 +59,21 @@ export default function NotificationsPage() {
 
     // Navigate based on notification type
     if (notification.type === 'task_assigned' && notification.related_id) {
-      // Navigate to tasks page and directly open the task info
-      navigate('/my-tasks', {
-        state: {
-          openTaskId: notification.related_id,
-          fromNotification: true
-        }
-      });
+      try {
+        // Check if the task still exists
+        const taskData = await apiService.getTaskById(notification.related_id);
+
+        // If task exists, navigate to open it
+        navigate('/my-tasks', {
+          state: {
+            openTaskId: notification.related_id,
+            fromNotification: true
+          }
+        });
+      } catch (error) {
+        // Task not found (deleted)
+        alert(`This task has been deleted and cannot be opened.`);
+      }
     }
   };
 
