@@ -260,6 +260,12 @@ class ApiService {
     });
   }
 
+  async deleteNotificationsByRelatedId(relatedId, type) {
+    return this.request(`/api/notifications/by-related/${relatedId}/${type}`, {
+      method: 'DELETE'
+    });
+  }
+
   // Health check
   async healthCheck() {
     return this.request('/api/health');

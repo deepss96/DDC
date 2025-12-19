@@ -95,8 +95,13 @@ const NotificationDropdown = () => {
 
       // Navigate based on notification type
       if (notification.type === 'task_assigned' && notification.related_id) {
-        // Navigate to tasks page and show the specific task
-        navigate('/my-tasks', { state: { highlightTaskId: notification.related_id } });
+        // Navigate to tasks page and directly open the task info
+        navigate('/my-tasks', {
+          state: {
+            openTaskId: notification.related_id,
+            fromNotification: true
+          }
+        });
       }
 
       setIsOpen(false);
@@ -270,8 +275,7 @@ const NotificationDropdown = () => {
             <div className="px-3 py-1 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={() => {
-                  // For now, navigate to tasks page, but this can be made dynamic based on notification types
-                  navigate('/my-tasks');
+                  navigate('/notifications');
                   setIsOpen(false);
                 }}
                 className="w-full text-xs text-blue-600 hover:text-blue-800 text-center"

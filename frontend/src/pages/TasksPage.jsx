@@ -48,19 +48,35 @@ export default function TasksPage({ searchTerm = '' }) {
     }
   }, [location.pathname]);
 
-  // Handle notification navigation - highlight specific task (just navigate to table, don't auto-open)
+  // Handle notification navigation - open task directly or highlight in table
   useEffect(() => {
-    if (location.state?.highlightTaskId && tasksData.length > 0) {
-      const taskToHighlight = tasksData.find(task => task.id === location.state.highlightTaskId);
-      if (taskToHighlight) {
-        setHighlightedTaskId(location.state.highlightTaskId);
-        // Remove auto-opening - just highlight the task in the table
-        setTimeout(() => {
-          setHighlightedTaskId(null);
-        }, 3000); // Clear highlight after 3 seconds
-      } else {
-        // Task not found - show alert and clear the state
-        alert(`Task not found. It may have been deleted.`);
+    if (location.state && tasksData.length > 0) {
+      const { openTaskId, highlightTaskId, fromNotification } = location.state;
+
+      if (openTaskId) {
+        // Directly open the task info
+        const taskToOpen = tasksData.find(task => task.id === openTaskId);
+        if (taskToOpen) {
+          setSelectedTask(taskToOpen);
+        } else {
+          // Task not found - show alert
+          alert(`Task not found. It may have been deleted.`);
+        }
+        // Clear the state to prevent repeated actions
+        window.history.replaceState({}, '', window.location.pathname);
+      } else if (highlightTaskId) {
+        // Just highlight the task in the table
+        const taskToHighlight = tasksData.find(task => task.id === highlightTaskId);
+        if (taskToHighlight) {
+          setHighlightedTaskId(highlightTaskId);
+          // Remove highlight after 3 seconds
+          setTimeout(() => {
+            setHighlightedTaskId(null);
+          }, 3000);
+        } else {
+          // Task not found - show alert
+          alert(`Task not found. It may have been deleted.`);
+        }
         // Clear the state to prevent repeated alerts
         window.history.replaceState({}, '', window.location.pathname);
       }
@@ -225,6 +241,14 @@ const fetchTasks = async () => {
     try {
       await apiService.deleteTask(id);
       setTasksData(tasksData.filter(task => task.id !== id));
+
+      // Also delete related notifications for this task
+      try {
+        await apiService.deleteNotificationsByRelatedId(id, 'task_assigned');
+      } catch (notificationError) {
+        console.error('Error deleting related notifications:', notificationError);
+        // Don't show error to user for notification deletion failure
+      }
     } catch (error) {
       console.error('Error deleting task:', error);
       console.error('Error response:', error.response);

@@ -10,6 +10,7 @@ import TasksPage from './pages/TasksPage.jsx';
 import LoginSignupPage from './pages/LoginSignupPage.jsx';
 import UsersPage from './pages/UsersPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import NotificationsPage from './pages/NotificationsPage.jsx';
 import ChangePasswordPopup from './components/ChangePasswordPopup.jsx';
 import { useTranslation } from './services/translationService.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
@@ -216,6 +217,7 @@ function AppLayout() {
               {/* Placeholder routes for other pages */}
               <Route path="/clients-management" element={<ClientsPage searchTerm={searchTerm} />} />
               <Route path="/my-tasks" element={<TasksPage searchTerm={searchTerm} />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/projects-management" element={
                 <div className="flex-1 flex flex-col min-w-0">
