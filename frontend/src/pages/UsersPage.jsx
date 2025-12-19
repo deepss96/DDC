@@ -16,7 +16,7 @@ export default function UsersPage({ searchTerm = '' }) {
   const currentUserName = user ? `${user.firstName} ${user.lastName}` : "Admin";
   const [usersData, setUsersData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedStatus, setSelectedStatus] = useState('Active');
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
   const [isUserFormOpen, setIsUserFormOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -415,26 +415,13 @@ const fetchUsers = async () => {
                     <div className="space-y-2 px-2">
                       {filteredUsers.map((user) => (
                         <div key={`mobile-user-${user.id}`} className="bg-white rounded-lg border border-gray-200 p-3 pb-1 shadow-sm hover:shadow-md transition-shadow" style={{ fontFamily: 'var(--font-family)' }}>
-                          {/* Row 1: Name and Status with Actions */}
+                          {/* Row 1: Name and Status */}
                           <div className="flex justify-between items-center mb-3">
                             <div className="flex-1 min-w-0 flex items-center gap-3">
                               <h3 className="text-sm font-semibold text-gray-900" style={{ fontFamily: 'var(--font-family)' }}>{`${user.first_name} ${user.last_name}`}</h3>
-                            </div>
-                            <div className="flex gap-2 ml-3">
-                              <TableActionButton
-                                icon={FaPencilAlt}
-                                type="edit"
-                                title="Edit"
-                                onClick={() => handleEditRow(user.id)}
-                                mobileSize={true}
-                              />
-                              <TableActionButton
-                                icon={FaTrash}
-                                type="delete"
-                                title="Delete"
-                                onClick={() => handleDeleteRow(user.id)}
-                                mobileSize={true}
-                              />
+                              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(user.status)}`} style={{ fontFamily: 'var(--font-family)' }}>
+                                {user.status}
+                              </span>
                             </div>
                           </div>
 
@@ -454,21 +441,30 @@ const fetchUsers = async () => {
                             </div>
                           </div>
 
-                          {/* Row 3: Role */}
-                          <div className="flex justify-center items-center text-xs text-gray-600 mb-2" style={{ fontFamily: 'var(--font-family)' }}>
+                          {/* Row 3: Role (left) and Action Buttons (right) */}
+                          <div className="flex justify-between items-center text-xs text-gray-600" style={{ fontFamily: 'var(--font-family)' }}>
                             <div className="flex items-center gap-2">
                               <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center">
                                 <FiUser size={10} className="text-green-600" />
                               </div>
                               <span style={{ fontFamily: 'var(--font-family)' }}>Role: {user.role}</span>
                             </div>
-                          </div>
-
-                          {/* Row 4: Status */}
-                          <div className="flex justify-center items-center mt-2">
-                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(user.status)}`} style={{ fontFamily: 'var(--font-family)' }}>
-                              {user.status}
-                            </span>
+                            <div className="flex gap-2">
+                              <TableActionButton
+                                icon={FaPencilAlt}
+                                type="edit"
+                                title="Edit"
+                                onClick={() => handleEditRow(user.id)}
+                                mobileSize={true}
+                              />
+                              <TableActionButton
+                                icon={FaTrash}
+                                type="delete"
+                                title="Delete"
+                                onClick={() => handleDeleteRow(user.id)}
+                                mobileSize={true}
+                              />
+                            </div>
                           </div>
                         </div>
                       ))}
