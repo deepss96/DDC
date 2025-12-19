@@ -19,7 +19,7 @@ export default function TasksPage({ searchTerm = '' }) {
   const [dueDates, setDueDates] = useState([]);
   const [tasksData, setTasksData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedStatus, setSelectedStatus] = useState('New');
   const [selectedDateFilter, setSelectedDateFilter] = useState('Today');
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
   const [isDateFilterPopupOpen, setIsDateFilterPopupOpen] = useState(false);
@@ -65,6 +65,11 @@ export default function TasksPage({ searchTerm = '' }) {
   // Handle clicks outside the filter dropdown to close it
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Don't close if clicking on dropdown options or the filter button itself
+      if (event.target.closest('[data-dropdown-option]') || event.target.closest('[data-filter-button]')) {
+        return;
+      }
+
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target)) {
         setIsFilterPopupOpen(false);
       }
@@ -461,19 +466,13 @@ const fetchTasks = async () => {
                       <div className="relative flex-shrink-0">
                         <button
                           onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
-                          className="flex items-center gap-0 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm"
-                          style={{ height: '28px', fontSize: '10px' }}
+                          className={`flex items-center justify-center w-8 h-7 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm ${selectedStatus !== 'All' ? 'bg-blue-50 border-blue-300' : ''}`}
                           title="Filter by status"
                         >
-                          <div className="flex items-center justify-center w-5 h-full bg-gray-100 rounded-l-lg border-r border-gray-300">
-                            <FiFilter size={10} />
-                          </div>
-                          <span className="hidden" style={{ fontWeight: '400', padding: '0 3px' }}>
-                            Status
-                          </span>
+                          <FiFilter size={14} className={selectedStatus !== 'All' ? 'text-blue-600' : ''} />
                         </button>
                         {isFilterPopupOpen && (
-                          <div ref={filterDropdownRef} className="absolute top-full mt-1 left-1/2 transform -translate-x-1/2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-32 py-1">
+                          <div ref={filterDropdownRef} className="absolute top-full mt-1 left-0 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-32 py-1" data-dropdown="status-filter">
                             {[
                               { value: "All", label: "All Status" },
                               { value: "New", label: "New" },
@@ -484,7 +483,9 @@ const fetchTasks = async () => {
                             ].map((option) => (
                               <button
                                 key={option.value}
-                                onClick={() => {
+                                data-dropdown-option="true"
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   setSelectedStatus(option.value);
                                   setIsFilterPopupOpen(false);
                                 }}
