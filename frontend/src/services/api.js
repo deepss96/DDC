@@ -112,6 +112,13 @@ class ApiService {
     });
   }
 
+  async changePassword(passwordData) {
+    return this.request('/api/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify(passwordData)
+    });
+  }
+
   async getProfile() {
     return this.request('/api/auth/profile');
   }

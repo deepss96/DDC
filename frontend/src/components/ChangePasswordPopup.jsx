@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FiLock, FiEye, FiEyeOff, FiShield, FiCheckCircle } from "react-icons/fi";
+import apiService from "../services/api";
 
 export default function ChangePasswordPopup({ user, onPasswordChanged }) {
     const [newPassword, setNewPassword] = useState("");
@@ -58,30 +59,20 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
 
         try {
             setLoading(true);
-            const response = await fetch("/api/auth/change-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    userId: user.id,
-                    newPassword: newPassword
-                })
+            const data = await apiService.changePassword({
+                userId: user.id,
+                newPassword: newPassword
             });
 
-            const data = await response.json();
+            // Update user in localStorage to remove temp password flag
+            const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+            storedUser.isTempPassword = false;
+            localStorage.setItem("user", JSON.stringify(storedUser));
 
-            if (response.ok) {
-                // Update user in localStorage to remove temp password flag
-                const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-                storedUser.isTempPassword = false;
-                localStorage.setItem("user", JSON.stringify(storedUser));
-
-                setSuccess("Password changed successfully! You can now access your account.");
-            } else {
-                setError(data.error || "Failed to change password. Please try again.");
-            }
+            setSuccess("Password changed successfully! You can now access your account.");
         } catch (err) {
             console.error("Error changing password:", err);
-            setError("Network error. Please try again.");
+            setError(err.message || "Failed to change password. Please try again.");
         } finally {
             setLoading(false);
         }
