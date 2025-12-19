@@ -87,18 +87,24 @@ const NotificationDropdown = () => {
 
   // Handle notification click
   const handleNotificationClick = async (notification) => {
-    // Mark as read if not already
-    if (!notification.is_read) {
-      await markAsRead(notification.id);
-    }
+    try {
+      // Mark as read if not already
+      if (!notification.is_read) {
+        await markAsRead(notification.id);
+      }
 
-    // Navigate based on notification type
-    if (notification.type === 'task_assigned' && notification.related_id) {
-      // Navigate to tasks page and show the specific task
-      navigate('/my-tasks', { state: { highlightTaskId: notification.related_id } });
-    }
+      // Navigate based on notification type
+      if (notification.type === 'task_assigned' && notification.related_id) {
+        // Navigate to tasks page and show the specific task
+        navigate('/my-tasks', { state: { highlightTaskId: notification.related_id } });
+      }
 
-    setIsOpen(false);
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error handling notification click:', error);
+      // Still close the dropdown even if there's an error
+      setIsOpen(false);
+    }
   };
 
   // Close dropdown when clicking outside

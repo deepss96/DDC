@@ -58,6 +58,11 @@ export default function TasksPage({ searchTerm = '' }) {
         setTimeout(() => {
           setHighlightedTaskId(null);
         }, 3000); // Clear highlight after 3 seconds
+      } else {
+        // Task not found - show alert and clear the state
+        alert(`Task not found. It may have been deleted.`);
+        // Clear the state to prevent repeated alerts
+        window.history.replaceState({}, '', window.location.pathname);
       }
     }
   }, [location.state, tasksData]);
