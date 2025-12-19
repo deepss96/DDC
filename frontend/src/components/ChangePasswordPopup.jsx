@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiLock, FiEye, FiEyeOff, FiShield, FiCheckCircle } from "react-icons/fi";
 import apiService from "../services/api";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 export default function ChangePasswordPopup({ user, onPasswordChanged }) {
     const navigate = useNavigate();
+    const { updateUser } = useAuth();
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -53,10 +55,9 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
                 newPassword: newPassword
             });
 
-            // Update user in localStorage to remove temp password flag
-            const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-            storedUser.isTempPassword = false;
-            localStorage.setItem("user", JSON.stringify(storedUser));
+            // Update user in localStorage and auth context to remove temp password flag
+            const updatedUser = { ...user, isTempPassword: false };
+            updateUser(updatedUser);
 
             // Close popup and navigate to profile page immediately
             if (onPasswordChanged) {
