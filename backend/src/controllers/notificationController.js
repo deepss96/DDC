@@ -97,7 +97,7 @@ class NotificationController {
   // Create notification (for internal use or admin)
   static createNotification(req, res) {
     try {
-      const { user_id, title, message, type, related_id } = req.body;
+      const { user_id, title, message, type, related_id, assignByName } = req.body;
 
       if (!user_id || !title || !message || !type) {
         return res.status(400).json({ error: 'user_id, title, message, and type are required' });
@@ -109,6 +109,7 @@ class NotificationController {
         message,
         type,
         related_id,
+        assignByName,
         is_read: false,
         created_at: new Date()
       };
@@ -117,6 +118,21 @@ class NotificationController {
         if (err) {
           return res.status(500).json({ error: 'Database error' });
         }
+
+        // Get the created notification with all details
+        Notification.getById(result.insertId, (err, notificationResult) => {
+          if (!err && notificationResult.length > 0) {
+            const notification = notificationResult[0];
+
+            // Emit real-time notification to the specific user
+            if (global.io) {
+              global.io.to(`user_${user_id}`).emit('new-notification', {
+                notification: notification,
+                unreadCount: 1 // This will be updated by the frontend
+              });
+            }
+          }
+        });
 
         res.status(201).json({
           message: 'Notification created',

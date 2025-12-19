@@ -3,6 +3,7 @@ import { FiBell, FiCheck, FiX, FiExternalLink, FiUserCheck, FiClipboard, FiAlert
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
+import io from 'socket.io-client';
 
 // Notification sound
 const playNotificationSound = () => {
@@ -35,6 +36,7 @@ const NotificationDropdown = ({ size = 20 }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [socket, setSocket] = useState(null);
   const dropdownRef = useRef(null);
 
   // Fetch notifications
@@ -126,6 +128,43 @@ const NotificationDropdown = ({ size = 20 }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Socket.IO connection and real-time notifications
+  useEffect(() => {
+    if (user && user.id) {
+      // Initialize socket connection
+      const socketConnection = io(process.env.NODE_ENV === 'production'
+        ? window.location.origin
+        : 'http://localhost:5000', {
+        transports: ['websocket', 'polling']
+      });
+
+      setSocket(socketConnection);
+
+      // Join user-specific room
+      socketConnection.emit('join-user-room', user.id);
+
+      // Listen for new notifications
+      socketConnection.on('new-notification', (data) => {
+        console.log('New notification received:', data);
+
+        // Add new notification to the list
+        setNotifications(prev => [data.notification, ...prev]);
+
+        // Update unread count
+        setUnreadCount(prev => prev + 1);
+
+        // Play notification sound
+        playNotificationSound();
+      });
+
+      // Cleanup on unmount or user change
+      return () => {
+        socketConnection.emit('leave-user-room', user.id);
+        socketConnection.disconnect();
+      };
+    }
+  }, [user]);
+
   // Fetch data on mount and when user changes
   useEffect(() => {
     if (user) {
@@ -134,7 +173,7 @@ const NotificationDropdown = ({ size = 20 }) => {
     }
   }, [user]);
 
-  // Play sound when new notification arrives
+  // Play sound when new notification arrives (for initial load)
   useEffect(() => {
     if (unreadCount > 0 && notifications.length > 0) {
       const hasNewNotification = notifications.some(n => !n.is_read);

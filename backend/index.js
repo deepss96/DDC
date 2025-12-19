@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
+const socketIo = require('socket.io');
 require('dotenv').config();
 
 // Import configuration
@@ -17,6 +19,15 @@ const commentRoutes = require('./src/routes/comments');
 const notificationRoutes = require('./src/routes/notifications');
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production'
+      ? process.env.CORS_ALLOWED_ORIGINS ? process.env.CORS_ALLOWED_ORIGINS.split(',') : []
+      : true, // Allow all in development
+    credentials: true
+  }
+});
 const PORT = config.server.port;
 
 // Middleware
@@ -64,6 +75,31 @@ app.get('/api/health/db', (req, res) => {
   });
 });
 
-app.listen(PORT, config.server.host, () => {
+// Socket.IO connection handling
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  // Join user-specific room for notifications
+  socket.on('join-user-room', (userId) => {
+    socket.join(`user_${userId}`);
+    console.log(`User ${userId} joined room user_${userId}`);
+  });
+
+  // Leave user-specific room
+  socket.on('leave-user-room', (userId) => {
+    socket.leave(`user_${userId}`);
+    console.log(`User ${userId} left room user_${userId}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+// Make io accessible from controllers
+global.io = io;
+
+server.listen(PORT, config.server.host, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`WebSocket server ready`);
 });
