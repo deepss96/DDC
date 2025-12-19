@@ -87,6 +87,7 @@ const NotificationDropdown = () => {
 
   // Handle notification click
   const handleNotificationClick = async (notification) => {
+    console.log('Notification clicked:', notification);
     try {
       // Mark as read if not already
       if (!notification.is_read) {
@@ -95,6 +96,7 @@ const NotificationDropdown = () => {
 
       // Navigate based on notification type
       if (notification.type === 'task_assigned' && notification.related_id) {
+        console.log('Navigating to task:', notification.related_id);
         // Navigate to tasks page and directly open the task info
         navigate('/my-tasks', {
           state: {

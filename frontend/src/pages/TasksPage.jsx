@@ -50,21 +50,27 @@ export default function TasksPage({ searchTerm = '' }) {
 
   // Handle notification navigation - open task directly or highlight in table
   useEffect(() => {
+    console.log('TasksPage location.state:', location.state);
     if (location.state && tasksData.length > 0) {
       const { openTaskId, highlightTaskId, fromNotification } = location.state;
+      console.log('Processing notification navigation:', { openTaskId, highlightTaskId, fromNotification });
 
       if (openTaskId) {
+        console.log('Opening task directly:', openTaskId);
         // Directly open the task info
         const taskToOpen = tasksData.find(task => task.id === openTaskId);
         if (taskToOpen) {
+          console.log('Task found, opening:', taskToOpen);
           setSelectedTask(taskToOpen);
         } else {
+          console.log('Task not found for ID:', openTaskId);
           // Task not found - show alert
           alert(`Task not found. It may have been deleted.`);
         }
         // Clear the state to prevent repeated actions
         window.history.replaceState({}, '', window.location.pathname);
       } else if (highlightTaskId) {
+        console.log('Highlighting task:', highlightTaskId);
         // Just highlight the task in the table
         const taskToHighlight = tasksData.find(task => task.id === highlightTaskId);
         if (taskToHighlight) {
