@@ -355,8 +355,8 @@ const fetchTasks = async () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col  hero-section   " >
-      <div className="flex-1 flex  ">
+    <div className="flex-1 flex flex-col hero-section">
+      <div className="flex-1 flex">
         <main className="flex-1 overflow-hidden px-4 sm:px-6 py-4 space-y-4 md:pb-4 pb-24">
 
           {/* TASKS TABLE */}

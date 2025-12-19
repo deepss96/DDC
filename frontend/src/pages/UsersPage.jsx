@@ -311,7 +311,7 @@ const fetchUsers = async () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col   " >
+    <div className="flex-1 flex flex-col">
 
       {/* Success Message Toast */}
       {showSuccessMessage && (
@@ -322,27 +322,29 @@ const fetchUsers = async () => {
         </div>
       )}
 
-      <div className="flex-1 flex  ">
-        <main className="flex-1 overflow-hidden sm:overflow-auto px-4 sm:px-6 py-4 space-y-4 md:pb-4 pb-24 ">
+      <div className="flex-1 flex">
+        <main className="flex-1 overflow-hidden px-4 sm:px-6 py-4 space-y-4 md:pb-4 pb-24 ">
 
           {/* USERS TABLE */}
-          <div className="bg-white rounded-xl border border-gray-400 pb-4 sm:h-[calc(100vh-90px)]">
+          <div className="bg-white rounded-xl border border-gray-400 flex flex-col overflow-hidden" style={{ height: window.innerWidth < 640 ? 'calc(100vh - 180px)' : 'calc(100vh - 90px)' }}>
             {selectedUser ? (
               <UserInfo selectedUser={selectedUser} onClose={() => setSelectedUser(null)} />
             ) : (
               <>
-                <div className="sticky top-0 z-10 bg-white rounded-t-xl flex flex-col sm:flex-row sm:items-center sm:justify-between mb-0 px-4 sm:px-6 pt-2 pb-2 border-b border-gray-200 shadow-sm">
-                  <div className="hidden sm:flex items-center gap-3 mb-3 sm:mb-0">
-                    <ListViewDropdown
-                      views={userViews}
-                      currentViewId={currentViewId}
-                      onChange={setCurrentViewId}
-                      onPinToggle={(id) => {
-                        setUserViews(views => views.map(v => v.id === id ? { ...v, pinned: !v.pinned } : v));
-                      }}
-                    />
-                  </div>
-                  <div className="flex items-center justify-end gap-2 w-full sm:w-auto py-0">
+                {/* FIXED FILTER HEADER */}
+                <div className="sticky top-0 z-10 bg-white rounded-t-xl border-b border-gray-200 shadow-sm flex-shrink-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-3 sm:px-6 pt-2 pb-2">
+                    <div className="hidden sm:flex items-center gap-3 mb-3 sm:mb-0">
+                      <ListViewDropdown
+                        views={userViews}
+                        currentViewId={currentViewId}
+                        onChange={setCurrentViewId}
+                        onPinToggle={(id) => {
+                          setUserViews(views => views.map(v => v.id === id ? { ...v, pinned: !v.pinned } : v));
+                        }}
+                      />
+                    </div>
+                    <div className="flex items-center justify-end gap-2 w-full sm:w-auto py-0">
                     <div className="relative">
                       <button
                         onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
@@ -403,8 +405,10 @@ const fetchUsers = async () => {
                   </div>
                 </div>
 
-                {/* MOBILE CARD VIEW */}
-                <div className="block sm:hidden mt-4" style={{ fontFamily: 'var(--font-family)' }}>
+                {/* SCROLLABLE CONTENT AREA */}
+                <div className="flex-1 overflow-auto">
+                  {/* MOBILE CARD VIEW */}
+                  <div className="block sm:hidden mt-4" style={{ fontFamily: 'var(--font-family)' }}>
                   {filteredUsers.length === 0 ? (
                     <div className="text-center py-12 px-4">
                       <FiUserPlus className="mx-auto h-12 w-12 text-gray-400" />
@@ -485,10 +489,10 @@ const fetchUsers = async () => {
                       ))}
                     </div>
                   )}
-                </div>
+                  </div>
 
-                {/* DESKTOP TABLE VIEW */}
-                <Table
+                  {/* DESKTOP TABLE VIEW */}
+                  <Table
                   data={filteredUsers}
                   columns={userColumns}
                   loading={loading}
