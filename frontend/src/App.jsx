@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import TopNavbar from './components/TopNavbar.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import MobileBottomNavbar from './components/MobileBottomNavbar.jsx';
@@ -22,27 +22,31 @@ function AppLayout() {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
-  // Get current page from URL path
-  const getCurrentPageFromPath = (pathname) => {
-    if (pathname === '/' || pathname === '/dashboard') return 'dashboard';
-    if (pathname === '/lead-management') return 'lead-management';
-    if (pathname === '/clients-management') return 'clients-management';
-    if (pathname === '/my-tasks') return 'my-tasks';
-    if (pathname === '/projects-management') return 'projects-management';
-    if (pathname === '/users-management') return 'users-management';
-    if (pathname === '/profile') return 'profile';
-    if (pathname === '/employee-management') return 'employee-management';
-    if (pathname === '/site-expenses') return 'site-expenses';
-    if (pathname === '/site-received') return 'site-received';
-    if (pathname === '/reports') return 'reports';
-    if (pathname === '/settings') return 'settings';
-    if (pathname === '/help-support') return 'help-support';
+  // Get current page from URL hash (for HashRouter)
+  const getCurrentPageFromHash = (hash) => {
+    const path = hash.replace('#', '') || '/';
+    if (path === '/' || path === '/dashboard') return 'dashboard';
+    if (path === '/lead-management') return 'lead-management';
+    if (path === '/clients-management') return 'clients-management';
+    if (path === '/my-tasks') return 'my-tasks';
+    if (path === '/projects-management') return 'projects-management';
+    if (path === '/users-management') return 'users-management';
+    if (path === '/profile') return 'profile';
+    if (path === '/employee-management') return 'employee-management';
+    if (path === '/site-expenses') return 'site-expenses';
+    if (path === '/site-received') return 'site-received';
+    if (path === '/reports') return 'reports';
+    if (path === '/settings') return 'settings';
+    if (path === '/help-support') return 'help-support';
     return 'dashboard';
   };
 
-  const [currentPage, setCurrentPage] = useState(getCurrentPageFromPath(location.pathname));
+  const [currentPage, setCurrentPage] = useState(getCurrentPageFromHash(location.hash));
 
-
+  // Update currentPage when hash changes
+  useEffect(() => {
+    setCurrentPage(getCurrentPageFromHash(location.hash));
+  }, [location.hash]);
 
   const handleNavigate = (path) => {
     setCurrentPage(path);
@@ -226,6 +230,78 @@ function AppLayout() {
                 </div>
               } />
               <Route path="/users-management" element={<UsersPage searchTerm={searchTerm} />} />
+              <Route path="/employee-management" element={
+                <div className="flex-1 flex flex-col min-w-0">
+                  <div className="flex-1 flex overflow-hidden">
+                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                      <div className="text-center py-20">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Employee Management</h2>
+                        <p className="text-gray-600">This page is under development.</p>
+                      </div>
+                    </main>
+                  </div>
+                </div>
+              } />
+              <Route path="/site-expenses" element={
+                <div className="flex-1 flex flex-col min-w-0">
+                  <div className="flex-1 flex overflow-hidden">
+                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                      <div className="text-center py-20">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Site Expenses</h2>
+                        <p className="text-gray-600">This page is under development.</p>
+                      </div>
+                    </main>
+                  </div>
+                </div>
+              } />
+              <Route path="/site-received" element={
+                <div className="flex-1 flex flex-col min-w-0">
+                  <div className="flex-1 flex overflow-hidden">
+                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                      <div className="text-center py-20">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Site Received</h2>
+                        <p className="text-gray-600">This page is under development.</p>
+                      </div>
+                    </main>
+                  </div>
+                </div>
+              } />
+              <Route path="/reports" element={
+                <div className="flex-1 flex flex-col min-w-0">
+                  <div className="flex-1 flex overflow-hidden">
+                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                      <div className="text-center py-20">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Reports</h2>
+                        <p className="text-gray-600">This page is under development.</p>
+                      </div>
+                    </main>
+                  </div>
+                </div>
+              } />
+              <Route path="/settings" element={
+                <div className="flex-1 flex flex-col min-w-0">
+                  <div className="flex-1 flex overflow-hidden">
+                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                      <div className="text-center py-20">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Settings</h2>
+                        <p className="text-gray-600">This page is under development.</p>
+                      </div>
+                    </main>
+                  </div>
+                </div>
+              } />
+              <Route path="/help-support" element={
+                <div className="flex-1 flex flex-col min-w-0">
+                  <div className="flex-1 flex overflow-hidden">
+                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                      <div className="text-center py-20">
+                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Help & Support</h2>
+                        <p className="text-gray-600">This page is under development.</p>
+                      </div>
+                    </main>
+                  </div>
+                </div>
+              } />
             </Routes>
           </div>
 
