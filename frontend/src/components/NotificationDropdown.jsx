@@ -101,12 +101,7 @@ const NotificationDropdown = ({ size = 20 }) => {
       if (notification.type === 'task_assigned' && notification.related_id) {
         console.log('Navigating to task:', notification.related_id);
         // Navigate to tasks page and directly open the task info
-        navigate('/my-tasks', {
-          state: {
-            openTaskId: notification.related_id,
-            fromNotification: true
-          }
-        });
+        navigate(`/my-tasks?openTaskId=${notification.related_id}&fromNotification=true`);
       }
 
       setIsOpen(false);

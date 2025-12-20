@@ -50,16 +50,21 @@ export default function TasksPage({ searchTerm = '' }) {
 
   // Handle notification navigation - open task directly or highlight in table
   useEffect(() => {
-    console.log('TasksPage location.state:', location.state);
+    const urlParams = new URLSearchParams(window.location.search);
+    const openTaskId = urlParams.get('openTaskId');
+    const highlightTaskId = urlParams.get('highlightTaskId');
+    const fromNotification = urlParams.get('fromNotification') === 'true';
+
+    console.log('TasksPage URL params:', { openTaskId, highlightTaskId, fromNotification });
     console.log('TasksPage tasksData.length:', tasksData.length);
-    if (location.state && tasksData.length > 0) {
-      const { openTaskId, highlightTaskId, fromNotification } = location.state;
+
+    if ((openTaskId || highlightTaskId) && tasksData.length > 0) {
       console.log('Processing notification navigation:', { openTaskId, highlightTaskId, fromNotification });
 
       if (openTaskId) {
         console.log('Opening task directly:', openTaskId);
         // Directly open the task info
-        const taskToOpen = tasksData.find(task => task.id === openTaskId);
+        const taskToOpen = tasksData.find(task => task.id === parseInt(openTaskId));
         if (taskToOpen) {
           console.log('Task found, opening:', taskToOpen);
           setSelectedTask(taskToOpen);
@@ -68,17 +73,17 @@ export default function TasksPage({ searchTerm = '' }) {
           // Task not found - show alert
           alert(`Task not found. It may have been deleted.`);
         }
-        // Clear the state to prevent repeated actions
-        // For HashRouter, we need to use a different approach
+        // Clear the URL params to prevent repeated actions
         setTimeout(() => {
-          window.history.replaceState({}, '', window.location.hash.replace('#', ''));
+          const newUrl = window.location.pathname + window.location.hash;
+          window.history.replaceState({}, '', newUrl);
         }, 100);
       } else if (highlightTaskId) {
         console.log('Highlighting task:', highlightTaskId);
         // Just highlight the task in the table
-        const taskToHighlight = tasksData.find(task => task.id === highlightTaskId);
+        const taskToHighlight = tasksData.find(task => task.id === parseInt(highlightTaskId));
         if (taskToHighlight) {
-          setHighlightedTaskId(highlightTaskId);
+          setHighlightedTaskId(parseInt(highlightTaskId));
           // Remove highlight after 3 seconds
           setTimeout(() => {
             setHighlightedTaskId(null);
@@ -87,13 +92,14 @@ export default function TasksPage({ searchTerm = '' }) {
           // Task not found - show alert
           alert(`Task not found. It may have been deleted.`);
         }
-        // Clear the state to prevent repeated alerts
+        // Clear the URL params to prevent repeated alerts
         setTimeout(() => {
-          window.history.replaceState({}, '', window.location.hash.replace('#', ''));
+          const newUrl = window.location.pathname + window.location.hash;
+          window.history.replaceState({}, '', newUrl);
         }, 100);
       }
     }
-  }, [location.state, tasksData]);
+  }, [tasksData]);
 
   // Handle clicks outside the filter dropdown to close it
   useEffect(() => {
