@@ -641,15 +641,19 @@ const fetchUsers = async () => {
               >
                 Cancel
               </button>
-              {!deleteError && (
-                <button
-                  onClick={confirmDelete}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                  style={{ fontFamily: 'var(--font-family)' }}
-                >
-                  Delete User
-                </button>
-              )}
+              <button
+                onClick={confirmDelete}
+                disabled={!!deleteError}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  deleteError
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
+                    : 'bg-red-600 text-white hover:bg-red-700'
+                }`}
+                style={{ fontFamily: 'var(--font-family)' }}
+                title={deleteError ? 'Cannot delete user with pending tasks' : 'Delete this user'}
+              >
+                Delete User
+              </button>
             </div>
           </div>
         </div>
