@@ -146,7 +146,7 @@ class User {
              CONCAT(u.first_name, ' ', u.last_name) as assignedBy
       FROM tasks t
       LEFT JOIN users u ON t.assignBy = u.id
-      WHERE t.assignTo = ? AND t.status != 'Completed'
+      WHERE t.assignTo = ? AND LOWER(t.status) NOT IN ('completed', 'done', 'finished')
     `;
 
     // Check tasks assigned BY this user (pending/incomplete)
@@ -155,7 +155,7 @@ class User {
              CONCAT(u.first_name, ' ', u.last_name) as assignedTo
       FROM tasks t
       LEFT JOIN users u ON t.assignTo = u.id
-      WHERE t.assignBy = ? AND t.status != 'Completed'
+      WHERE t.assignBy = ? AND LOWER(t.status) NOT IN ('completed', 'done', 'finished')
     `;
 
     // Run both queries
