@@ -88,8 +88,8 @@ export default function Sidebar({ activeItem, onNavigate }) {
     localStorage.clear();
     sessionStorage.clear();
 
-    // Redirect to root (login page) with replace to prevent back navigation
-    navigate('/', { replace: true });
+    // Redirect to root (login page) - reload page to ensure URL changes
+    window.location.href = '/';
   };
 
   return (
