@@ -45,12 +45,21 @@ function AppLayout() {
     return 'dashboard';
   };
 
-  const [currentPage, setCurrentPage] = useState(getCurrentPageFromHash(location.hash));
+  const [currentPage, setCurrentPage] = useState(getCurrentPageFromHash(window.location.hash));
 
   // Update currentPage when hash changes
   useEffect(() => {
-    setCurrentPage(getCurrentPageFromHash(location.hash));
-  }, [location.hash]);
+    const handleHashChange = () => {
+      setCurrentPage(getCurrentPageFromHash(window.location.hash));
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+
+    // Set initial value
+    handleHashChange();
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const handleNavigate = (path) => {
     setCurrentPage(path);
