@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import {
   FiHome,
   FiUsers,
@@ -75,7 +74,6 @@ function SidebarItem({ icon, label, active, onClick }) {
 export default function Sidebar({ activeItem, onNavigate }) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   const handleNavigate = (path) => {
     if (onNavigate) {
@@ -88,7 +86,9 @@ export default function Sidebar({ activeItem, onNavigate }) {
     localStorage.clear();
     sessionStorage.clear();
 
-    // Redirect to root (login page) - reload page to ensure URL changes
+    // Redirect to login page or reload the app
+    // Since there's no login page, we'll redirect to dashboard
+    // In a real app, this would redirect to /login
     window.location.href = '/';
   };
 
@@ -137,14 +137,14 @@ export default function Sidebar({ activeItem, onNavigate }) {
           active={activeItem === "projects-management"}
           onClick={() => handleNavigate("projects-management")}
         /> */}
-        {user?.role?.toLowerCase() === 'admin' && (
+        {/* {user?.role?.toLowerCase() === 'admin' && (
           <SidebarItem
             icon={<FiUser size={15} />}
             label="Users"
             active={activeItem === "users-management"}
             onClick={() => handleNavigate("users-management")}
           />
-        )}
+        )} */}
         {/* <SidebarItem
           icon={<FiUserCheck size={15} />}
           label={t('Employee Management')}
