@@ -190,9 +190,24 @@ class User {
         return callback(error, null);
       }
 
-      // No pending tasks, safe to delete
-      const sql = 'DELETE FROM users WHERE id = ?';
-      db.query(sql, [id], callback);
+      // No pending tasks, but may have completed tasks
+      // Update foreign key references to NULL for completed tasks before deleting user
+      const updateTasksSql = `
+        UPDATE tasks
+        SET assignTo = NULL
+        WHERE assignTo = ?;
+        UPDATE tasks
+        SET assignBy = NULL
+        WHERE assignBy = ?
+      `;
+
+      db.query(updateTasksSql, [id, id], (updateErr, updateResult) => {
+        if (updateErr) return callback(updateErr, null);
+
+        // Now safe to delete the user
+        const deleteUserSql = 'DELETE FROM users WHERE id = ?';
+        db.query(deleteUserSql, [id], callback);
+      });
     });
   }
 
