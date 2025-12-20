@@ -100,12 +100,12 @@ export default function DashboardPage() {
                       <span className="ml-2 text-sm text-gray-500">Loading tasks...</span>
                     </div>
                   ) : (
-                    <table className="w-full text-left text-xs sm:text-[13px]">
+                    <table className="w-full text-left text-xs sm:text-[13px] table-fixed">
                       <thead className="bg-white sticky top-0">
                         <tr className="border-b">
-                          <th className="py-2 px-1 font-medium text-gray-700">Task Name</th>
-                          <th className="py-2 px-1 font-medium text-gray-700">Due Date</th>
-                          <th className="py-2 px-1 font-medium text-gray-700">Status</th>
+                          <th className="py-2 px-1 font-medium text-gray-700 w-1/2">Task Name</th>
+                          <th className="py-2 px-1 font-medium text-gray-700 w-1/4">Due Date</th>
+                          <th className="py-2 px-1 font-medium text-gray-700 w-1/4">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-gray-700">
