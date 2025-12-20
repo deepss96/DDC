@@ -93,17 +93,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="flex-1 overflow-hidden">
-                <table className="w-full text-left text-xs sm:text-[13px]">
-                  <thead className="bg-white">
-                    <tr className="border-b">
-                      <th className="py-2 px-1">Task Name</th>
-                      <th className="py-2 px-1">Due Date</th>
-                      <th className="py-2 px-1">Status</th>
-                    </tr>
-                  </thead>
-                </table>
-
-                <div className="overflow-y-auto max-h-72">
+                <div className="overflow-y-auto max-h-80">
                   {loading ? (
                     <div className="flex items-center justify-center py-8">
                       <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
@@ -111,13 +101,24 @@ export default function DashboardPage() {
                     </div>
                   ) : (
                     <table className="w-full text-left text-xs sm:text-[13px]">
+                      <thead className="bg-white sticky top-0">
+                        <tr className="border-b">
+                          <th className="py-2 px-1 font-medium text-gray-700">Task Name</th>
+                          <th className="py-2 px-1 font-medium text-gray-700">Due Date</th>
+                          <th className="py-2 px-1 font-medium text-gray-700">Status</th>
+                        </tr>
+                      </thead>
                       <tbody className="text-gray-700">
                         {tasks.length > 0 ? tasks.map((task, index) => (
-                          <tr key={task.id} className={index < tasks.length - 1 ? "border-b" : ""}>
-                            <td className="py-2 px-1">{task.name}</td>
-                            <td className="py-2 px-1">{formatDateForDisplay(task.dueDate || task.due_date)}</td>
+                          <tr key={task.id} className={index < tasks.length - 1 ? "border-b border-gray-100" : ""}>
+                            <td className="py-2 px-1 truncate max-w-0" title={task.name}>
+                              {task.name}
+                            </td>
+                            <td className="py-2 px-1 whitespace-nowrap">
+                              {formatDateForDisplay(task.dueDate || task.due_date)}
+                            </td>
                             <td className="py-2 px-1">
-                              <span className={`px-2 py-0.5 rounded-full text-xs ${getStatusBadge(task.status)}`}>
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(task.status)}`}>
                                 {task.status}
                               </span>
                             </td>
