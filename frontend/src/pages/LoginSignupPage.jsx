@@ -93,9 +93,13 @@ const LoginSignupPage = () => {
           setMessage('Login successful! Please change your password to continue.');
         } else {
           setMessage('Login successful! Redirecting...');
-          // Redirect to dashboard after successful login
+          // Redirect based on user role after successful login
           setTimeout(() => {
-            navigate('/dashboard');
+            if (data.user.role && data.user.role.toLowerCase() === 'admin') {
+              navigate('/users-management');
+            } else {
+              navigate('/dashboard');
+            }
           }, 1500);
         }
       } else if (formType === 'forgot') {
@@ -399,7 +403,22 @@ const LoginSignupPage = () => {
   // Redirect authenticated users away from auth page
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate('/dashboard');
+      // Get user from localStorage to check role
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          if (userData.role && userData.role.toLowerCase() === 'admin') {
+            navigate('/users-management');
+          } else {
+            navigate('/dashboard');
+          }
+        } catch (error) {
+          navigate('/dashboard');
+        }
+      } else {
+        navigate('/dashboard');
+      }
     }
   }, [isAuthenticated, navigate]);
 };
