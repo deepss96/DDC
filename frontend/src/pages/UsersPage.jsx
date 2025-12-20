@@ -141,24 +141,13 @@ const fetchUsers = async () => {
       console.error('Error response:', error.response);
       console.error('Error response data:', error.response?.data);
 
-      // Handle task validation errors with detailed information
-      if (error.response?.data?.taskDetails) {
-        console.log('Task validation error detected for delete');
-        const { assignedTo } = error.response.data.taskDetails;
-        let taskMessage = error.response.data.message || 'Cannot delete this user because they have pending tasks.';
-
-        // Add task details
-        const taskList = [];
-        if (assignedTo && assignedTo.length > 0) {
-          taskList.push(...assignedTo.map(task => `"${task.name}" (assigned by ${task.assignedBy})`));
-        }
-
-        if (taskList.length > 0) {
-          taskMessage += `\n\nPlease complete these tasks or reassign them to another user first: ${taskList.join(', ')}`;
-        }
-
-        console.log('Setting delete task error message:', taskMessage);
-        setDeleteError(taskMessage);
+  // Handle task validation errors with detailed information
+  if (error.response?.data?.taskDetails) {
+    console.log('Task validation error detected for delete');
+    // Use the message from backend directly, as it already includes task details
+    const taskMessage = error.response.data.message || 'Cannot delete this user because they have pending tasks.';
+    console.log('Setting delete task error message:', taskMessage);
+    setDeleteError(taskMessage);
       } else {
         // Handle other errors
         const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message || 'An error occurred while deleting the user. Check console for details.';
