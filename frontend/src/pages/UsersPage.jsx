@@ -111,12 +111,31 @@ const fetchUsers = async () => {
     }
   };
 
-  const handleDeleteRow = (id) => {
+  const handleDeleteRow = async (id) => {
     const user = usersData.find(u => u.id === id);
-    if (user) {
-      // Show custom delete confirmation dialog directly
+    if (!user) return;
+
+    // First check if user has pending tasks
+    try {
+      // We'll make a test delete call to check for pending tasks
+      // The backend will return an error if there are pending tasks
+      await apiService.deleteUser(id);
+
+      // If we reach here, no pending tasks - proceed with confirmation
       setUserToDelete(user);
       setShowDeleteConfirm(true);
+    } catch (error) {
+      // If there are pending tasks, show the error directly
+      if (error.response?.data?.pendingTasks) {
+        setUserToDelete(user);
+        setDeleteError(error.response.data.message);
+        setShowDeleteConfirm(true);
+      } else {
+        // For other errors, show generic error
+        setUserToDelete(user);
+        setDeleteError(error.response?.data?.message || 'Unable to check user status. Please try again.');
+        setShowDeleteConfirm(true);
+      }
     }
   };
 
@@ -622,13 +641,15 @@ const fetchUsers = async () => {
               >
                 Cancel
               </button>
-              <button
-                onClick={confirmDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                style={{ fontFamily: 'var(--font-family)' }}
-              >
-                Delete User
-              </button>
+              {!deleteError && (
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  style={{ fontFamily: 'var(--font-family)' }}
+                >
+                  Delete User
+                </button>
+              )}
             </div>
           </div>
         </div>
