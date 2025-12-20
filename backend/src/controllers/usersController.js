@@ -232,14 +232,18 @@ exports.deleteUser = (req, res) => {
             console.error('Error deleting user:', err);
 
             // Check if it's a task validation error
-            if (err.message && err.message.includes('Cannot delete user with pending assigned tasks')) {
-                const { assignedTo } = err.taskDetails || { assignedTo: [] };
+            if (err.message && err.message.includes('Cannot delete user with pending tasks')) {
+                const { assignedTo, assignedBy } = err.taskDetails || { assignedTo: [], assignedBy: [] };
 
-                let errorMessage = 'Cannot delete this user because they have pending tasks assigned to them. ';
+                let errorMessage = 'Cannot delete this user because they have pending tasks. ';
                 const taskNames = [];
 
                 if (assignedTo.length > 0) {
                     taskNames.push(...assignedTo.map(task => `"${task.name}" (assigned by ${task.assignedBy})`));
+                }
+
+                if (assignedBy.length > 0) {
+                    taskNames.push(...assignedBy.map(task => `"${task.name}" (assigned to ${task.assignedTo})`));
                 }
 
                 if (taskNames.length > 0) {
@@ -249,7 +253,7 @@ exports.deleteUser = (req, res) => {
                 return res.status(400).json({
                     error: 'Cannot delete user',
                     message: errorMessage,
-                    taskDetails: { assignedTo, assignedBy: [] }
+                    taskDetails: { assignedTo, assignedBy }
                 });
             }
 

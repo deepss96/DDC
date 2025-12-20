@@ -177,18 +177,20 @@ class User {
 
   // Delete user (with task validation)
   static delete(id, callback) {
-    // Check only tasks assigned TO this user (can reassign tasks assigned BY this user)
-    this.checkAssignedToTasks(id, (err, assignedToTasks) => {
+    // Check for any pending tasks related to this user (assigned to or assigned by)
+    this.checkTaskRelationships(id, (err, relationships) => {
       if (err) return callback(err, null);
 
-      if (assignedToTasks.length > 0) {
-        // User has pending tasks assigned to them, cannot delete
-        const error = new Error('Cannot delete user with pending assigned tasks');
-        error.taskDetails = { assignedTo: assignedToTasks, assignedBy: [] };
+      const { assignedTo, assignedBy } = relationships;
+
+      if (assignedTo.length > 0 || assignedBy.length > 0) {
+        // User has pending tasks, cannot delete
+        const error = new Error('Cannot delete user with pending tasks');
+        error.taskDetails = { assignedTo, assignedBy };
         return callback(error, null);
       }
 
-      // No pending tasks assigned to user, safe to delete
+      // No pending tasks, safe to delete
       const sql = 'DELETE FROM users WHERE id = ?';
       db.query(sql, [id], callback);
     });
