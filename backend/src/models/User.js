@@ -191,22 +191,20 @@ class User {
       }
 
       // No pending tasks, but may have completed tasks
-      // Update foreign key references to NULL for completed tasks before deleting user
-      const updateTasksSql = `
-        UPDATE tasks
-        SET assignTo = NULL
-        WHERE assignTo = ?;
-        UPDATE tasks
-        SET assignBy = NULL
-        WHERE assignBy = ?
-      `;
+      // Update foreign key references to NULL for all tasks before deleting user
+      const updateAssignToSql = 'UPDATE tasks SET assignTo = NULL WHERE assignTo = ?';
+      const updateAssignBySql = 'UPDATE tasks SET assignBy = NULL WHERE assignBy = ?';
 
-      db.query(updateTasksSql, [id, id], (updateErr, updateResult) => {
-        if (updateErr) return callback(updateErr, null);
+      db.query(updateAssignToSql, [id], (updateErr1, updateResult1) => {
+        if (updateErr1) return callback(updateErr1, null);
 
-        // Now safe to delete the user
-        const deleteUserSql = 'DELETE FROM users WHERE id = ?';
-        db.query(deleteUserSql, [id], callback);
+        db.query(updateAssignBySql, [id], (updateErr2, updateResult2) => {
+          if (updateErr2) return callback(updateErr2, null);
+
+          // Now safe to delete the user
+          const deleteUserSql = 'DELETE FROM users WHERE id = ?';
+          db.query(deleteUserSql, [id], callback);
+        });
       });
     });
   }
