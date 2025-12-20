@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { FiUserPlus, FiMail, FiPhone, FiCalendar, FiEdit2, FiTrash2, FiSearch, FiPlus, FiSliders, FiList, FiUpload, FiFilter, FiCheck, FiUser, FiUserCheck } from "react-icons/fi";
 import TableActionButton from "../components/TableActionButton";
 import TaskFormPopup from "../components/TaskFormPopup";
@@ -12,6 +12,7 @@ import apiService from "../services/api";
 export default function TasksPage({ searchTerm = '' }) {
   const { user } = useAuth();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [highlightedTaskId, setHighlightedTaskId] = useState(null);
 
   const currentUserName = user ? `${user.firstName} ${user.lastName}` : "Admin";
@@ -49,10 +50,9 @@ export default function TasksPage({ searchTerm = '' }) {
 
   // Handle notification navigation - open task directly or highlight in table
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const openTaskId = urlParams.get('openTaskId');
-    const highlightTaskId = urlParams.get('highlightTaskId');
-    const fromNotification = urlParams.get('fromNotification') === 'true';
+    const openTaskId = searchParams.get('openTaskId');
+    const highlightTaskId = searchParams.get('highlightTaskId');
+    const fromNotification = searchParams.get('fromNotification') === 'true';
 
     console.log('TasksPage URL params:', { openTaskId, highlightTaskId, fromNotification });
     console.log('TasksPage tasksData.length:', tasksData.length);
@@ -74,7 +74,12 @@ export default function TasksPage({ searchTerm = '' }) {
         }
         // Clear the URL params to prevent repeated actions
         setTimeout(() => {
-          const newUrl = window.location.pathname + window.location.hash;
+          // Remove the search params from URL
+          const newSearchParams = new URLSearchParams(searchParams);
+          newSearchParams.delete('openTaskId');
+          newSearchParams.delete('fromNotification');
+          const newSearch = newSearchParams.toString();
+          const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '') + window.location.hash;
           window.history.replaceState({}, '', newUrl);
         }, 100);
       } else if (highlightTaskId) {
@@ -93,12 +98,16 @@ export default function TasksPage({ searchTerm = '' }) {
         }
         // Clear the URL params to prevent repeated alerts
         setTimeout(() => {
-          const newUrl = window.location.pathname + window.location.hash;
+          const newSearchParams = new URLSearchParams(searchParams);
+          newSearchParams.delete('highlightTaskId');
+          newSearchParams.delete('fromNotification');
+          const newSearch = newSearchParams.toString();
+          const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '') + window.location.hash;
           window.history.replaceState({}, '', newUrl);
         }, 100);
       }
     }
-  }, [tasksData]);
+  }, [tasksData, searchParams]);
 
   // Handle clicks outside the filter dropdown to close it
   useEffect(() => {
