@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
 import io from 'socket.io-client';
+import config from '../config/config';
 
 // Notification sound
 const playNotificationSound = () => {
@@ -132,9 +133,7 @@ const NotificationDropdown = ({ size = 20 }) => {
   useEffect(() => {
     if (user && user.id) {
       // Initialize socket connection
-      const socketConnection = io(process.env.NODE_ENV === 'production'
-        ? window.location.origin
-        : 'http://localhost:5000', {
+      const socketConnection = io(config.socket.url, {
         transports: ['websocket', 'polling']
       });
 

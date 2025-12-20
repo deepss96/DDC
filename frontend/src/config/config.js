@@ -6,6 +6,11 @@ const config = {
     timeout: 10000
   },
 
+  // Socket Configuration
+  socket: {
+    url: import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000'
+  },
+
   // App Configuration
   app: {
     name: import.meta.env.VITE_APP_NAME || 'DDC Developer',
