@@ -137,14 +137,14 @@ export default function Sidebar({ activeItem, onNavigate }) {
           active={activeItem === "projects-management"}
           onClick={() => handleNavigate("projects-management")}
         /> */}
-        {/* {user?.role?.toLowerCase() === 'admin' && (
+        {user?.role?.toLowerCase() === 'admin' && (
           <SidebarItem
             icon={<FiUser size={15} />}
             label="Users"
             active={activeItem === "users-management"}
             onClick={() => handleNavigate("users-management")}
           />
-        )} */}
+        )}
         {/* <SidebarItem
           icon={<FiUserCheck size={15} />}
           label={t('Employee Management')}

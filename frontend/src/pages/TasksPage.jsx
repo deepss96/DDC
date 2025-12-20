@@ -4,7 +4,6 @@ import { FiUserPlus, FiMail, FiPhone, FiCalendar, FiEdit2, FiTrash2, FiSearch, F
 import TableActionButton from "../components/TableActionButton";
 import TaskFormPopup from "../components/TaskFormPopup";
 import TaskInfo from "../components/TaskInfo";
-
 import Table from "../components/Table";
 import { useAuth } from "../contexts/AuthContext";
 import { formatDateForDisplay } from "../utils/dateUtils.jsx";
