@@ -160,10 +160,11 @@ export default function TasksPage({ searchTerm = '' }) {
 
 const fetchTasks = async () => {
   try {
-    const params = {};
-    if (user?.id) {
-      params.user_id = user.id;
-    }
+    // Admin can see all tasks, other users see only their related tasks
+    const isAdmin = user?.role?.toLowerCase() === 'admin';
+    const params = isAdmin ? {} : { user_id: user.id };
+
+    console.log('TasksPage fetchTasks - User role:', user?.role, 'isAdmin:', isAdmin, 'params:', params);
 
     const tasks = await apiService.getTasks(params);
     const sortedTasks = tasks.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
