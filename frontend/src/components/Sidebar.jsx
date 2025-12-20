@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FiHome,
   FiUsers,
@@ -74,6 +75,7 @@ function SidebarItem({ icon, label, active, onClick }) {
 export default function Sidebar({ activeItem, onNavigate }) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleNavigate = (path) => {
     if (onNavigate) {
@@ -86,10 +88,8 @@ export default function Sidebar({ activeItem, onNavigate }) {
     localStorage.clear();
     sessionStorage.clear();
 
-    // Redirect to login page or reload the app
-    // Since there's no login page, we'll redirect to dashboard
-    // In a real app, this would redirect to /login
-    window.location.href = '/';
+    // Redirect to root (login page) with replace to prevent back navigation
+    navigate('/', { replace: true });
   };
 
   return (
