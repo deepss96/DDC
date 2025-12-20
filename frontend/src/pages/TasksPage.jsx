@@ -98,7 +98,7 @@ export default function TasksPage({ searchTerm = '' }) {
         }, 100);
       }
     }
-  }, [tasksData]);
+  }, [tasksData, location.search]);
 
   // Handle clicks outside the filter dropdown to close it
   useEffect(() => {
