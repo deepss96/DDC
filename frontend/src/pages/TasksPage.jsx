@@ -51,6 +51,7 @@ export default function TasksPage({ searchTerm = '' }) {
   // Handle notification navigation - open task directly or highlight in table
   useEffect(() => {
     console.log('TasksPage location.state:', location.state);
+    console.log('TasksPage tasksData.length:', tasksData.length);
     if (location.state && tasksData.length > 0) {
       const { openTaskId, highlightTaskId, fromNotification } = location.state;
       console.log('Processing notification navigation:', { openTaskId, highlightTaskId, fromNotification });
@@ -68,7 +69,10 @@ export default function TasksPage({ searchTerm = '' }) {
           alert(`Task not found. It may have been deleted.`);
         }
         // Clear the state to prevent repeated actions
-        window.history.replaceState({}, '', window.location.pathname);
+        // For HashRouter, we need to use a different approach
+        setTimeout(() => {
+          window.history.replaceState({}, '', window.location.hash.replace('#', ''));
+        }, 100);
       } else if (highlightTaskId) {
         console.log('Highlighting task:', highlightTaskId);
         // Just highlight the task in the table
@@ -84,7 +88,9 @@ export default function TasksPage({ searchTerm = '' }) {
           alert(`Task not found. It may have been deleted.`);
         }
         // Clear the state to prevent repeated alerts
-        window.history.replaceState({}, '', window.location.pathname);
+        setTimeout(() => {
+          window.history.replaceState({}, '', window.location.hash.replace('#', ''));
+        }, 100);
       }
     }
   }, [location.state, tasksData]);
@@ -207,7 +213,7 @@ const fetchTasks = async () => {
           matchesCreatedDate = createdDate >= startOfToday && createdDate < startOfTomorrow;
         }
 
-        matchesDateFilter = matchesDueDate || matchesCreatedDate;
+        matchesDateFilter = matchesCreatedDate;
       } else if (selectedDateFilter === 'This Week') {
         // For week/month, only check due date
         if (task.dueDate) {
