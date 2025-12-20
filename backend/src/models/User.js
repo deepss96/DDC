@@ -58,10 +58,12 @@ class User {
 
   // === USER MANAGEMENT METHODS ===
 
-  // Get all users (for user management)
+  // Get all users (for user management) - exclude soft deleted users
   static getAll(callback) {
     const sql = `SELECT id, first_name, last_name, email, phone, username, password, role, status, created_at, is_temp_password
-             FROM users ORDER BY created_at DESC`;
+             FROM users
+             WHERE status != 'Deleted'
+             ORDER BY created_at DESC`;
     db.query(sql, callback);
   }
 
@@ -105,25 +107,11 @@ class User {
   static update(id, userData, callback) {
     const { first_name, last_name, email, phone, role, status, profile_image } = userData;
 
-    // Check for any pending tasks related to this user (assigned to or assigned by)
-    this.checkTaskRelationships(id, (err, relationships) => {
-      if (err) return callback(err, null);
-
-      const { assignedTo, assignedBy } = relationships;
-
-      // If user has any incomplete tasks (assigned to them or assigned by them), prevent deactivation
-      if (status === 'Inactive' && (assignedTo.length > 0 || assignedBy.length > 0)) {
-        const error = new Error('Cannot deactivate user with pending tasks');
-        error.taskDetails = { assignedTo, assignedBy };
-        return callback(error, null);
-      }
-
-      // Proceed with update
-      const sql = `UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?, role = ?, status = ?, profile_image = ?
-               WHERE id = ?`;
-      const values = [first_name, last_name, email, phone, role, status, profile_image, id];
-      db.query(sql, values, callback);
-    });
+    // Proceed with update (task validation is now done in controller)
+    const sql = `UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?, role = ?, status = ?, profile_image = ?
+             WHERE id = ?`;
+    const values = [first_name, last_name, email, phone, role, status, profile_image, id];
+    db.query(sql, values, callback);
   }
 
   // Check only tasks assigned TO this user (for deactivation validation)
@@ -175,42 +163,38 @@ class User {
     });
   }
 
-  // Delete user (with task validation)
-  static delete(id, callback) {
-    // Check for any pending tasks related to this user (assigned to or assigned by)
-    this.checkTaskRelationships(id, (err, relationships) => {
-      if (err) return callback(err, null);
+  // Check if user has any incomplete tasks (simplified for delete/inactive operations)
+  static checkUserIncompleteTasks(userId, callback) {
+    const sql = `
+      SELECT id, name, status
+      FROM tasks
+      WHERE (assignTo = ? OR assignBy = ?)
+      AND LOWER(TRIM(status)) != 'completed'
+    `;
+    db.query(sql, [userId, userId], callback);
+  }
 
-      const { assignedTo, assignedBy } = relationships;
+  // Soft delete user (task validation is now done in controller)
+  static softDelete(id, callback) {
+    // Delete notifications first
+    const deleteNotificationsSql = 'DELETE FROM notifications WHERE user_id = ?';
 
-      if (assignedTo.length > 0 || assignedBy.length > 0) {
-        // User has pending tasks, cannot delete
-        const error = new Error('Cannot delete user with pending tasks');
-        error.taskDetails = { assignedTo, assignedBy };
-        return callback(error, null);
-      }
+    db.query(deleteNotificationsSql, [id], (deleteNotifErr, deleteNotifResult) => {
+      if (deleteNotifErr) return callback(deleteNotifErr, null);
 
-      // No pending tasks, but may have completed tasks and notifications
-      // Delete notifications first
-      const deleteNotificationsSql = 'DELETE FROM notifications WHERE user_id = ?';
+      // Update foreign key references to NULL for all tasks
+      const updateAssignToSql = 'UPDATE tasks SET assignTo = NULL WHERE assignTo = ?';
+      const updateAssignBySql = 'UPDATE tasks SET assignBy = NULL WHERE assignBy = ?';
 
-      db.query(deleteNotificationsSql, [id], (deleteNotifErr, deleteNotifResult) => {
-        if (deleteNotifErr) return callback(deleteNotifErr, null);
+      db.query(updateAssignToSql, [id], (updateErr1, updateResult1) => {
+        if (updateErr1) return callback(updateErr1, null);
 
-        // Update foreign key references to NULL for all tasks
-        const updateAssignToSql = 'UPDATE tasks SET assignTo = NULL WHERE assignTo = ?';
-        const updateAssignBySql = 'UPDATE tasks SET assignBy = NULL WHERE assignBy = ?';
+        db.query(updateAssignBySql, [id], (updateErr2, updateResult2) => {
+          if (updateErr2) return callback(updateErr2, null);
 
-        db.query(updateAssignToSql, [id], (updateErr1, updateResult1) => {
-          if (updateErr1) return callback(updateErr1, null);
-
-          db.query(updateAssignBySql, [id], (updateErr2, updateResult2) => {
-            if (updateErr2) return callback(updateErr2, null);
-
-            // Now safe to delete the user
-            const deleteUserSql = 'DELETE FROM users WHERE id = ?';
-            db.query(deleteUserSql, [id], callback);
-          });
+          // Soft delete: Mark user as deleted instead of hard delete
+          const softDeleteUserSql = "UPDATE users SET status = 'Deleted', deleted_at = NOW() WHERE id = ?";
+          db.query(softDeleteUserSql, [id], callback);
         });
       });
     });

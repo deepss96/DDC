@@ -134,144 +134,120 @@ exports.updateUser = async (req, res) => {
     const { id } = req.params;
     const { first_name, last_name, email, phone, role, status, profile_image } = req.body;
 
-    if (!first_name) {
-        return res.status(400).json({ error: 'First name is required' });
+    // FIRST: Check task restrictions (most important business rule)
+    if (status === 'Inactive') {
+        User.checkUserIncompleteTasks(id, (taskErr, taskResults) => {
+            if (taskErr) {
+                console.error('Error checking tasks for deactivation:', taskErr);
+                return res.status(500).json({ error: 'Failed to update user' });
+            }
+
+            if (taskResults.length > 0) {
+                return res.status(400).json({
+                    error: 'User cannot be deactivated',
+                    message: 'This user has pending tasks. Complete all tasks before deactivating the user.'
+                });
+            }
+
+            // No pending tasks, proceed with validation and update
+            validateAndUpdate();
+        });
+    } else {
+        // Not deactivating, proceed with validation and update
+        validateAndUpdate();
     }
 
-    if (!role) {
-        return res.status(400).json({ error: 'Role is required' });
-    }
-
-    if (!status) {
-        return res.status(400).json({ error: 'Status is required' });
-    }
-
-    // Check if email already exists (excluding current user)
-    User.checkEmailExists(email, id, (err, results) => {
-        if (err) {
-            console.error('Error checking email:', err);
-            return res.status(500).json({ error: 'Failed to update user' });
+    function validateAndUpdate() {
+        // THEN: Validate basic fields
+        if (!first_name) {
+            return res.status(400).json({ error: 'First name is required' });
         }
 
-        if (results.length > 0) {
-            return res.status(400).json({ error: 'Email already exists' });
+        if (!role) {
+            return res.status(400).json({ error: 'Role is required' });
         }
 
-        // Check if phone already exists (excluding current user)
-        User.checkPhoneExists(phone, id, (err, results) => {
+        if (!status) {
+            return res.status(400).json({ error: 'Status is required' });
+        }
+
+        // Check if email already exists (excluding current user)
+        User.checkEmailExists(email, id, (err, results) => {
             if (err) {
-                console.error('Error checking phone:', err);
+                console.error('Error checking email:', err);
                 return res.status(500).json({ error: 'Failed to update user' });
             }
 
             if (results.length > 0) {
-                return res.status(400).json({ error: 'Phone number already exists' });
+                return res.status(400).json({ error: 'Email already exists' });
             }
 
-            // Update user
-            const userData = { first_name, last_name, email, phone, role, status, profile_image };
-
-            User.update(id, userData, (err, result) => {
+            // Check if phone already exists (excluding current user)
+            User.checkPhoneExists(phone, id, (err, results) => {
                 if (err) {
-                    console.error('Error updating user:', err);
-                    console.error('Error message:', err.message);
-                    console.error('Error taskDetails:', err.taskDetails);
-
-                    // Check if it's a task validation error
-                    if (err.message && err.message.includes('Cannot deactivate user with pending tasks')) {
-                        console.log('Task validation error detected in controller');
-                        const { assignedTo, assignedBy } = err.taskDetails || { assignedTo: [], assignedBy: [] };
-
-                        let errorMessage = 'Cannot deactivate this user because they have pending tasks. ';
-                        const taskNames = [];
-
-                        if (assignedTo.length > 0) {
-                            taskNames.push(...assignedTo.map(task => `"${task.name}" (assigned by ${task.assignedBy})`));
-                        }
-
-                        if (assignedBy.length > 0) {
-                            taskNames.push(...assignedBy.map(task => `"${task.name}" (assigned to ${task.assignedTo})`));
-                        }
-
-                        if (taskNames.length > 0) {
-                            errorMessage += `Please complete or reassign these tasks first: ${taskNames.join(', ')}`;
-                        }
-
-                        console.log('Sending task validation error response:', {
-                            error: 'Cannot deactivate user',
-                            message: errorMessage,
-                            taskDetails: { assignedTo, assignedBy }
-                        });
-
-                        return res.status(400).json({
-                            error: 'Cannot deactivate user',
-                            message: errorMessage,
-                            taskDetails: { assignedTo, assignedBy }
-                        });
-                    }
-
+                    console.error('Error checking phone:', err);
                     return res.status(500).json({ error: 'Failed to update user' });
                 }
 
-                if (result.affectedRows === 0) {
-                    return res.status(404).json({ error: 'User not found' });
+                if (results.length > 0) {
+                    return res.status(400).json({ error: 'Phone number already exists' });
                 }
 
-                res.json({ message: 'User updated successfully' });
+                // Proceed with update
+                const userData = { first_name, last_name, email, phone, role, status, profile_image };
+
+                User.update(id, userData, (err, result) => {
+                    if (err) {
+                        console.error('Error updating user:', err);
+                        return res.status(500).json({ error: 'Failed to update user' });
+                    }
+
+                    if (result.affectedRows === 0) {
+                        return res.status(404).json({ error: 'User not found' });
+                    }
+
+                    res.json({ message: 'User updated successfully' });
+                });
             });
         });
-    });
+    }
 };
 
 // Delete user
 exports.deleteUser = (req, res) => {
     const { id } = req.params;
 
-    User.delete(id, (err, result) => {
+    console.log("DELETE USER ID:", id);
+
+    // Step 1: Check if user has incomplete tasks
+    User.checkUserIncompleteTasks(id, (err, results) => {
         if (err) {
-            console.error('Error deleting user:', err);
-
-            // Check if it's a task validation error
-            if (err.message && err.message.includes('Cannot delete user with pending tasks')) {
-                const { assignedTo, assignedBy } = err.taskDetails || { assignedTo: [], assignedBy: [] };
-
-                let errorMessage = 'Cannot delete this user because they have pending tasks. ';
-                const taskNames = [];
-
-                if (assignedTo.length > 0) {
-                    taskNames.push(...assignedTo.map(task => `"${task.name}" (assigned by ${task.assignedBy})`));
-                }
-
-                if (assignedBy.length > 0) {
-                    taskNames.push(...assignedBy.map(task => `"${task.name}" (assigned to ${task.assignedTo})`));
-                }
-
-                if (taskNames.length > 0) {
-                    errorMessage += `Please complete these tasks or reassign them to another user first: ${taskNames.join(', ')}`;
-                }
-
-                return res.status(400).json({
-                    error: 'Cannot delete user',
-                    message: errorMessage,
-                    taskDetails: { assignedTo, assignedBy }
-                });
-            }
-
-            // Check if it's a foreign key constraint error
-            if (err.code === 'ER_ROW_IS_REFERENCED_2' || err.errno === 1451) {
-                return res.status(400).json({
-                    error: 'Cannot delete user',
-                    message: 'This user has associated tasks and cannot be deleted. Please reassign or delete all tasks first.'
-                });
-            }
-
+            console.error('Error checking tasks:', err);
             return res.status(500).json({ error: 'Failed to delete user' });
         }
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'User not found' });
+        console.log("PENDING TASK COUNT:", results.length);
+
+        // If any task is NOT completed → BLOCK delete
+        if (results.length > 0) {
+            return res.status(400).json({
+                error: 'User cannot be deleted',
+                message: 'This user has pending tasks. Complete all tasks before deleting the user.'
+            });
         }
 
-        res.json({ message: 'User deleted successfully' });
+        // Step 2: No pending tasks → SOFT DELETE user
+        User.softDelete(id, (err, result) => {
+            if (err) {
+                console.error('Soft delete error:', err);
+                return res.status(500).json({ error: 'Failed to delete user' });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            res.json({ message: 'User deleted successfully' });
+        });
     });
 };
