@@ -63,7 +63,7 @@ export default function TasksPage({ searchTerm = '' }) {
       if (openTaskId) {
         console.log('Opening task directly:', openTaskId);
         // Directly open the task info
-        const taskToOpen = tasksData.find(task => task.id === parseInt(openTaskId));
+        const taskToOpen = tasksData.find(task => task.id == openTaskId);
         if (taskToOpen) {
           console.log('Task found, opening:', taskToOpen);
           setSelectedTask(taskToOpen);
