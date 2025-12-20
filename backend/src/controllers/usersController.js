@@ -143,9 +143,11 @@ exports.updateUser = async (req, res) => {
             }
 
             if (taskResults.length > 0) {
+                const taskList = formatTaskList(taskResults);
                 return res.status(400).json({
                     error: 'User cannot be deactivated',
-                    message: 'This user has pending tasks. Complete all tasks before deactivating the user.'
+                    message: `This user has ${taskResults.length} pending task(s). Complete all tasks before deactivating the user.${taskList}`,
+                    pendingTasks: taskResults
                 });
             }
 
@@ -213,6 +215,23 @@ exports.updateUser = async (req, res) => {
     }
 };
 
+// Helper function to format task list for error messages
+function formatTaskList(tasks) {
+    if (!tasks || tasks.length === 0) return '';
+
+    let message = `\n\nPending Tasks (${tasks.length}):`;
+
+    tasks.forEach((task, index) => {
+        const taskType = task.taskType === 'assigned_to_you' ? 'Assigned to you' : 'Assigned by you';
+        const assignedBy = task.assignedBy || 'Unknown';
+        const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date';
+
+        message += `\n${index + 1}. "${task.name}" (${taskType} by ${assignedBy}) - Due: ${dueDate}`;
+    });
+
+    return message;
+}
+
 // Delete user
 exports.deleteUser = (req, res) => {
     const { id } = req.params;
@@ -230,9 +249,11 @@ exports.deleteUser = (req, res) => {
 
         // If any task is NOT completed → BLOCK delete
         if (results.length > 0) {
+            const taskList = formatTaskList(results);
             return res.status(400).json({
                 error: 'User cannot be deleted',
-                message: 'This user has pending tasks. Complete all tasks before deleting the user.'
+                message: `This user has ${results.length} pending task(s). Complete all tasks before deleting the user.${taskList}`,
+                pendingTasks: results
             });
         }
 

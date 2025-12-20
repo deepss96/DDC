@@ -166,12 +166,27 @@ class User {
   // Check if user has any incomplete tasks (simplified for delete/inactive operations)
   static checkUserIncompleteTasks(userId, callback) {
     const sql = `
-      SELECT id, name, status
-      FROM tasks
-      WHERE (assignTo = ? OR assignBy = ?)
-      AND LOWER(TRIM(status)) != 'completed'
+      SELECT
+        t.id,
+        t.name,
+        t.status,
+        t.dueDate,
+        CASE
+          WHEN t.assignTo = ? THEN CONCAT(u1.first_name, ' ', u1.last_name)
+          WHEN t.assignBy = ? THEN CONCAT(u2.first_name, ' ', u2.last_name)
+        END as assignedBy,
+        CASE
+          WHEN t.assignTo = ? THEN 'assigned_to_you'
+          WHEN t.assignBy = ? THEN 'assigned_by_you'
+        END as taskType
+      FROM tasks t
+      LEFT JOIN users u1 ON t.assignBy = u1.id
+      LEFT JOIN users u2 ON t.assignTo = u2.id
+      WHERE (t.assignTo = ? OR t.assignBy = ?)
+      AND LOWER(TRIM(t.status)) != 'completed'
+      ORDER BY t.dueDate ASC
     `;
-    db.query(sql, [userId, userId], callback);
+    db.query(sql, [userId, userId, userId, userId, userId, userId], callback);
   }
 
   // Soft delete user (task validation is now done in controller)
