@@ -36,7 +36,7 @@ class Comment {
   static create(commentData, callback) {
     const { task_id, user_id, message, parent_comment_id } = commentData;
 
-    const sql = `INSERT INTO taskcomments (task_id, user_id, comment, parent_comment_id) VALUES (?, ?, ?, ?)`;
+    const sql = `INSERT INTO taskcomments (task_id, user_id, comment, parent_comment_id, updated_at) VALUES (?, ?, ?, ?, NOW())`;
     const values = [task_id, user_id, message, parent_comment_id || null];
 
     db.query(sql, values, callback);
@@ -46,7 +46,7 @@ class Comment {
   static update(id, commentData, callback) {
     const { message } = commentData;
 
-    const sql = `UPDATE taskcomments SET comment = ? WHERE id = ?`;
+    const sql = `UPDATE taskcomments SET comment = ?, updated_at = NOW() WHERE id = ?`;
     const values = [message, id];
 
     db.query(sql, values, callback);
