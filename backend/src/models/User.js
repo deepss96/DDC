@@ -190,20 +190,27 @@ class User {
         return callback(error, null);
       }
 
-      // No pending tasks, but may have completed tasks
-      // Update foreign key references to NULL for all tasks before deleting user
-      const updateAssignToSql = 'UPDATE tasks SET assignTo = NULL WHERE assignTo = ?';
-      const updateAssignBySql = 'UPDATE tasks SET assignBy = NULL WHERE assignBy = ?';
+      // No pending tasks, but may have completed tasks and notifications
+      // Delete notifications first
+      const deleteNotificationsSql = 'DELETE FROM notifications WHERE user_id = ?';
 
-      db.query(updateAssignToSql, [id], (updateErr1, updateResult1) => {
-        if (updateErr1) return callback(updateErr1, null);
+      db.query(deleteNotificationsSql, [id], (deleteNotifErr, deleteNotifResult) => {
+        if (deleteNotifErr) return callback(deleteNotifErr, null);
 
-        db.query(updateAssignBySql, [id], (updateErr2, updateResult2) => {
-          if (updateErr2) return callback(updateErr2, null);
+        // Update foreign key references to NULL for all tasks
+        const updateAssignToSql = 'UPDATE tasks SET assignTo = NULL WHERE assignTo = ?';
+        const updateAssignBySql = 'UPDATE tasks SET assignBy = NULL WHERE assignBy = ?';
 
-          // Now safe to delete the user
-          const deleteUserSql = 'DELETE FROM users WHERE id = ?';
-          db.query(deleteUserSql, [id], callback);
+        db.query(updateAssignToSql, [id], (updateErr1, updateResult1) => {
+          if (updateErr1) return callback(updateErr1, null);
+
+          db.query(updateAssignBySql, [id], (updateErr2, updateResult2) => {
+            if (updateErr2) return callback(updateErr2, null);
+
+            // Now safe to delete the user
+            const deleteUserSql = 'DELETE FROM users WHERE id = ?';
+            db.query(deleteUserSql, [id], callback);
+          });
         });
       });
     });
