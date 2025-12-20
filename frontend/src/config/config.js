@@ -2,13 +2,13 @@
 const config = {
   // API Configuration - Simple environment variable based
   api: {
-    baseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000',
+    baseUrl: import.meta.env.VITE_API_BASE_URL,
     timeout: 10000
   },
 
   // Socket Configuration
   socket: {
-    url: import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000'
+    url: import.meta.env.VITE_SOCKET_URL
   },
 
   // App Configuration
