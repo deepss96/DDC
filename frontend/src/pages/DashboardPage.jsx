@@ -11,18 +11,19 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Function to get status badge styling
+  // Function to get status badge styling - same as other tables
   const getStatusBadge = (status) => {
     const statusConfig = {
-      'Completed': 'bg-green-100 text-green-700',
-      'Delayed': 'bg-yellow-100 text-yellow-700',
-      'At Risk': 'bg-red-100 text-red-700',
-      'Ongoing': 'bg-orange-100 text-orange-700',
-      'Pending': 'bg-gray-100 text-gray-700',
-      'In Progress': 'bg-blue-100 text-blue-700'
+      'Completed': 'bg-green-100 text-green-700 border border-green-200',
+      'Delayed': 'bg-yellow-100 text-yellow-700 border border-yellow-200',
+      'At Risk': 'bg-red-100 text-red-700 border border-red-200',
+      'Ongoing': 'bg-orange-100 text-orange-700 border border-orange-200',
+      'On going': 'bg-orange-100 text-orange-700 border border-orange-200',
+      'Pending': 'bg-gray-100 text-gray-700 border border-gray-200',
+      'In Progress': 'bg-blue-100 text-blue-700 border border-blue-200'
     };
 
-    return statusConfig[status] || 'bg-gray-100 text-gray-700';
+    return statusConfig[status] || 'bg-gray-100 text-gray-700 border border-gray-200';
   };
 
   // Fetch tasks on component mount
