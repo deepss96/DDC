@@ -38,6 +38,8 @@ export default function TasksPage({ searchTerm = '' }) {
   const [deleteError, setDeleteError] = useState(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const filterDropdownRef = useRef(null);
 
   useEffect(() => {
@@ -63,7 +65,14 @@ export default function TasksPage({ searchTerm = '' }) {
         setSelectedTask(taskToOpen);
       } else {
         console.log('Task not found for direct route ID:', taskId);
-        alert(`Task not found. It may have been deleted.`);
+        // Show error toast for deleted task
+        setErrorMessage('Task not found. It may have been deleted.');
+        setShowErrorMessage(true);
+        // Hide error message after 5 seconds
+        setTimeout(() => {
+          setShowErrorMessage(false);
+          setErrorMessage("");
+        }, 5000);
       }
     }
   }, [taskId, tasksData]);
@@ -90,8 +99,14 @@ export default function TasksPage({ searchTerm = '' }) {
           setSelectedTask(taskToOpen);
         } else {
           console.log('Task not found for ID:', openTaskId);
-          // Task not found - show alert
-          alert(`Task not found. It may have been deleted.`);
+          // Show error toast for deleted task
+          setErrorMessage('Task not found. It may have been deleted.');
+          setShowErrorMessage(true);
+          // Hide error message after 5 seconds
+          setTimeout(() => {
+            setShowErrorMessage(false);
+            setErrorMessage("");
+          }, 5000);
         }
         // Clear the URL params to prevent repeated actions
         setTimeout(() => {
@@ -109,8 +124,14 @@ export default function TasksPage({ searchTerm = '' }) {
             setHighlightedTaskId(null);
           }, 3000);
         } else {
-          // Task not found - show alert
-          alert(`Task not found. It may have been deleted.`);
+          // Show error toast for deleted task
+          setErrorMessage('Task not found. It may have been deleted.');
+          setShowErrorMessage(true);
+          // Hide error message after 5 seconds
+          setTimeout(() => {
+            setShowErrorMessage(false);
+            setErrorMessage("");
+          }, 5000);
         }
         // Clear the URL params to prevent repeated alerts
         setTimeout(() => {
@@ -944,6 +965,15 @@ const fetchTasks = async () => {
         <div className="fixed top-4 right-4 z-[1200] bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
           <p className="text-sm font-medium" style={{ fontFamily: 'var(--font-family)' }}>
             {successMessage}
+          </p>
+        </div>
+      )}
+
+      {/* Error Message Toast */}
+      {showErrorMessage && (
+        <div className="fixed top-4 right-4 z-[1200] bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
+          <p className="text-sm font-medium" style={{ fontFamily: 'var(--font-family)' }}>
+            {errorMessage}
           </p>
         </div>
       )}
