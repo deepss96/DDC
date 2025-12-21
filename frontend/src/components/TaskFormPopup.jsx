@@ -277,6 +277,11 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
       newErrors.taskName = "Task name is required";
     }
 
+    // Validate ASSIGNED BY for admin users
+    if (user?.role?.toLowerCase() === 'admin' && !assignBy) {
+      newErrors.assignBy = "Assigned By is required";
+    }
+
     if (!assignTo) {
       newErrors.assignTo = "Assigned To is required";
     }
@@ -296,6 +301,16 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
     // Check if due date is not in the past
     if (dueDate && isDateInPast(dueDate)) {
       newErrors.dueDate = "Due date cannot be in the past";
+    }
+
+    // Validate PROJECT NAME when RELATED TO is Project
+    if (relatedTo === "Project" && !projectName.trim()) {
+      newErrors.projectName = "Project name is required when Related To is Project";
+    }
+
+    // Validate LEAD NAME when RELATED TO is Lead
+    if (relatedTo === "Lead" && !leadId) {
+      newErrors.leadId = "Lead name is required when Related To is Lead";
     }
 
     setErrors(newErrors);
@@ -592,7 +607,8 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
             <div className="md:col-span-1">
               {user?.role?.toLowerCase() === 'admin' ? (
                 <SelectField
-                  label="ASSIGNED BY*"
+                  label="ASSIGNED BY"
+                  required
                   options={users.map(user => user.name)}
                   value={users.find(u => u.id === parseInt(assignBy || user?.id))?.name || ""}
                   onChange={(name) => {
@@ -601,6 +617,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
                   }}
                   placeholder="Select assigned by"
                   searchable={true}
+                  error={errors.assignBy}
                 />
               ) : (
                 <InputField
@@ -679,14 +696,17 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
                 {relatedTo === "Project" && (
                   <InputField
                     label="PROJECT NAME"
+                    required
                     value={projectName}
                     onChange={(e) => setProjectName(e.target.value)}
                     placeholder="Enter project name"
+                    error={errors.projectName}
                   />
                 )}
                 {relatedTo === "Lead" && (
                   <SelectField
                     label="LEAD NAME"
+                    required
                     options={leads.map(lead => lead.contact_name)}
                     value={leads.find(lead => lead.id === parseInt(leadId))?.contact_name || ""}
                     onChange={(contactName) => {
@@ -695,6 +715,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
                     }}
                     placeholder="Select lead name"
                     searchable={true}
+                    error={errors.leadId}
                   />
                 )}
               </div>
