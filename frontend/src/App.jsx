@@ -31,7 +31,7 @@ function AppLayout() {
     if (path === '/' || path === '/dashboard') return 'dashboard';
     if (path === '/lead-management') return 'lead-management';
     if (path === '/clients-management') return 'clients-management';
-    if (path === '/my-tasks') return 'my-tasks';
+    if (path === '/my-tasks' || path.startsWith('/task/')) return 'my-tasks';
     if (path === '/notifications') return 'notifications';
     if (path === '/projects-management') return 'projects-management';
     if (path === '/users-management') return 'users-management';
