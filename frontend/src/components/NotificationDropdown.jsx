@@ -60,15 +60,66 @@ const playNotificationSoundHTML5 = () => {
   }
 };
 
-// Main notification sound function (choose which one to use)
+// Global audio context and initialization
+let audioContext = null;
+let audioInitialized = false;
+
+// Initialize audio context on user interaction
+const initializeAudio = () => {
+  if (!audioInitialized) {
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      // Resume audio context if suspended (required by browser autoplay policies)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+      audioInitialized = true;
+      console.log('Audio initialized successfully');
+    } catch (error) {
+      console.log('Audio initialization failed:', error);
+    }
+  }
+};
+
+// Main notification sound function with better reliability
 const playNotificationSound = () => {
+  // Initialize audio on first play
+  initializeAudio();
+
   try {
+    // Try HTML5 Audio first (more reliable for notifications)
     const audio = new Audio();
     audio.src = '/sounds/Sound-4.mp3';
     audio.volume = 1.0; // 100% volume
-    audio.play().catch(e => console.log('Audio play failed:', e));
+    audio.preload = 'auto';
+
+    // Add event listeners for better debugging
+    audio.oncanplaythrough = () => {
+      console.log('Audio loaded successfully');
+    };
+
+    audio.onerror = (e) => {
+      console.log('Audio load error:', e);
+      // Fallback to Web Audio API
+      playNotificationSoundWebAudio();
+    };
+
+    // Play with promise handling
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          console.log('Audio played successfully');
+        })
+        .catch(error => {
+          console.log('Audio play failed, trying Web Audio API:', error);
+          // Fallback to Web Audio API
+          playNotificationSoundWebAudio();
+        });
+    }
   } catch (error) {
-    console.log('Audio not supported');
+    console.log('HTML5 Audio not supported, trying Web Audio API:', error);
+    playNotificationSoundWebAudio();
   }
 };
 
@@ -229,6 +280,29 @@ const NotificationDropdown = ({ size = 20 }) => {
     }
   }, [user]);
 
+  // Initialize audio on user interaction (required for browser autoplay policies)
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      initializeAudio();
+      // Remove listeners after first interaction
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
+
+    // Add listeners for user interactions
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
+    document.addEventListener('touchstart', handleUserInteraction);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
+  }, []);
+
   // Fetch data on mount and when user changes
   useEffect(() => {
     if (user) {
@@ -237,15 +311,8 @@ const NotificationDropdown = ({ size = 20 }) => {
     }
   }, [user]);
 
-  // Play sound when new notification arrives (for initial load)
-  useEffect(() => {
-    if (unreadCount > 0 && notifications.length > 0) {
-      const hasNewNotification = notifications.some(n => !n.is_read);
-      if (hasNewNotification) {
-        playNotificationSound();
-      }
-    }
-  }, [unreadCount, notifications]);
+  // Note: Sound is played in the socket 'new-notification' event handler
+  // No need for additional sound playing logic here
 
   // Format time ago
   const formatTimeAgo = (dateString) => {
