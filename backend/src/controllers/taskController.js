@@ -12,7 +12,9 @@ class TaskController {
         SELECT
           t.*,
           CONCAT(u1.first_name, ' ', u1.last_name) as assignByName,
-          CONCAT(u2.first_name, ' ', u2.last_name) as assignToName
+          CONCAT(u2.first_name, ' ', u2.last_name) as assignToName,
+          u1.status as assignByStatus,
+          u2.status as assignToStatus
         FROM tasks t
         LEFT JOIN users u1 ON t.assignBy = u1.id
         LEFT JOIN users u2 ON t.assignTo = u2.id
@@ -44,7 +46,9 @@ class TaskController {
         SELECT
           t.*,
           CONCAT(u1.first_name, ' ', u1.last_name) as assignByName,
-          CONCAT(u2.first_name, ' ', u2.last_name) as assignToName
+          CONCAT(u2.first_name, ' ', u2.last_name) as assignToName,
+          u1.status as assignByStatus,
+          u2.status as assignToStatus
         FROM tasks t
         LEFT JOIN users u1 ON t.assignBy = u1.id
         LEFT JOIN users u2 ON t.assignTo = u2.id

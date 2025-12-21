@@ -383,9 +383,25 @@ const fetchTasks = async () => {
           </div>
         );
       case 'assignByName':
-        return task.assignByName || task.assignBy;
+        const assignByName = task.assignByName || task.assignBy;
+        return (
+          <span
+            className={task.assignByStatus === 'Deleted' ? 'line-through text-gray-500' : ''}
+            title={task.assignByStatus === 'Deleted' ? 'This user has been deleted' : ''}
+          >
+            {assignByName}
+          </span>
+        );
       case 'assignToName':
-        return task.assignToName || task.assignTo;
+        const assignToName = task.assignToName || task.assignTo;
+        return (
+          <span
+            className={task.assignToStatus === 'Deleted' ? 'line-through text-gray-500' : ''}
+            title={task.assignToStatus === 'Deleted' ? 'This user has been deleted' : ''}
+          >
+            {assignToName}
+          </span>
+        );
       case 'status':
         return (
           <span className={`inline-flex px-2 py-1 text-xs font-normal rounded-full ${getStatusColor(task.status)}`}>
