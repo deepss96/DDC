@@ -64,8 +64,15 @@ export default function NotificationsPage() {
         // Check if the task still exists
         const taskData = await apiService.getTaskById(notification.related_id);
 
-        // If task exists, navigate to task info page
-        navigate(`/task/${notification.related_id}`);
+        // For comment notifications, navigate to task with comments tab active
+        if (notification.type === 'comment') {
+          navigate(`/task/${notification.related_id}`, {
+            state: { activeTab: 'comments' }
+          });
+        } else {
+          // For other task notifications, navigate normally
+          navigate(`/task/${notification.related_id}`);
+        }
       } catch (error) {
         // Task not found (deleted) - show toast error
         toast.error('This task has been deleted and cannot be opened.');
