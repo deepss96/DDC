@@ -86,6 +86,22 @@ class Task {
             console.error('Error creating notification:', notifErr);
           } else {
             console.log('Notification created for task assignment');
+
+            // Emit real-time notification to the assigned user
+            if (global.io) {
+              // Get the full notification data
+              Notification.getById(notifResult.insertId, (getErr, notifResults) => {
+                if (!getErr && notifResults.length > 0) {
+                  const notification = notifResults[0];
+                  console.log('Emitting real-time notification for task assignment:', notification);
+
+                  global.io.to(`user_${assignTo}`).emit('new-notification', {
+                    notification: notification,
+                    unreadCount: 1
+                  });
+                }
+              });
+            }
           }
           // Still return the task creation result
           callback(null, result);

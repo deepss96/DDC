@@ -20,7 +20,7 @@ const playNotificationSound = () => {
     oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
     oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
 
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(1.0, audioContext.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
 
     oscillator.start(audioContext.currentTime);
@@ -133,19 +133,40 @@ const NotificationDropdown = ({ size = 20 }) => {
   // Socket.IO connection and real-time notifications
   useEffect(() => {
     if (user && user.id) {
+      console.log('🔌 Initializing Socket.IO connection for user:', user.id);
+
       // Initialize socket connection
       const socketConnection = io(config.socket.url, {
-        transports: ['websocket', 'polling']
+        transports: ['websocket', 'polling'],
+        timeout: 20000,
+        forceNew: true
       });
 
       setSocket(socketConnection);
 
+      // Connection event handlers
+      socketConnection.on('connect', () => {
+        console.log('✅ Socket.IO connected successfully:', socketConnection.id);
+        // Join user-specific room after connection
+        socketConnection.emit('join-user-room', user.id);
+      });
+
+      socketConnection.on('connect_error', (error) => {
+        console.error('❌ Socket.IO connection error:', error);
+      });
+
+      socketConnection.on('disconnect', (reason) => {
+        console.log('🔌 Socket.IO disconnected:', reason);
+      });
+
       // Join user-specific room
-      socketConnection.emit('join-user-room', user.id);
+      socketConnection.on('joined-room', (userId) => {
+        console.log('✅ Joined user room:', userId);
+      });
 
       // Listen for new notifications
       socketConnection.on('new-notification', (data) => {
-        console.log('New notification received:', data);
+        console.log('🔔 New notification received via Socket.IO:', data);
 
         // Add new notification to the list
         setNotifications(prev => [data.notification, ...prev]);
@@ -159,6 +180,7 @@ const NotificationDropdown = ({ size = 20 }) => {
 
       // Cleanup on unmount or user change
       return () => {
+        console.log('🔌 Cleaning up Socket.IO connection');
         socketConnection.emit('leave-user-room', user.id);
         socketConnection.disconnect();
       };
