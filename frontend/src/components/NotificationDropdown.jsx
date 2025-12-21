@@ -184,6 +184,7 @@ const NotificationDropdown = ({ size = 20 }) => {
   // Handle notification click
   const handleNotificationClick = async (notification) => {
     console.log('Notification clicked:', notification);
+    console.log('Notification type:', notification.type);
     try {
       // Mark as read if not already
       if (!notification.is_read) {
@@ -196,11 +197,13 @@ const NotificationDropdown = ({ size = 20 }) => {
 
         // For comment notifications, navigate to task with comments tab active
         if (notification.type === 'comment') {
+          console.log('Opening comments tab for comment notification');
           navigate(`/task/${notification.related_id}`, {
             state: { activeTab: 'comments' }
           });
         } else {
-          // For other task notifications, navigate normally
+          // For other task notifications, navigate normally (overview tab)
+          console.log('Opening overview tab for task notification');
           navigate(`/task/${notification.related_id}`);
         }
       } else if (notification.related_id) {
