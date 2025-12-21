@@ -11,6 +11,7 @@ import LoginSignupPage from './pages/LoginSignupPage.jsx';
 import UsersPage from './pages/UsersPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import NotificationsPage from './pages/NotificationsPage.jsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 import ChangePasswordPopup from './components/ChangePasswordPopup.jsx';
 import { useTranslation } from './services/translationService.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
@@ -215,6 +216,7 @@ function AppLayout() {
             <Routes>
               <Route path="/" element={<DashboardPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
               <Route path="/lead-management" element={<LeadsPage searchTerm={searchTerm} />} />
               {/* Placeholder routes for other pages */}
               <Route path="/clients-management" element={<ClientsPage searchTerm={searchTerm} />} />

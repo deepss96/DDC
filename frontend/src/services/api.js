@@ -112,6 +112,13 @@ class ApiService {
     });
   }
 
+  async resetPassword(token, newPassword) {
+    return this.request('/api/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword })
+    });
+  }
+
   async changePassword(passwordData) {
     return this.request('/api/auth/change-password', {
       method: 'POST',

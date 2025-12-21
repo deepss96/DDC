@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const transporter = require('../config/mailer');
 
 class AuthController {
   // Register User
@@ -126,8 +127,8 @@ class AuthController {
     }
   }
 
-  // Forgot Password
-  static forgotPassword(req, res) {
+  // Forgot Password - Send email with reset link
+  static async forgotPassword(req, res) {
     try {
       const { email } = req.body;
 
@@ -136,7 +137,7 @@ class AuthController {
       }
 
       // Check if user exists
-      User.getByIdentifier(email, (err, results) => {
+      User.getByIdentifier(email, async (err, results) => {
         if (err) {
           return res.status(500).json({ error: 'Database error' });
         }
@@ -145,22 +146,87 @@ class AuthController {
           return res.status(404).json({ error: 'User with this email not found' });
         }
 
-        // Generate reset token (simplified - in production, use proper reset mechanism)
+        const user = results[0];
+
+        // Generate reset token
         const resetToken = jwt.sign(
-          { id: results[0].id, email },
+          { id: user.id, email },
           process.env.JWT_SECRET || 'your-secret-key',
           { expiresIn: '1h' }
         );
 
-        // In a real application, you would send an email with the reset link
-        // For now, we'll just return the token for testing
-        res.json({
-          message: 'Password reset link sent to your email',
-          resetToken, // Remove this in production
-          note: 'In production, this token would be sent via email'
-        });
+        // Create reset link
+        const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/#/reset-password/${resetToken}`;
+
+        try {
+          // Send email using nodemailer
+          await transporter.sendMail({
+            from: `"NirmaanTrack Support" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: 'Reset Your Password - NirmaanTrack',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 20px; border-radius: 10px 10px 0 0;">
+                  <h2 style="color: white; margin: 0; text-align: center;">NirmaanTrack</h2>
+                  <p style="color: white; margin: 10px 0 0 0; text-align: center;">Password Reset Request</p>
+                </div>
+
+                <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px;">
+                  <h3 style="color: #374151; margin-top: 0;">Hello ${user.first_name || 'User'},</h3>
+
+                  <p style="color: #6b7280; line-height: 1.6;">
+                    You requested to reset your password for your NirmaanTrack account. Click the button below to reset your password:
+                  </p>
+
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="${resetLink}"
+                       style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                              color: white;
+                              padding: 12px 30px;
+                              text-decoration: none;
+                              border-radius: 6px;
+                              font-weight: bold;
+                              display: inline-block;
+                              box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);">
+                      Reset Password
+                    </a>
+                  </div>
+
+                  <p style="color: #6b7280; line-height: 1.6;">
+                    This link will expire in 1 hour for security reasons. If you didn't request this password reset, please ignore this email.
+                  </p>
+
+                  <p style="color: #6b7280; line-height: 1.6;">
+                    If the button doesn't work, copy and paste this link into your browser:
+                    <br>
+                    <a href="${resetLink}" style="color: #f59e0b; word-break: break-all;">${resetLink}</a>
+                  </p>
+
+                  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+
+                  <p style="color: #9ca3af; font-size: 14px; margin-bottom: 0;">
+                    Best regards,<br>
+                    NirmaanTrack Team
+                  </p>
+                </div>
+              </div>
+            `
+          });
+
+          console.log('✅ Password reset email sent to:', email);
+          res.json({
+            message: 'Password reset link sent to your email successfully'
+          });
+
+        } catch (emailError) {
+          console.error('❌ Error sending email:', emailError);
+          res.status(500).json({
+            error: 'Failed to send email. Please try again later.'
+          });
+        }
       });
     } catch (error) {
+      console.error('Server error in forgot password:', error);
       res.status(500).json({ error: 'Server error' });
     }
   }
