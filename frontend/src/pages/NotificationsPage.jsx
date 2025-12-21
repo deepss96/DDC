@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FiBell, FiCheck, FiX, FiExternalLink, FiUserCheck, FiClipboard, FiAlertCircle, FiInfo, FiArrowLeft } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import apiService from '../services/api';
 
 export default function NotificationsPage() {
@@ -58,21 +59,16 @@ export default function NotificationsPage() {
     }
 
     // Navigate based on notification type
-    if (notification.type === 'task_assigned' && notification.related_id) {
+    if ((notification.type === 'task_assigned' || notification.type === 'task_completed' || notification.type === 'task_overdue' || notification.type === 'comment') && notification.related_id) {
       try {
         // Check if the task still exists
         const taskData = await apiService.getTaskById(notification.related_id);
 
-        // If task exists, navigate to open it
-        navigate('/my-tasks', {
-          state: {
-            openTaskId: notification.related_id,
-            fromNotification: true
-          }
-        });
+        // If task exists, navigate to task info page
+        navigate(`/task/${notification.related_id}`);
       } catch (error) {
-        // Task not found (deleted)
-        alert(`This task has been deleted and cannot be opened.`);
+        // Task not found (deleted) - show toast error
+        toast.error('This task has been deleted and cannot be opened.');
       }
     }
   };
