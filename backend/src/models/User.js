@@ -197,21 +197,10 @@ class User {
     db.query(deleteNotificationsSql, [id], (deleteNotifErr, deleteNotifResult) => {
       if (deleteNotifErr) return callback(deleteNotifErr, null);
 
-      // Update foreign key references to NULL for all tasks
-      const updateAssignToSql = 'UPDATE tasks SET assignTo = NULL WHERE assignTo = ?';
-      const updateAssignBySql = 'UPDATE tasks SET assignBy = NULL WHERE assignBy = ?';
-
-      db.query(updateAssignToSql, [id], (updateErr1, updateResult1) => {
-        if (updateErr1) return callback(updateErr1, null);
-
-        db.query(updateAssignBySql, [id], (updateErr2, updateResult2) => {
-          if (updateErr2) return callback(updateErr2, null);
-
-          // Soft delete: Mark user as deleted instead of hard delete
-          const softDeleteUserSql = "UPDATE users SET status = 'Deleted' WHERE id = ?";
-          db.query(softDeleteUserSql, [id], callback);
-        });
-      });
+      // Soft delete: Mark user as deleted instead of hard delete
+      // Task assignments remain intact - only status check was performed
+      const softDeleteUserSql = "UPDATE users SET status = 'Deleted' WHERE id = ?";
+      db.query(softDeleteUserSql, [id], callback);
     });
   }
 
