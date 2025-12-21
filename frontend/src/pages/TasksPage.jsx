@@ -8,6 +8,8 @@ import Table from "../components/Table";
 import { useAuth } from "../contexts/AuthContext";
 import { formatDateForDisplay } from "../utils/dateUtils.jsx";
 import apiService from "../services/api";
+import io from 'socket.io-client';
+import config from '../config/config';
 
 export default function TasksPage({ searchTerm = '' }) {
   const { user } = useAuth();
@@ -40,6 +42,8 @@ export default function TasksPage({ searchTerm = '' }) {
   const [successMessage, setSuccessMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [socket, setSocket] = useState(null);
+  const [hasShownDeletedTaskError, setHasShownDeletedTaskError] = useState(false);
   const filterDropdownRef = useRef(null);
 
   useEffect(() => {
@@ -57,7 +61,7 @@ export default function TasksPage({ searchTerm = '' }) {
 
   // Handle direct task route navigation (e.g., /task/123)
   useEffect(() => {
-    if (taskId && tasksData.length > 0) {
+    if (taskId && tasksData.length > 0 && !hasShownDeletedTaskError) {
       console.log('Direct task route navigation:', taskId);
       const taskToOpen = tasksData.find(task => task.id == taskId);
       if (taskToOpen) {
@@ -65,9 +69,10 @@ export default function TasksPage({ searchTerm = '' }) {
         setSelectedTask(taskToOpen);
       } else {
         console.log('Task not found for direct route ID:', taskId);
-        // Show error toast for deleted task
+        // Show error toast for deleted task only once
         setErrorMessage('Task not found. It may have been deleted.');
         setShowErrorMessage(true);
+        setHasShownDeletedTaskError(true);
         // Hide error message after 5 seconds
         setTimeout(() => {
           setShowErrorMessage(false);
@@ -75,7 +80,7 @@ export default function TasksPage({ searchTerm = '' }) {
         }, 5000);
       }
     }
-  }, [taskId, tasksData]);
+  }, [taskId, tasksData, hasShownDeletedTaskError]);
 
   // Handle notification navigation - open task directly or highlight in table
   useEffect(() => {
@@ -97,11 +102,12 @@ export default function TasksPage({ searchTerm = '' }) {
         if (taskToOpen) {
           console.log('Task found, opening:', taskToOpen);
           setSelectedTask(taskToOpen);
-        } else {
+        } else if (!hasShownDeletedTaskError) {
           console.log('Task not found for ID:', openTaskId);
-          // Show error toast for deleted task
+          // Show error toast for deleted task only once
           setErrorMessage('Task not found. It may have been deleted.');
           setShowErrorMessage(true);
+          setHasShownDeletedTaskError(true);
           // Hide error message after 5 seconds
           setTimeout(() => {
             setShowErrorMessage(false);
@@ -123,10 +129,11 @@ export default function TasksPage({ searchTerm = '' }) {
           setTimeout(() => {
             setHighlightedTaskId(null);
           }, 3000);
-        } else {
-          // Show error toast for deleted task
+        } else if (!hasShownDeletedTaskError) {
+          // Show error toast for deleted task only once
           setErrorMessage('Task not found. It may have been deleted.');
           setShowErrorMessage(true);
+          setHasShownDeletedTaskError(true);
           // Hide error message after 5 seconds
           setTimeout(() => {
             setShowErrorMessage(false);
@@ -197,6 +204,110 @@ export default function TasksPage({ searchTerm = '' }) {
       document.removeEventListener('mousedown', handleClickOutsideView);
     };
   }, [isViewDropdownOpen]);
+
+  // Socket.IO connection for real-time task updates
+  useEffect(() => {
+    if (user && user.id) {
+      console.log('🔌 Initializing Socket.IO connection for TasksPage user:', user.id);
+
+      const socketConnection = io(config.socket.url, {
+        transports: ['websocket', 'polling'],
+        timeout: 20000,
+        forceNew: true
+      });
+
+      setSocket(socketConnection);
+
+      socketConnection.on('connect', () => {
+        console.log('✅ TasksPage Socket.IO connected successfully:', socketConnection.id);
+        // Join user-specific room for task updates
+        socketConnection.emit('join-user-room', user.id);
+      });
+
+      socketConnection.on('connect_error', (error) => {
+        console.error('❌ TasksPage Socket.IO connection error:', error);
+      });
+
+      socketConnection.on('disconnect', (reason) => {
+        console.log('🔌 TasksPage Socket.IO disconnected:', reason);
+      });
+
+      // Listen for real-time task creation
+      socketConnection.on('task-created', (data) => {
+        console.log('📝 New task created via Socket.IO:', data);
+        const { task } = data;
+
+        // Check if this task should be visible to current user
+        const isAdmin = user?.role?.toLowerCase() === 'admin';
+        const shouldShowTask = isAdmin || task.assignBy === user?.id || task.assignTo === user?.id;
+
+        if (shouldShowTask) {
+          // Add new task to the list and sort
+          setTasksData(prevTasks => {
+            const updatedTasks = [...prevTasks, task].sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+            return updatedTasks;
+          });
+
+          // Show success message
+          setSuccessMessage(`New task "${task.name}" has been assigned to you!`);
+          setShowSuccessMessage(true);
+          setTimeout(() => {
+            setShowSuccessMessage(false);
+            setSuccessMessage("");
+          }, 5000);
+        }
+      });
+
+      // Listen for real-time task updates
+      socketConnection.on('task-updated', (data) => {
+        console.log('📝 Task updated via Socket.IO:', data);
+        const { task } = data;
+
+        // Check if this task should be visible to current user
+        const isAdmin = user?.role?.toLowerCase() === 'admin';
+        const shouldShowTask = isAdmin || task.assignBy === user?.id || task.assignTo === user?.id;
+
+        if (shouldShowTask) {
+          // Update the task in the list
+          setTasksData(prevTasks => {
+            const updatedTasks = prevTasks.map(t =>
+              t.id === task.id ? { ...task } : t
+            ).sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+            return updatedTasks;
+          });
+
+          // If the currently selected task is updated, update it too
+          if (selectedTask && selectedTask.id === task.id) {
+            setSelectedTask(task);
+          }
+        }
+      });
+
+      // Listen for real-time task deletions
+      socketConnection.on('task-deleted', (data) => {
+        console.log('🗑️ Task deleted via Socket.IO:', data);
+        const { taskId } = data;
+
+        // Remove the task from the list
+        setTasksData(prevTasks => {
+          const filteredTasks = prevTasks.filter(t => t.id !== parseInt(taskId));
+          return filteredTasks;
+        });
+
+        // If the currently selected task is deleted, close it
+        if (selectedTask && selectedTask.id === parseInt(taskId)) {
+          setSelectedTask(null);
+        }
+      });
+
+      // Cleanup on unmount or user change
+      return () => {
+        console.log('🔌 Cleaning up TasksPage Socket.IO connection');
+        socketConnection.emit('leave-user-room', user.id);
+        socketConnection.disconnect();
+      };
+    }
+  }, [user]);
 
   // ⬇️ Reusable function to fetch tasks
 
@@ -392,10 +503,8 @@ const fetchTasks = async () => {
 
     try {
       const savedTask = await apiService.createTask(taskWithUserData);
-      // Add new task and sort by createdDate DESC (newest first)
-      const updatedTasks = [...tasksData, savedTask].sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
-      setTasksData(updatedTasks);
-      console.log('Task created:', updatedTasks);
+      // Don't add to local state here - let Socket.IO handle real-time updates
+      console.log('Task created:', savedTask);
       setIsTaskFormOpen(false); // Close the popup on success
       setIsEditMode(false);
       setTaskToEdit(null);
@@ -409,10 +518,7 @@ const fetchTasks = async () => {
     console.log("updated form data",updatedTask)
     try {
       const updatedTaskData = await apiService.updateTask(taskToEdit.id, updatedTask);
-      const updatedTasks = tasksData.map(task =>
-        task.id === taskToEdit.id ? { ...updatedTaskData } : task
-      ).sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
-      setTasksData(updatedTasks);
+      // Don't update local state here - let Socket.IO handle real-time updates
       console.log("updated form response",updatedTaskData)
       setIsTaskFormOpen(false); // Close the popup on success
       setIsEditMode(false);

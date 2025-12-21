@@ -1,4 +1,5 @@
 const Comment = require('../models/Comment');
+const Notification = require('../models/Notification');
 const db = require('../config/database');
 
 class CommentController {
@@ -88,6 +89,87 @@ class CommentController {
         }
 
         const comment = results[0];
+
+        // Emit real-time comment event to task room
+        if (global.io) {
+          global.io.to(`task_${task_id}`).emit('new-comment', {
+            comment: {
+              id: comment.id,
+              task_id: comment.task_id,
+              user_id: comment.user_id,
+              userName: comment.userName,
+              username: comment.username,
+              message: comment.message,
+              parent_comment_id: comment.parent_comment_id,
+              created_at: comment.created_at,
+              updated_at: comment.updated_at,
+              replies: []
+            },
+            taskId: task_id
+          });
+        }
+
+        // Create notifications for users assigned to this task (except the commenter)
+        const sql = `
+          SELECT t.name as taskName, t.assignBy, t.assignTo,
+                 u1.first_name as assignByFirstName, u1.last_name as assignByLastName,
+                 u2.first_name as assignToFirstName, u2.last_name as assignToLastName
+          FROM tasks t
+          LEFT JOIN users u1 ON t.assignBy = u1.id
+          LEFT JOIN users u2 ON t.assignTo = u2.id
+          WHERE t.id = ?
+        `;
+
+        db.query(sql, [task_id], (err3, taskResults) => {
+          if (!err3 && taskResults.length > 0) {
+            const task = taskResults[0];
+            const usersToNotify = [];
+
+            // Add task creator if different from commenter
+            if (task.assignBy && task.assignBy !== user_id) {
+              usersToNotify.push({
+                user_id: task.assignBy,
+                userName: `${task.assignByFirstName} ${task.assignByLastName}`.trim()
+              });
+            }
+
+            // Add task assignee if different from commenter
+            if (task.assignTo && task.assignTo !== user_id) {
+              usersToNotify.push({
+                user_id: task.assignTo,
+                userName: `${task.assignToFirstName} ${task.assignToLastName}`.trim()
+              });
+            }
+
+            // Create notifications for each user
+            usersToNotify.forEach(user => {
+              const notificationData = {
+                user_id: user.user_id,
+                title: `New comment on task: ${task.taskName}`,
+                message: `${comment.userName} commented: "${comment.message.length > 50 ? comment.message.substring(0, 50) + '...' : comment.message}"`,
+                type: 'comment',
+                related_id: task_id,
+                assignByName: comment.userName,
+                is_read: false,
+                created_at: new Date()
+              };
+
+              Notification.create(notificationData, (err4, result) => {
+                if (!err4 && global.io) {
+                  // Emit notification to the user
+                  global.io.to(`user_${user.user_id}`).emit('new-notification', {
+                    notification: {
+                      id: result.insertId,
+                      ...notificationData
+                    },
+                    unreadCount: 1
+                  });
+                }
+              });
+            });
+          }
+        });
+
         res.status(201).json({
           id: comment.id,
           task_id: comment.task_id,

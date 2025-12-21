@@ -62,6 +62,12 @@ class Notification {
     const sql = `SELECT * FROM notifications WHERE id = ?`;
     db.query(sql, [id], callback);
   }
+
+  // Delete notifications by related_id
+  static deleteByRelatedId(relatedId, callback) {
+    const sql = 'DELETE FROM notifications WHERE related_id = ?';
+    db.query(sql, [relatedId], callback);
+  }
 }
 
 module.exports = Notification;

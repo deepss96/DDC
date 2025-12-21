@@ -91,6 +91,38 @@ io.on('connection', (socket) => {
     console.log(`User ${userId} left room user_${userId}`);
   });
 
+  // Join task-specific room for comments
+  socket.on('join-task-room', (taskId) => {
+    socket.join(`task_${taskId}`);
+    console.log(`User joined task room task_${taskId}`);
+  });
+
+  // Leave task-specific room
+  socket.on('leave-task-room', (taskId) => {
+    socket.leave(`task_${taskId}`);
+    console.log(`User left task room task_${taskId}`);
+  });
+
+  // Handle typing indicators
+  socket.on('typing-start', (data) => {
+    const { taskId, userId, userName } = data;
+    socket.to(`task_${taskId}`).emit('user-typing', {
+      userId,
+      userName,
+      taskId,
+      isTyping: true
+    });
+  });
+
+  socket.on('typing-stop', (data) => {
+    const { taskId, userId } = data;
+    socket.to(`task_${taskId}`).emit('user-typing', {
+      userId,
+      taskId,
+      isTyping: false
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
   });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiBell, FiCheck, FiX, FiExternalLink, FiUserCheck, FiClipboard, FiAlertCircle, FiInfo } from 'react-icons/fi';
+import { FiBell, FiCheck, FiX, FiExternalLink, FiUserCheck, FiClipboard, FiAlertCircle, FiInfo, FiMessageSquare } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
@@ -98,7 +98,7 @@ const NotificationDropdown = ({ size = 20 }) => {
       }
 
       // Navigate based on notification type or fallback to related_id
-      if ((notification.type === 'task_assigned' || notification.type === 'task_completed' || notification.type === 'task_overdue') && notification.related_id) {
+      if ((notification.type === 'task_assigned' || notification.type === 'task_completed' || notification.type === 'task_overdue' || notification.type === 'comment') && notification.related_id) {
         console.log('Navigating to task:', notification.related_id);
         // Navigate directly to task details page
         navigate(`/task/${notification.related_id}`);
@@ -262,7 +262,7 @@ const NotificationDropdown = ({ size = 20 }) => {
                 <p className="text-xs sm:text-base">No notifications</p>
               </div>
             ) : (
-              notifications.map((notification) => {
+              notifications.slice(0, 3).map((notification) => {
                 // Get icon and color based on notification type
                 const getNotificationIcon = (type) => {
                   switch (type) {
@@ -272,6 +272,8 @@ const NotificationDropdown = ({ size = 20 }) => {
                       return { icon: FiClipboard, color: 'text-green-500', bgColor: 'bg-green-100' };
                     case 'task_overdue':
                       return { icon: FiAlertCircle, color: 'text-red-500', bgColor: 'bg-red-100' };
+                    case 'comment':
+                      return { icon: FiMessageSquare, color: 'text-purple-500', bgColor: 'bg-purple-100' };
                     default:
                       return { icon: FiInfo, color: 'text-purple-500', bgColor: 'bg-purple-100' };
                   }

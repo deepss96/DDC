@@ -121,7 +121,18 @@ class TaskController {
         if (err2) {
           return res.status(500).json({ error: err2.message });
         }
-        res.json(results[0]);
+
+        const newTask = results[0];
+
+        // Emit real-time task creation event to ALL connected users
+        if (global.io) {
+          global.io.emit('task-created', {
+            task: newTask,
+            action: 'created'
+          });
+        }
+
+        res.json(newTask);
       });
     });
   }
@@ -146,7 +157,18 @@ class TaskController {
         if (err2) {
           return res.status(500).json({ error: err2.message });
         }
-        res.json(results[0]);
+
+        const updatedTask = results[0];
+
+        // Emit real-time task update event to ALL connected users
+        if (global.io) {
+          global.io.emit('task-updated', {
+            task: updatedTask,
+            action: 'updated'
+          });
+        }
+
+        res.json(updatedTask);
       });
     });
   }
@@ -164,16 +186,44 @@ class TaskController {
       });
     }
 
-    Task.delete(id, (err, result) => {
+    // First get the task details before deletion for socket events
+    Task.getById(id, (err, results) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
 
-      if (result.affectedRows === 0) {
+      if (results.length === 0) {
         return res.status(404).json({ error: 'Task not found' });
       }
 
-      res.json({ message: 'Task deleted successfully' });
+      const taskToDelete = results[0];
+
+      Task.delete(id, (err2, result) => {
+        if (err2) {
+          return res.status(500).json({ error: err2.message });
+        }
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ error: 'Task not found' });
+        }
+
+        // Delete related notifications for this task
+        const Notification = require('../models/Notification');
+        Notification.deleteByRelatedId(id, (err3, result3) => {
+          // Ignore errors for notification deletion, task deletion is more important
+          console.log(`Deleted ${result3?.affectedRows || 0} notifications for task ${id}`);
+        });
+
+        // Emit real-time task deletion event to ALL connected users
+        if (global.io) {
+          global.io.emit('task-deleted', {
+            taskId: id,
+            action: 'deleted'
+          });
+        }
+
+        res.json({ message: 'Task deleted successfully' });
+      });
     });
   }
 

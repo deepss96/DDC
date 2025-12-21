@@ -6,6 +6,8 @@ import {
 } from "react-icons/fi";
 import { useAuth } from "../contexts/AuthContext";
 import apiService from "../services/api";
+import io from 'socket.io-client';
+import config from '../config/config';
 
 // Add wave animation for back button
 const waveStyles = `
@@ -37,11 +39,14 @@ const TaskInfo = ({ selectedTask, onClose }) => {
 
   const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(false);
+  const [socket, setSocket] = useState(null);
+  const [typingUsers, setTypingUsers] = useState(new Map());
 
   // PERFECT SCROLL REFS
   const chatContainerRef = useRef(null);
   const isUserScrollingRef = useRef(false);
   const wasNearBottomRef = useRef(true);
+  const typingTimeoutRef = useRef(null);
 
   // ====== Utils ======
   const formatDateForDisplay = (dateString) => {
@@ -185,6 +190,123 @@ const TaskInfo = ({ selectedTask, onClose }) => {
       });
     }
   }, [comments, activeTab, scrollToBottom, isNearBottom]);
+
+  // Socket.IO connection for real-time comments
+  useEffect(() => {
+    if (user && user.id && selectedTask?.id && activeTab === "comments") {
+      console.log('🔌 Initializing Socket.IO connection for TaskInfo comments:', selectedTask.id);
+
+      const socketConnection = io(config.socket.url, {
+        transports: ['websocket', 'polling'],
+        timeout: 20000,
+        forceNew: true
+      });
+
+      setSocket(socketConnection);
+
+      socketConnection.on('connect', () => {
+        console.log('✅ TaskInfo Socket.IO connected successfully:', socketConnection.id);
+        // Join task-specific room for comments
+        socketConnection.emit('join-task-room', selectedTask.id);
+      });
+
+      socketConnection.on('connect_error', (error) => {
+        console.error('❌ TaskInfo Socket.IO connection error:', error);
+      });
+
+      socketConnection.on('disconnect', (reason) => {
+        console.log('🔌 TaskInfo Socket.IO disconnected:', reason);
+      });
+
+      // Listen for real-time new comments
+      socketConnection.on('new-comment', (data) => {
+        console.log('💬 New comment received via Socket.IO:', data);
+        const { comment, taskId } = data;
+
+        // Only add if it's for this task and not from current user (to avoid duplicates)
+        if (taskId === selectedTask.id && comment.user_id !== user.id) {
+          setComments(prev => sortByCreatedAt([...prev, comment]));
+        }
+      });
+
+      // Listen for typing indicators
+      socketConnection.on('user-typing', (data) => {
+        const { userId, userName, taskId, isTyping } = data;
+
+        // Only show typing for this task and not for current user
+        if (taskId === selectedTask.id && userId !== user.id) {
+          setTypingUsers(prev => {
+            const newMap = new Map(prev);
+            if (isTyping) {
+              newMap.set(userId, { userName, timestamp: Date.now() });
+            } else {
+              newMap.delete(userId);
+            }
+            return newMap;
+          });
+        }
+      });
+
+      // Cleanup on unmount or task change
+      return () => {
+        console.log('🔌 Cleaning up TaskInfo Socket.IO connection');
+        socketConnection.emit('leave-task-room', selectedTask.id);
+        socketConnection.disconnect();
+      };
+    }
+  }, [user, selectedTask?.id, activeTab]);
+
+  // Handle typing indicators
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setNewComment(value);
+
+    // Send typing start/stop events
+    if (socket && selectedTask?.id) {
+      if (value.trim() && !typingTimeoutRef.current) {
+        // Start typing
+        socket.emit('typing-start', {
+          taskId: selectedTask.id,
+          userId: user.id,
+          userName: `${user.firstName} ${user.lastName}`
+        });
+      }
+
+      // Clear existing timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      // Set timeout to stop typing after 1 second of no input
+      typingTimeoutRef.current = setTimeout(() => {
+        if (socket && selectedTask?.id) {
+          socket.emit('typing-stop', {
+            taskId: selectedTask.id,
+            userId: user.id
+          });
+        }
+        typingTimeoutRef.current = null;
+      }, 1000);
+    }
+  };
+
+  // Clean up typing indicators that are too old
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setTypingUsers(prev => {
+        const newMap = new Map();
+        for (const [userId, data] of prev) {
+          if (now - data.timestamp < 5000) { // Remove after 5 seconds
+            newMap.set(userId, data);
+          }
+        }
+        return newMap;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // ====== Send comment (local append, no refetch) ======
   const handleSendComment = async () => {
@@ -667,23 +789,40 @@ const TaskInfo = ({ selectedTask, onClose }) => {
 
       {/* Chat Input - Fixed at bottom when comments tab is active */}
       {activeTab === "comments" && (
-        <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-gray-200 bg-white">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            />
-            <button
-              onClick={handleSendComment}
-              disabled={!newComment.trim() || postingComment}
-              className="px-3 sm:px-4 py-2 sm:py-3 bg-primary text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-            >
-              <FiSend size={14} className="sm:w-4 sm:h-4" />
-            </button>
+        <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
+          {/* Typing Indicators */}
+          {typingUsers.size > 0 && (
+            <div className="px-3 sm:px-4 py-2 text-xs text-gray-500 bg-gray-50 border-b border-gray-200">
+              {Array.from(typingUsers.values()).map((user, index) => (
+                <span key={index} className="inline-flex items-center">
+                  <span className="font-medium">{user.userName}</span>
+                  <span className="ml-1">is typing</span>
+                  {index < typingUsers.size - 1 && <span className="mx-1">,</span>}
+                </span>
+              ))}
+              <span className="ml-1 animate-pulse">...</span>
+            </div>
+          )}
+
+          {/* Input Area */}
+          <div className="p-3 sm:p-4">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newComment}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message..."
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+              <button
+                onClick={handleSendComment}
+                disabled={!newComment.trim() || postingComment}
+                className="px-3 sm:px-4 py-2 sm:py-3 bg-primary text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              >
+                <FiSend size={14} className="sm:w-4 sm:h-4" />
+              </button>
+            </div>
           </div>
         </div>
       )}
