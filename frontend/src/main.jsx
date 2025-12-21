@@ -10,7 +10,22 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <TranslationProvider>
       <App />
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        toastStyle={{
+          backgroundColor: '#dc2626', // red-600 for error toasts
+          color: '#ffffff'
+        }}
+      />
     </TranslationProvider>
   </React.StrictMode>,
 )
