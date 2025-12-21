@@ -110,10 +110,14 @@ const TaskInfo = ({ selectedTask, onClose }) => {
 
   // Check navigation state for comment notifications
   useEffect(() => {
+    console.log('TaskInfo location state:', location.state);
     if (location.state?.activeTab === 'comments') {
+      console.log('Setting active tab to comments from navigation state');
       setActiveTab('comments');
       // Clear the state to prevent re-triggering
       window.history.replaceState({}, '', window.location.pathname);
+    } else {
+      console.log('No comment navigation state, keeping default tab');
     }
   }, [location.state]);
 
