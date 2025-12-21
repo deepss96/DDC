@@ -111,21 +111,21 @@ export default function NotificationsPage() {
       <div className="flex-1 flex">
         <main className="flex-1 overflow-hidden px-4 sm:px-6 py-4 space-y-4 md:pb-4 pb-24">
           {/* Header */}
-          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
+          <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-6">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <button
                   onClick={() => navigate(-1)}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+                  className="flex items-center gap-1 sm:gap-2 text-gray-600 hover:text-gray-800 transition-colors p-1"
                 >
-                  <FiArrowLeft size={20} />
-                  <span className="hidden sm:inline">Back</span>
+                  <FiArrowLeft size={18} className="sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline text-sm">Back</span>
                 </button>
-                <div className="flex items-center gap-3">
-                  <FiBell size={24} className="text-blue-600" />
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <FiBell size={20} className="sm:w-6 sm:h-6 text-blue-600" />
                   <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Notifications</h1>
-                    <p className="text-sm text-gray-600">View all your notifications</p>
+                    <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Notifications</h1>
+                    <p className="text-xs sm:text-sm text-gray-600">View all your notifications</p>
                   </div>
                 </div>
               </div>
@@ -133,16 +133,17 @@ export default function NotificationsPage() {
               {notifications.length > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-blue-600 text-white rounded-md sm:rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  <FiCheck size={16} />
-                  Mark All Read
+                  <FiCheck size={14} className="sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Mark All Read</span>
+                  <span className="sm:hidden">Mark Read</span>
                 </button>
               )}
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex gap-2 mb-6 border-b border-gray-200">
+            <div className="flex gap-1 sm:gap-2 mb-4 sm:mb-6 border-b border-gray-200 overflow-x-auto">
               {[
                 { value: 'all', label: 'All', count: notifications.length },
                 { value: 'unread', label: 'Unread', count: notifications.filter(n => !n.is_read).length },
@@ -151,14 +152,19 @@ export default function NotificationsPage() {
                 <button
                   key={tab.value}
                   onClick={() => setFilter(tab.value)}
-                  className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-t-md sm:rounded-t-lg transition-colors whitespace-nowrap ${
                     filter === tab.value
                       ? 'bg-blue-600 text-white border-b-2 border-blue-600'
                       : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
                   }`}
                 >
-                  {tab.label}
-                  <span className={`px-2 py-0.5 text-xs rounded-full ${
+                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="sm:hidden">
+                    {tab.value === 'all' ? 'All' :
+                     tab.value === 'unread' ? 'New' :
+                     'Read'}
+                  </span>
+                  <span className={`px-1.5 sm:px-2 py-0.5 text-xs rounded-full ${
                     filter === tab.value
                       ? 'bg-white/20 text-white'
                       : 'bg-gray-200 text-gray-700'
@@ -170,7 +176,7 @@ export default function NotificationsPage() {
             </div>
 
             {/* Notifications List */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {loading ? (
                 <div className="text-center py-12">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -211,47 +217,47 @@ export default function NotificationsPage() {
                   return (
                     <div
                       key={notification.id}
-                      className={`p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer ${
+                      className={`p-3 sm:p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200 cursor-pointer ${
                         !notification.is_read ? 'bg-blue-50 border-blue-200' : 'bg-white'
                       }`}
                       onClick={() => handleNotificationClick(notification)}
                     >
-                      <div className="flex items-start gap-4">
+                      <div className="flex items-start gap-3 sm:gap-4">
                         {/* Notification Type Icon */}
-                        <div className={`w-10 h-10 rounded-full ${bgColor} flex items-center justify-center flex-shrink-0 mt-1`}>
-                          <NotificationIcon size={20} className={color} />
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${bgColor} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                          <NotificationIcon size={16} className={`sm:w-5 sm:h-5 ${color}`} />
                         </div>
 
                         <div className="flex-1 min-w-0">
                           {/* Header with title and time */}
-                          <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-start justify-between mb-1.5 sm:mb-2">
                             <div className="flex-1">
-                              <h4 className="text-sm font-semibold text-gray-900 break-words">
+                              <h4 className="text-xs sm:text-sm font-semibold text-gray-900 break-words leading-tight">
                                 {notification.type === 'task_assigned' && notification.assignByName
                                   ? `New Task Assigned By ${notification.assignByName} To You`
                                   : notification.title
                                 }
                               </h4>
                             </div>
-                            <div className="flex items-center gap-2 ml-4">
+                            <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4 flex-shrink-0">
                               <span className="text-xs text-gray-500 whitespace-nowrap">
                                 {formatTimeAgo(notification.created_at)}
                               </span>
                               {!notification.is_read && (
-                                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full animate-pulse"></div>
                               )}
                             </div>
                           </div>
 
                           {/* Message */}
-                          <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                          <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-2 sm:mb-3 line-clamp-2">
                             {notification.message}
                           </p>
 
                           {/* Action indicator */}
                           {notification.type === 'task_assigned' && (
-                            <div className="flex items-center gap-2 text-xs text-blue-600">
-                              <FiExternalLink size={12} />
+                            <div className="flex items-center gap-1 sm:gap-2 text-xs text-blue-600">
+                              <FiExternalLink size={10} className="sm:w-3 sm:h-3" />
                               <span>Click to view task</span>
                             </div>
                           )}
