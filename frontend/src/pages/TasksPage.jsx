@@ -248,13 +248,15 @@ export default function TasksPage({ searchTerm = '' }) {
             return updatedTasks;
           });
 
-          // Show success message
-          setSuccessMessage(`New task "${task.name}" has been assigned to you!`);
-          setShowSuccessMessage(true);
-          setTimeout(() => {
-            setShowSuccessMessage(false);
-            setSuccessMessage("");
-          }, 5000);
+          // Only show notification to the assigned user, not success messages
+          if (task.assignTo === user?.id) {
+            setSuccessMessage(`New task "${task.name}" has been assigned to you!`);
+            setShowSuccessMessage(true);
+            setTimeout(() => {
+              setShowSuccessMessage(false);
+              setSuccessMessage("");
+            }, 5000);
+          }
         }
       });
 
@@ -505,6 +507,15 @@ const fetchTasks = async () => {
       const savedTask = await apiService.createTask(taskWithUserData);
       // Don't add to local state here - let Socket.IO handle real-time updates
       console.log('Task created:', savedTask);
+
+      // Show success message to the task creator
+      setSuccessMessage(`Task "${newTask.name}" has been successfully assigned!`);
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        setSuccessMessage("");
+      }, 5000);
+
       setIsTaskFormOpen(false); // Close the popup on success
       setIsEditMode(false);
       setTaskToEdit(null);
