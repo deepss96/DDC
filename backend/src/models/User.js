@@ -208,7 +208,7 @@ class User {
           if (updateErr2) return callback(updateErr2, null);
 
           // Soft delete: Mark user as deleted instead of hard delete
-          const softDeleteUserSql = "UPDATE users SET status = 'Deleted', deleted_at = NOW() WHERE id = ?";
+          const softDeleteUserSql = "UPDATE users SET status = 'Deleted' WHERE id = ?";
           db.query(softDeleteUserSql, [id], callback);
         });
       });
