@@ -33,6 +33,11 @@ export default function TasksPage({ searchTerm = '' }) {
   ]);
   const [currentViewId, setCurrentViewId] = useState(1);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const filterDropdownRef = useRef(null);
 
   useEffect(() => {
@@ -272,28 +277,20 @@ const fetchTasks = async () => {
   });
 
   const handleDeleteTask = async (id) => {
-    try {
-      await apiService.deleteTask(id);
-      setTasksData(tasksData.filter(task => task.id !== id));
+    const task = tasksData.find(t => t.id === id);
+    if (!task) return;
 
-      // Also delete related notifications for this task
-      try {
-        await apiService.deleteNotificationsByRelatedId(id, 'task_assigned');
-      } catch (notificationError) {
-        console.error('Error deleting related notifications:', notificationError);
-        // Don't show error to user for notification deletion failure
-      }
-    } catch (error) {
-      console.error('Error deleting task:', error);
-      console.error('Error response:', error.response);
-
-      // Handle admin-only access error
-      if (error.response?.status === 403) {
-        alert('Access denied: Only administrators can delete tasks. Regular users can only create tasks.');
-      } else {
-        alert('An error occurred while deleting the task. Please try again.');
-      }
+    // Check if user is admin
+    if (user?.role?.toLowerCase() !== 'admin') {
+      setTaskToDelete(task);
+      setDeleteError('Access denied: Only administrators can delete tasks. Regular users can only create tasks.');
+      setShowDeleteConfirm(true);
+      return;
     }
+
+    // For admin, proceed with confirmation
+    setTaskToDelete(task);
+    setShowDeleteConfirm(true);
   };
 
   const handleEditRow = (id) => {
@@ -310,6 +307,59 @@ const fetchTasks = async () => {
 
   const handleDeleteRow = (id) => {
     handleDeleteTask(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!taskToDelete) return;
+
+    setDeleteError(null); // Clear any previous error
+
+    try {
+      console.log('🔄 DEBUG: Starting delete operation for task ID:', taskToDelete.id);
+
+      await apiService.deleteTask(taskToDelete.id);
+
+      console.log('✅ DEBUG: Delete successful, removing from UI');
+      // Immediately remove from UI
+      setTasksData(tasksData.filter(task => task.id !== taskToDelete.id));
+      setShowDeleteConfirm(false);
+      setTaskToDelete(null);
+      setDeleteError(null);
+
+      // Show success message
+      setSuccessMessage(`Task "${taskToDelete.name}" has been deleted successfully!`);
+      setShowSuccessMessage(true);
+
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        setSuccessMessage("");
+      }, 3000);
+    } catch (error) {
+      console.error('❌ DEBUG: Delete operation error:', error);
+      console.error('Error response:', error.response);
+      console.error('Error response data:', error.response?.data);
+
+      // Handle task validation errors with detailed information
+      if (error.response?.data?.pendingTasks) {
+        console.log('Task validation error detected for delete');
+        // Use the message from backend directly, as it already includes task details
+        const taskMessage = error.response.data.message || 'Cannot delete this task because it has pending dependencies.';
+        console.log('Setting delete task error message:', taskMessage);
+        setDeleteError(taskMessage);
+      } else {
+        // Handle other errors
+        const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message || 'An error occurred while deleting the task. Check console for details.';
+        console.log('Setting delete generic error message:', errorMsg);
+        setDeleteError(errorMsg);
+      }
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setTaskToDelete(null);
+    setDeleteError(null);
   };
 
   const handleCreateTask = async (newTask) => {
@@ -888,6 +938,86 @@ const fetchTasks = async () => {
         taskToEdit={taskToEdit}
         dueDates={dueDates}
       />
+
+      {/* Success Message Toast */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 right-4 z-[1200] bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg">
+          <p className="text-sm font-medium" style={{ fontFamily: 'var(--font-family)' }}>
+            {successMessage}
+          </p>
+        </div>
+      )}
+
+      {/* Custom Delete Confirmation Dialog */}
+      {showDeleteConfirm && taskToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1200] p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                <FiTrash2 className="text-red-600" size={20} />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: 'var(--font-family)' }}>
+                  Delete Task
+                </h3>
+                <p className="text-sm text-gray-600" style={{ fontFamily: 'var(--font-family)' }}>
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              {deleteError ? (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <div className="w-5 h-5 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-red-800 mb-1" style={{ fontFamily: 'var(--font-family)' }}>
+                        Unable to Delete Task
+                      </h4>
+                      <div className="text-sm text-red-700 whitespace-pre-line" style={{ fontFamily: 'var(--font-family)' }}>
+                        {deleteError}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-700" style={{ fontFamily: 'var(--font-family)' }}>
+                  Are you sure you want to delete <strong>{taskToDelete.name}</strong>?
+                  This will permanently remove the task from the system.
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                style={{ fontFamily: 'var(--font-family)' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={!!deleteError}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  deleteError
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
+                    : 'bg-red-600 text-white hover:bg-red-700'
+                }`}
+                style={{ fontFamily: 'var(--font-family)' }}
+                title={deleteError ? 'Cannot delete task with dependencies' : 'Delete this task'}
+              >
+                Delete Task
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
