@@ -77,7 +77,7 @@ export default function DashboardPage() {
             */}
 
             {/* ================= MIDDLE — MY TASK (VISIBLE) ================= */}
-            <div className="bg-white rounded-xl border border-gray-400 p-3 sm:p-4 shadow-sm hover:shadow-lg transition-shadow duration-300 h-96 flex flex-col">
+            <div className="bg-white rounded-xl border border-gray-400 p-2 sm:p-3 shadow-sm hover:shadow-lg transition-shadow duration-300 h-96 flex flex-col overflow-hidden">
 
               {/* Error Message */}
               {error && (
@@ -103,22 +103,22 @@ export default function DashboardPage() {
                     <table className="w-full text-left text-xs sm:text-[13px] table-fixed">
                       <thead className="bg-white sticky top-0">
                         <tr className="border-b">
-                          <th className="py-2 px-1 font-medium text-gray-700 w-1/3 text-center">Task Name</th>
-                          <th className="py-2 px-1 font-medium text-gray-700 w-1/3 text-center">Due Date</th>
-                          <th className="py-2 px-1 font-medium text-gray-700 w-1/3 text-center">Status</th>
+                          <th className="py-1.5 px-0.5 font-medium text-gray-700 w-1/3 text-center text-xs sm:text-sm">Task Name</th>
+                          <th className="py-1.5 px-0.5 font-medium text-gray-700 w-1/3 text-center text-xs sm:text-sm">Due Date</th>
+                          <th className="py-1.5 px-0.5 font-medium text-gray-700 w-1/3 text-center text-xs sm:text-sm">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-gray-700">
                         {tasks.length > 0 ? tasks.map((task, index) => (
                           <tr key={task.id} className={index < tasks.length - 1 ? "border-b border-gray-100" : ""}>
-                            <td className="py-2 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm" title={task.name}>
+                            <td className="py-1.5 px-0.5 text-center break-words whitespace-normal leading-tight text-xs" title={task.name}>
                               {task.name}
                             </td>
-                            <td className="py-2 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">
+                            <td className="py-1.5 px-0.5 text-center break-words whitespace-normal leading-tight text-xs">
                               {formatDateForDisplay(task.dueDate || task.due_date)}
                             </td>
-                            <td className="py-2 px-1 text-center">
-                              <span className={`px-1 sm:px-2 py-0.5 rounded-full text-xs font-medium w-full inline-block text-center ${getStatusBadge(task.status)}`}>
+                            <td className="py-1.5 px-0.5 text-center">
+                              <span className={`px-0.5 py-0.5 rounded text-xs font-medium inline-block text-center min-w-full ${getStatusBadge(task.status)}`}>
                                 {task.status}
                               </span>
                             </td>
