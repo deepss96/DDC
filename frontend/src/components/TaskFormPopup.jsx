@@ -167,9 +167,9 @@ const DateInputField = ({ label, required, value, onChange, placeholder, error, 
           {error}
         </p>
       )}
-    </div>
-  );
-};
+      </div>
+    );
+  };
 
 export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = false, taskToEdit = null  ,dueDates}) {
   console.log('dueDates=========>',dueDates)
@@ -347,7 +347,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
     onClose();
   };
 
-  const SelectField = ({ label, options = [], value, onChange, placeholder, searchable = false, disabled = false }) => {
+  const SelectField = ({ label, required, options = [], value, onChange, placeholder, searchable = false, disabled = false, error }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchText, setSearchText] = useState("");
     const selectRef = useRef(null);
@@ -398,7 +398,9 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
     return (
       <div ref={selectRef} className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
         <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
-          {label}
+          <span>
+            {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
+          </span>
         </label>
         {searchable ? (
           <input
@@ -416,14 +418,14 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
               paddingRight: '40px', // Space for dropdown arrow
               fontSize: 'var(--placeholder-font-size)',
               fontFamily: 'var(--font-family)',
-              border: `1px solid var(--input-border-color)`,
+              border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
               borderRadius: 'var(--input-border-radius)',
               backgroundColor: 'var(--input-bg-color)',
               color: 'var(--input-text-color)',
               outline: 'none',
               transition: 'border-color 0.2s',
             }}
-            onBlur={(e) => e.target.style.borderColor = 'var(--input-border-color)'}
+            onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
           />
         ) : (
           <div
@@ -435,7 +437,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
               paddingTop: '16px', // Extra top padding to accommodate the label
               fontSize: 'var(--input-font-size)',
               fontFamily: 'var(--font-family)',
-              border: `1px solid var(--input-border-color)`,
+              border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
               borderRadius: 'var(--input-border-radius)',
               backgroundColor: disabled ? '#f9fafb' : 'var(--input-bg-color)',
               color: value ? 'var(--input-text-color)' : 'var(--input-placeholder-color)',
@@ -613,6 +615,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
             <div className="md:col-span-1">
               <SelectField
                 label="ASSIGNED TO"
+                required
                 options={users.map(user => user.name)}
                 value={users.find(u => u.id === parseInt(assignTo))?.name || ""}
                 onChange={(name) => {
@@ -621,6 +624,7 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
                 }}
                 placeholder="Select assigned to"
                 searchable={true}
+                error={errors.assignTo}
               />
             </div>
 
@@ -628,19 +632,23 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
             <div className="md:col-span-1">
               <SelectField
                 label="PRIORITY"
+                required
                 options={["High", "Medium", "Low"]}
                 value={priority}
                 onChange={setPriority}
                 placeholder="Select priority"
+                error={errors.priority}
               />
             </div>
             <div className="md:col-span-1">
               <SelectField
                 label="STATUS"
+                required
                 options={["New", "Working", "Completed", "On Hold", "Cancelled"]}
                 value={status}
                 onChange={setStatus}
                 placeholder="Select status"
+                error={errors.status}
               />
             </div>
 
