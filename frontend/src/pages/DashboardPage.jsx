@@ -19,8 +19,10 @@ export default function DashboardPage() {
       'At Risk': 'bg-red-100 text-red-700 border border-red-200',
       'Ongoing': 'bg-orange-100 text-orange-700 border border-orange-200',
       'On going': 'bg-orange-100 text-orange-700 border border-orange-200',
-      'Pending': 'bg-gray-100 text-gray-700 border border-gray-200',
-      'In Progress': 'bg-blue-100 text-blue-700 border border-blue-200'
+      'Pending': 'bg-yellow-100 text-yellow-700 border border-yellow-200',
+      'In Progress': 'bg-blue-100 text-blue-700 border border-blue-200',
+      'New': 'bg-orange-100 text-orange-700 border border-orange-200',
+      'Working': 'bg-blue-100 text-blue-700 border border-blue-200'
     };
 
     return statusConfig[status] || 'bg-gray-100 text-gray-700 border border-gray-200';
