@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middlewares/auth');
+const { verifyToken } = require('../middlewares/auth');
 const db = require('../config/database');
 
 // Get VAPID public key
@@ -18,7 +18,7 @@ router.get('/vapid-public-key', (req, res) => {
 });
 
 // Subscribe to push notifications
-router.post('/subscribe', auth, (req, res) => {
+router.post('/subscribe', verifyToken, (req, res) => {
   try {
     const userId = req.user.id;
     const { subscription } = req.body;
@@ -71,7 +71,7 @@ router.post('/subscribe', auth, (req, res) => {
 });
 
 // Unsubscribe from push notifications
-router.post('/unsubscribe', auth, (req, res) => {
+router.post('/unsubscribe', verifyToken, (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -90,7 +90,7 @@ router.post('/unsubscribe', auth, (req, res) => {
 });
 
 // Get user's subscription status
-router.get('/subscription-status', auth, (req, res) => {
+router.get('/subscription-status', verifyToken, (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -109,7 +109,7 @@ router.get('/subscription-status', auth, (req, res) => {
 });
 
 // Test push notification (for debugging)
-router.post('/test-notification', auth, (req, res) => {
+router.post('/test-notification', verifyToken, (req, res) => {
   try {
     const userId = req.user.id;
     const pushNotificationService = require('../services/pushNotificationService');
