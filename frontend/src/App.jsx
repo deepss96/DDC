@@ -25,9 +25,8 @@ function AppLayout() {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
-  // Get current page from URL hash (for HashRouter)
-  const getCurrentPageFromHash = (hash) => {
-    const path = hash.replace('#', '') || '/';
+  // Get current page from URL path (for HashRouter)
+  const getCurrentPageFromPath = (path) => {
     if (path === '/' || path === '/dashboard') return 'dashboard';
     if (path === '/lead-management') return 'lead-management';
     if (path === '/clients-management') return 'clients-management';
@@ -45,21 +44,12 @@ function AppLayout() {
     return 'dashboard';
   };
 
-  const [currentPage, setCurrentPage] = useState(getCurrentPageFromHash(window.location.hash));
+  const [currentPage, setCurrentPage] = useState(getCurrentPageFromPath(location.pathname));
 
-  // Update currentPage when hash changes
+  // Update currentPage when location changes
   useEffect(() => {
-    const handleHashChange = () => {
-      setCurrentPage(getCurrentPageFromHash(window.location.hash));
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-
-    // Set initial value
-    handleHashChange();
-
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+    setCurrentPage(getCurrentPageFromPath(location.pathname));
+  }, [location.pathname]);
 
   const handleNavigate = (path) => {
     setCurrentPage(path);
