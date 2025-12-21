@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import apiService from '../services/api';
+import pushNotificationService from '../services/pushNotificationService';
 
 const AuthContext = createContext();
 
@@ -17,6 +18,48 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [isLoggingOutTempUser, setIsLoggingOutTempUser] = useState(false);
+
+  // Initialize push notifications
+  const initializePushNotifications = async () => {
+    try {
+      console.log('Initializing push notifications...');
+
+      // Initialize the service
+      const initialized = await pushNotificationService.init();
+      if (!initialized) {
+        console.warn('Push notifications not supported or failed to initialize');
+        return;
+      }
+
+      // Check permission status
+      const permissionStatus = pushNotificationService.getPermissionStatus();
+      console.log('Notification permission status:', permissionStatus);
+
+      if (permissionStatus === 'default') {
+        // Request permission
+        const granted = await pushNotificationService.requestPermission();
+        if (!granted) {
+          console.log('User denied notification permission');
+          return;
+        }
+      } else if (permissionStatus === 'denied') {
+        console.log('Notification permission denied by user');
+        return;
+      }
+
+      // Check if already subscribed
+      const existingSubscription = await pushNotificationService.getSubscription();
+      if (!existingSubscription) {
+        // Subscribe to push notifications
+        await pushNotificationService.subscribe();
+        console.log('Successfully subscribed to push notifications');
+      } else {
+        console.log('Already subscribed to push notifications');
+      }
+    } catch (error) {
+      console.error('Error initializing push notifications:', error);
+    }
+  };
 
   // Check for existing token and user data on app start
   useEffect(() => {
@@ -38,7 +81,12 @@ export const AuthProvider = ({ children }) => {
         }
 
         // Fetch full profile to ensure we have complete user data including role
-        fetchFullProfile(storedToken, true);
+        fetchFullProfile(storedToken, true).then(() => {
+          // Initialize push notifications after profile is loaded
+          if (!userData.isTempPassword) {
+            initializePushNotifications();
+          }
+        });
       } catch (error) {
         // Invalid stored data, clear it
         localStorage.removeItem('token');
@@ -97,6 +145,11 @@ export const AuthProvider = ({ children }) => {
       } else {
         // User has changed password, hide any password change popup
         setShowPasswordChange(false);
+
+        // Initialize push notifications for authenticated users
+        if (!isInitialLoad) {
+          initializePushNotifications();
+        }
       }
     } catch (error) {
       console.error('Error fetching full profile:', error);

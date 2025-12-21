@@ -1,4 +1,5 @@
 const Notification = require('../models/Notification');
+const pushNotificationService = require('../services/pushNotificationService');
 
 class NotificationController {
   // Get notifications for a user
@@ -124,13 +125,26 @@ class NotificationController {
           if (!err && notificationResult.length > 0) {
             const notification = notificationResult[0];
 
-            // Emit real-time notification to the specific user
+            // Emit real-time notification to the specific user via Socket.IO
             if (global.io) {
               global.io.to(`user_${user_id}`).emit('new-notification', {
                 notification: notification,
                 unreadCount: 1 // This will be updated by the frontend
               });
             }
+
+            // Send push notification to the user
+            const pushData = {
+              id: notification.id,
+              title: notification.title,
+              message: notification.message,
+              type: notification.type,
+              url: NotificationController.getNotificationUrl(notification)
+            };
+
+            // Send push notification asynchronously (don't wait for it)
+            pushNotificationService.sendNotificationToUser(user_id, pushData)
+              .catch(error => console.error('Error sending push notification:', error));
           }
         });
 
@@ -141,6 +155,23 @@ class NotificationController {
       });
     } catch (error) {
       res.status(500).json({ error: 'Server error' });
+    }
+  }
+
+  // Helper method to get URL for notification based on type
+  static getNotificationUrl(notification) {
+    switch (notification.type) {
+      case 'task_assigned':
+      case 'task_updated':
+      case 'task_completed':
+        return `/my-tasks`;
+      case 'lead_assigned':
+      case 'lead_updated':
+        return `/lead-management`;
+      case 'comment_added':
+        return `/task/${notification.related_id}`;
+      default:
+        return '/notifications';
     }
   }
 }

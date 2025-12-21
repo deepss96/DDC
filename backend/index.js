@@ -17,6 +17,7 @@ const userRoutes = require('./src/routes/users');
 const taskRoutes = require('./src/routes/tasks');
 const commentRoutes = require('./src/routes/comments');
 const notificationRoutes = require('./src/routes/notifications');
+const pushRoutes = require('./src/routes/push');
 
 const app = express();
 const server = http.createServer(app);
@@ -46,10 +47,12 @@ app.use('/api/leads', leadRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/comments', commentRoutes);
-app.use('/api/notifications', notificationRoutes); 
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/push', pushRoutes);
 
 console.log('Comment routes registered at /api/comments');
 console.log('Notification routes registered at /api/notifications');
+console.log('Push notification routes registered at /api/push');
 
 // Health check route
 app.get('/api/health', (req, res) => {
