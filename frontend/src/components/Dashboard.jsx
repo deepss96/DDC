@@ -195,67 +195,53 @@ export default function Dashboard() {
 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
 
   
-<div className="bg-white rounded-xl p-4 shadow-sm h-[323px] overflow-y-auto overflow-x-auto md:overflow-x-visible">
-
+<div className="bg-white rounded-xl p-3 sm:p-4 shadow-sm h-[323px] overflow-y-auto overflow-x-auto md:overflow-x-visible">
 
     {/* TABLE HEADER */}
     <div className="flex items-center justify-between mb-2">
-      <h2 className="text-[18px] font-semibold text-gray-700">Pending Task</h2>
+      <h2 className="text-base sm:text-[18px] font-semibold text-gray-700">Pending Task</h2>
     </div>
 
     {/* TABLE */}
-    <table className="w-full text-left text-[13px]">
+    <table className="w-full text-left text-xs sm:text-[13px] table-fixed">
       <thead>
         <tr className="border-b">
-          <th className="py-2">Task Name</th>
-          <th className="py-2">Due date</th>
-          <th className="py-2">Status</th>
-          
+          <th className="py-2 w-1/3 text-center">Task Name</th>
+          <th className="py-2 w-1/3 text-center">Due date</th>
+          <th className="py-2 w-1/3 text-center">Status</th>
         </tr>
       </thead>
 
       <tbody className="text-gray-700">
-
         <tr className="border-b">
-          <td className="py-3">Nelsa web development</td>
-         
-          <td>May 25, 2023</td>
-          <td><span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs">Completed</span></td>
-         
+          <td className="py-2 sm:py-3 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">Nelsa web development</td>
+          <td className="py-2 sm:py-3 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">May 25, 2023</td>
+          <td className="py-2 sm:py-3 px-1 text-center"><span className="px-1 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-green-700 rounded-full text-xs inline-block w-full text-center">Completed</span></td>
         </tr>
 
         <tr className="border-b">
-          <td className="py-3">Datascale AI app</td>
-          
-          <td>Jun 20, 2023</td>
-          <td><span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Delayed</span></td>
-         
+          <td className="py-2 sm:py-3 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">Datascale AI app</td>
+          <td className="py-2 sm:py-3 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">Jun 20, 2023</td>
+          <td className="py-2 sm:py-3 px-1 text-center"><span className="px-1 sm:px-2 py-0.5 sm:py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs inline-block w-full text-center">Delayed</span></td>
         </tr>
 
         <tr className="border-b">
-          <td className="py-3">Media channel branding</td>
-         
-          <td>July 13, 2023</td>
-          <td><span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs">At risk</span></td>
-          
+          <td className="py-2 sm:py-3 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">Media channel branding</td>
+          <td className="py-2 sm:py-3 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">July 13, 2023</td>
+          <td className="py-2 sm:py-3 px-1 text-center"><span className="px-1 sm:px-2 py-0.5 sm:py-1 bg-red-100 text-red-700 rounded-full text-xs inline-block w-full text-center">At risk</span></td>
         </tr>
 
         <tr className="border-b">
-          <td className="py-3">Corlax iOS app development</td>
-          
-          <td>Dec 20, 2023</td>
-          <td><span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs">Completed</span></td>
-         
+          <td className="py-2 sm:py-3 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">Corlax iOS app development</td>
+          <td className="py-2 sm:py-3 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">Dec 20, 2023</td>
+          <td className="py-2 sm:py-3 px-1 text-center"><span className="px-1 sm:px-2 py-0.5 sm:py-1 bg-green-100 text-green-700 rounded-full text-xs inline-block w-full text-center">Completed</span></td>
         </tr>
 
         <tr>
-          <td className="py-3">Website builder development</td>
-         
-          <td>Mar 15, 2024</td>
-          <td><span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs">On going</span></td>
-          
+          <td className="py-2 sm:py-3 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">Website builder development</td>
+          <td className="py-2 sm:py-3 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">Mar 15, 2024</td>
+          <td className="py-2 sm:py-3 px-1 text-center"><span className="px-1 sm:px-2 py-0.5 sm:py-1 bg-orange-100 text-orange-700 rounded-full text-xs inline-block w-full text-center">On going</span></td>
         </tr>
-
       </tbody>
     </table>
 
