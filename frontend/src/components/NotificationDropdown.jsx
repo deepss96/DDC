@@ -6,8 +6,8 @@ import apiService from '../services/api';
 import io from 'socket.io-client';
 import config from '../config/config';
 
-// Notification sound
-const playNotificationSound = () => {
+// Notification sound - Option 1: Web Audio API (Current)
+const playNotificationSoundWebAudio = () => {
   try {
     // Create a simple beep sound using Web Audio API
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -17,6 +17,11 @@ const playNotificationSound = () => {
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
+    // Customize frequency for different sounds:
+    // - Bell: 800Hz
+    // - Ding: 1000Hz
+    // - Chime: 523Hz (C note)
+    // - Alert: 440Hz (A note)
     oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
     oscillator.frequency.setValueAtTime(600, audioContext.currentTime + 0.1);
 
@@ -25,6 +30,43 @@ const playNotificationSound = () => {
 
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + 0.3);
+  } catch (error) {
+    console.log('Web Audio not supported, trying HTML5 Audio...');
+    playNotificationSoundHTML5();
+  }
+};
+
+// Notification sound - Option 2: HTML5 Audio (External files)
+const playNotificationSoundHTML5 = () => {
+  try {
+    // Create audio element for external sound files
+    const audio = new Audio();
+
+    // You can use:
+    // 1. Local files in public folder: '/sounds/notification.mp3'
+    // 2. External URLs: 'https://example.com/sound.mp3'
+    // 3. Data URIs for embedded sounds
+
+    // Example with data URI (embedded sound):
+    // audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmQdBzaO1fLOfTIFJHfH8N2QQAoUXrTp66hVFApGn+DyvmQdBzaO1fLOfTIFJHfH8N2QQAoUXrTp66hVFApGn+DyvmQdBzaO1fLOfTI=';
+
+    // For now, using a simple beep - replace with your sound file
+    audio.src = '/sounds/notification.mp3'; // Place sound files in public/sounds/
+
+    audio.volume = 0.5; // 50% volume
+    audio.play().catch(e => console.log('Audio play failed:', e));
+  } catch (error) {
+    console.log('HTML5 Audio not supported');
+  }
+};
+
+// Main notification sound function (choose which one to use)
+const playNotificationSound = () => {
+  try {
+    const audio = new Audio();
+    audio.src = '/sounds/Sound-4.mp3';
+    audio.volume = 1.0; // 100% volume
+    audio.play().catch(e => console.log('Audio play failed:', e));
   } catch (error) {
     console.log('Audio not supported');
   }
