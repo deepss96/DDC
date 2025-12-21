@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { FiUserPlus, FiMail, FiPhone, FiCalendar, FiEdit2, FiTrash2, FiSearch, FiPlus, FiSliders, FiList, FiUpload, FiFilter, FiCheck, FiUser, FiUserCheck } from "react-icons/fi";
 import TableActionButton from "../components/TableActionButton";
 import TaskFormPopup from "../components/TaskFormPopup";
@@ -12,6 +12,7 @@ import apiService from "../services/api";
 export default function TasksPage({ searchTerm = '' }) {
   const { user } = useAuth();
   const location = useLocation();
+  const { taskId } = useParams();
   const [highlightedTaskId, setHighlightedTaskId] = useState(null);
 
   const currentUserName = user ? `${user.firstName} ${user.lastName}` : "Admin";
@@ -46,6 +47,21 @@ export default function TasksPage({ searchTerm = '' }) {
       setSelectedTask(null);
     }
   }, [location.pathname]);
+
+  // Handle direct task route navigation (e.g., /task/123)
+  useEffect(() => {
+    if (taskId && tasksData.length > 0) {
+      console.log('Direct task route navigation:', taskId);
+      const taskToOpen = tasksData.find(task => task.id == taskId);
+      if (taskToOpen) {
+        console.log('Task found for direct route, opening:', taskToOpen);
+        setSelectedTask(taskToOpen);
+      } else {
+        console.log('Task not found for direct route ID:', taskId);
+        alert(`Task not found. It may have been deleted.`);
+      }
+    }
+  }, [taskId, tasksData]);
 
   // Handle notification navigation - open task directly or highlight in table
   useEffect(() => {

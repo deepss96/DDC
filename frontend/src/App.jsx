@@ -229,6 +229,7 @@ function AppLayout() {
               {/* Placeholder routes for other pages */}
               <Route path="/clients-management" element={<ClientsPage searchTerm={searchTerm} />} />
               <Route path="/my-tasks" element={<TasksPage searchTerm={searchTerm} />} />
+              <Route path="/task/:taskId" element={<TasksPage searchTerm={searchTerm} />} />
               <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/projects-management" element={
