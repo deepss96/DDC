@@ -284,6 +284,23 @@ const NotificationDropdown = ({ size = 20 }) => {
         playNotificationSound();
       });
 
+      // Listen for updated notifications (for comment notifications)
+      socketConnection.on('update-notification', (data) => {
+        console.log('🔄 Notification updated via Socket.IO:', data);
+
+        // Update existing notification in the list
+        setNotifications(prev =>
+          prev.map(notif =>
+            notif.id === data.notification.id ? data.notification : notif
+          )
+        );
+
+        // Update unread count if notification became unread
+        if (!data.notification.is_read) {
+          setUnreadCount(prev => prev + 1);
+        }
+      });
+
       // Cleanup on unmount or user change
       return () => {
         console.log('🔌 Cleaning up Socket.IO connection');

@@ -63,6 +63,14 @@ class Notification {
     db.query(sql, [id], callback);
   }
 
+  // Update notification
+  static update(id, updateData, callback) {
+    const { title, message, assignByName, is_read, created_at } = updateData;
+    const sql = `UPDATE notifications SET title = ?, message = ?, assignByName = ?, is_read = ?, created_at = ? WHERE id = ?`;
+    const values = [title, message, assignByName, is_read, created_at, id];
+    db.query(sql, values, callback);
+  }
+
   // Delete notifications by related_id
   static deleteByRelatedId(relatedId, callback) {
     const sql = 'DELETE FROM notifications WHERE related_id = ?';
