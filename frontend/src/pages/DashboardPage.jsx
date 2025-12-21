@@ -103,22 +103,22 @@ export default function DashboardPage() {
                     <table className="w-full text-left text-xs sm:text-[13px] table-fixed">
                       <thead className="bg-white sticky top-0">
                         <tr className="border-b">
-                          <th className="py-2 px-1 font-medium text-gray-700 w-1/2">Task Name</th>
-                          <th className="py-2 px-1 font-medium text-gray-700 w-1/4">Due Date</th>
-                          <th className="py-2 px-1 font-medium text-gray-700 w-1/4">Status</th>
+                          <th className="py-2 px-1 font-medium text-gray-700 w-1/3 text-center">Task Name</th>
+                          <th className="py-2 px-1 font-medium text-gray-700 w-1/3 text-center">Due Date</th>
+                          <th className="py-2 px-1 font-medium text-gray-700 w-1/3 text-center">Status</th>
                         </tr>
                       </thead>
                       <tbody className="text-gray-700">
                         {tasks.length > 0 ? tasks.map((task, index) => (
                           <tr key={task.id} className={index < tasks.length - 1 ? "border-b border-gray-100" : ""}>
-                            <td className="py-2 px-1 truncate max-w-0" title={task.name}>
+                            <td className="py-2 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm" title={task.name}>
                               {task.name}
                             </td>
-                            <td className="py-2 px-1 whitespace-nowrap">
+                            <td className="py-2 px-1 text-center break-words whitespace-normal leading-tight text-xs sm:text-sm">
                               {formatDateForDisplay(task.dueDate || task.due_date)}
                             </td>
-                            <td className="py-2 px-1">
-                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(task.status)}`}>
+                            <td className="py-2 px-1 text-center">
+                              <span className={`px-1 sm:px-2 py-0.5 rounded-full text-xs font-medium w-full inline-block text-center ${getStatusBadge(task.status)}`}>
                                 {task.status}
                               </span>
                             </td>
