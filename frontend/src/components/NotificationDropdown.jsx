@@ -277,7 +277,7 @@ const NotificationDropdown = ({ size = 20 }) => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute left-1/2 top-full mt-4 w-56 sm:w-72 max-w-[calc(100vw-1rem)] -translate-x-1/2 sm:mt-4 bg-gradient-to-b from-blue-50 to-white rounded-xl shadow-xl border border-blue-200 z-50 max-h-60 overflow-hidden">
+        <div className="absolute left-1/2 top-full mt-4 w-56 sm:w-72 max-w-[calc(100vw-1rem)] -translate-x-1/2 sm:mt-4 bg-gradient-to-b from-blue-50 to-white rounded-xl shadow-xl border border-blue-200 z-50 max-h-72 overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-3 py-2 border-b border-blue-200 bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-xl">
             <div className="flex items-center gap-2">
