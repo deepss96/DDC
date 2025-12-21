@@ -25,6 +25,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           backgroundColor: '#dc2626', // red-600 for error toasts
           color: '#ffffff'
         }}
+        progressStyle={{
+          backgroundColor: '#ffffff' // white progress bar
+        }}
+        closeButtonStyle={{
+          color: '#ffffff' // white close button
+        }}
       />
     </TranslationProvider>
   </React.StrictMode>,
