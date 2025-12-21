@@ -202,9 +202,11 @@ const NotificationDropdown = ({ size = 20 }) => {
             state: { activeTab: 'comments' }
           });
         } else {
-          // For other task notifications, navigate normally (overview tab)
+          // For other task notifications, navigate with overview tab state
           console.log('Opening overview tab for task notification');
-          navigate(`/task/${notification.related_id}`);
+          navigate(`/task/${notification.related_id}`, {
+            state: { activeTab: 'overview' }
+          });
         }
       } else if (notification.related_id) {
         // Fallback: if we have a related_id but unknown type, assume it's a task
