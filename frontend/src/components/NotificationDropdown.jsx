@@ -97,11 +97,17 @@ const NotificationDropdown = ({ size = 20 }) => {
         await markAsRead(notification.id);
       }
 
-      // Navigate based on notification type
-      if (notification.type === 'task_assigned' && notification.related_id) {
+      // Navigate based on notification type or fallback to related_id
+      if ((notification.type === 'task_assigned' || notification.type === 'task_completed' || notification.type === 'task_overdue') && notification.related_id) {
         console.log('Navigating to task:', notification.related_id);
         // Navigate to tasks page and directly open the task info
         navigate(`/my-tasks?openTaskId=${notification.related_id}&fromNotification=true`);
+      } else if (notification.related_id) {
+        // Fallback: if we have a related_id but unknown type, assume it's a task
+        console.log('Fallback navigation to task:', notification.related_id);
+        navigate(`/my-tasks?openTaskId=${notification.related_id}&fromNotification=true`);
+      } else {
+        console.warn('No related_id found, cannot navigate');
       }
 
       setIsOpen(false);
