@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import {
   FiFileText,
   FiMessageSquare,
@@ -31,6 +32,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
   if (!selectedTask) return null;
 
   const { user, token } = useAuth();
+  const location = useLocation();
 
   const [activeTab, setActiveTab] = useState("overview");
   const [newComment, setNewComment] = useState("");
@@ -105,6 +107,15 @@ const TaskInfo = ({ selectedTask, onClose }) => {
     [...data].sort(
       (a, b) => new Date(a.created_at) - new Date(b.created_at)
     );
+
+  // Check navigation state for comment notifications
+  useEffect(() => {
+    if (location.state?.activeTab === 'comments') {
+      setActiveTab('comments');
+      // Clear the state to prevent re-triggering
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [location.state]);
 
   // ====== PERFECT AUTO-SCROLL FUNCTIONS =====
   const scrollToBottom = useCallback(() => {

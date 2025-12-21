@@ -190,11 +190,19 @@ const NotificationDropdown = ({ size = 20 }) => {
         await markAsRead(notification.id);
       }
 
-      // Navigate based on notification type or fallback to related_id
+      // Navigate based on notification type
       if ((notification.type === 'task_assigned' || notification.type === 'task_completed' || notification.type === 'task_overdue' || notification.type === 'comment') && notification.related_id) {
         console.log('Navigating to task:', notification.related_id);
-        // Navigate directly to task details page
-        navigate(`/task/${notification.related_id}`);
+
+        // For comment notifications, navigate to task with comments tab active
+        if (notification.type === 'comment') {
+          navigate(`/task/${notification.related_id}`, {
+            state: { activeTab: 'comments' }
+          });
+        } else {
+          // For other task notifications, navigate normally
+          navigate(`/task/${notification.related_id}`);
+        }
       } else if (notification.related_id) {
         // Fallback: if we have a related_id but unknown type, assume it's a task
         console.log('Fallback navigation to task:', notification.related_id);
