@@ -103,9 +103,14 @@ const LoginSignupPage = () => {
           email: formData.resetEmail
         });
 
-        setMessage('Password reset link sent to your email!');
-        // In production, don't show the token
-        console.log('Reset token:', data.resetToken);
+        if (data.resetLink) {
+          // Email not configured - show reset link for testing
+          setMessage(`Password reset link generated! Copy this link: ${data.resetLink}`);
+          console.log('Reset link for testing:', data.resetLink);
+        } else {
+          // Email configured - normal success message
+          setMessage('Password reset link sent to your email!');
+        }
       }
     } catch (error) {
       // Handle different types of errors with user-friendly messages
