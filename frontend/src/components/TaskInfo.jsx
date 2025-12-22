@@ -1665,7 +1665,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                   }
                 }}
                 placeholder="Type your message..."
-                rows={2}
+                rows={1}
                 className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                 style={{ minHeight: '40px', maxHeight: '120px' }}
               />
