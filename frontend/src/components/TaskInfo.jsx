@@ -33,12 +33,12 @@ if (typeof document !== 'undefined') {
   document.head.appendChild(styleSheet);
 }
 
-// Form Components - Similar to ProfilePage and TaskFormPopup
+// Form Components - Exact copy from TaskFormPopup.jsx
 const InputField = ({ label, required, type = "text", value, onChange, placeholder, error, ...rest }) => (
   <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
-    <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-medium text-gray-600 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)' }}>
+    <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
       <span>
-        {label}{required && <span style={{ color: 'var(--secondary-color)' }} className="ml-1">*</span>}
+        {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
       </span>
     </label>
     <input
@@ -50,9 +50,10 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
         width: '100%',
         height: 'var(--input-height)',
         padding: 'var(--input-padding)',
-        paddingTop: '16px',
+        paddingTop: '16px', // Extra top padding to accommodate the label
         fontSize: 'var(--placeholder-font-size)',
         fontFamily: 'var(--font-family)',
+        fontWeight: 'normal',
         border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
         borderRadius: 'var(--input-border-radius)',
         backgroundColor: 'var(--input-bg-color)',
@@ -65,69 +66,20 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
       {...rest}
     />
     {error && (
-      <p style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)', fontSize: '12px', marginTop: '4px' }}>
+      <p style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)', fontSize: 'var(--error-font-size)', marginTop: '4px' }}>
         {error}
       </p>
     )}
   </div>
 );
 
-const SelectField = ({ label, required, value, onChange, options, placeholder, error, ...rest }) => (
+// TextAreaField component for description
+const TextAreaField = ({ label, required, value, onChange, placeholder, ...rest }) => (
   <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
-    <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-medium text-gray-600 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)' }}>
+    <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
       <span>
-        {label}{required && <span style={{ color: 'var(--secondary-color)' }} className="ml-1">*</span>}
+        {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
       </span>
-    </label>
-    <div className="relative">
-      <select
-        value={value}
-        onChange={onChange}
-        style={{
-          width: '100%',
-          height: 'var(--input-height)',
-          padding: 'var(--input-padding)',
-          paddingTop: '16px',
-          paddingRight: '40px',
-          fontSize: 'var(--placeholder-font-size)',
-          fontFamily: 'var(--font-family)',
-          border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
-          borderRadius: 'var(--input-border-radius)',
-          backgroundColor: 'var(--input-bg-color)',
-          color: 'var(--input-text-color)',
-          outline: 'none',
-          appearance: 'none',
-          transition: 'border-color 0.2s',
-        }}
-        onFocus={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-focus-border-color)'}
-        onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
-        {...rest}
-      >
-        {placeholder && <option value="" disabled>{placeholder}</option>}
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </div>
-    </div>
-    {error && (
-      <p style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)', fontSize: '12px', marginTop: '4px' }}>
-        {error}
-      </p>
-    )}
-  </div>
-);
-
-const TextAreaField = ({ label, value, onChange, placeholder, ...rest }) => (
-  <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
-    <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-medium text-gray-600 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)' }}>
-      <span>{label}</span>
     </label>
     <textarea
       value={value}
@@ -137,17 +89,17 @@ const TextAreaField = ({ label, value, onChange, placeholder, ...rest }) => (
       style={{
         width: '100%',
         padding: 'var(--input-padding)',
-        paddingTop: '16px',
         fontSize: 'var(--placeholder-font-size)',
         fontFamily: 'var(--font-family)',
+        fontWeight: 'normal',
         border: '1px solid var(--input-border-color)',
         borderRadius: 'var(--input-border-radius)',
         backgroundColor: 'var(--input-bg-color)',
         color: 'var(--input-text-color)',
         outline: 'none',
-        resize: 'vertical',
-        minHeight: '80px',
         transition: 'border-color 0.2s',
+        resize: 'vertical',
+        minHeight: '80px'
       }}
       onFocus={(e) => e.target.style.borderColor = 'var(--input-focus-border-color)'}
       onBlur={(e) => e.target.style.borderColor = 'var(--input-border-color)'}
@@ -156,19 +108,20 @@ const TextAreaField = ({ label, value, onChange, placeholder, ...rest }) => (
   </div>
 );
 
-const DateInputField = ({ label, required, value, onChange, placeholder, error, readOnly = false }) => {
+// Custom DateInputField that shows dates in consistent DD-MMM-YY format across devices with optional date picker
+const DateInputField = ({ label, required, value, onChange, placeholder, error, readOnly = false, ...rest }) => {
   const hiddenDateRef = useRef(null);
 
   const handleTextChange = (e) => {
-    if (readOnly) return;
+    if (readOnly) return; // Don't allow manual editing for read-only fields
     const inputValue = e.target.value;
     const parsedValue = parseDisplayDate(inputValue);
     onChange({ target: { value: parsedValue } });
   };
 
   const handleDateChange = (e) => {
-    if (readOnly) return;
-    const selectedDate = e.target.value;
+    if (readOnly) return; // Don't allow date picker changes for read-only fields
+    const selectedDate = e.target.value; // YYYY-MM-DD format from date input
     onChange({ target: { value: selectedDate } });
   };
 
@@ -180,12 +133,13 @@ const DateInputField = ({ label, required, value, onChange, placeholder, error, 
 
   return (
     <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
-      <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-medium text-gray-600 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)' }}>
+      <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
         <span>
-          {label}{required && <span style={{ color: 'var(--secondary-color)' }} className="ml-1">*</span>}
+          {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
         </span>
       </label>
 
+      {/* Hidden date input for picker functionality - only if not readOnly */}
       {!readOnly && (
         <input
           ref={hiddenDateRef}
@@ -196,6 +150,7 @@ const DateInputField = ({ label, required, value, onChange, placeholder, error, 
         />
       )}
 
+      {/* Visible text input */}
       <div className="relative">
         <input
           type="text"
@@ -207,13 +162,14 @@ const DateInputField = ({ label, required, value, onChange, placeholder, error, 
             width: '100%',
             height: 'var(--input-height)',
             padding: 'var(--input-padding)',
-            paddingTop: '16px',
-            paddingRight: '40px',
+            paddingTop: '16px', // Extra top padding to accommodate the label
+            paddingRight: '40px', // Always space for calendar icon
             fontSize: 'var(--placeholder-font-size)',
             fontFamily: 'var(--font-family)',
+            fontWeight: 'normal',
             border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
             borderRadius: 'var(--input-border-radius)',
-            backgroundColor: readOnly ? '#f9fafb' : 'var(--input-bg-color)',
+            backgroundColor: readOnly ? '#f9fafb' : 'var(--input-bg-color)', // Different background for read-only
             color: 'var(--input-text-color)',
             outline: 'none',
             transition: 'border-color 0.2s',
@@ -221,8 +177,10 @@ const DateInputField = ({ label, required, value, onChange, placeholder, error, 
           }}
           onFocus={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-focus-border-color)'}
           onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
+          {...rest}
         />
 
+        {/* Calendar icon - show always but disable click for readOnly */}
         <div
           className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded ${readOnly ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer'}`}
           style={{ color: 'var(--input-text-color)' }}
@@ -234,9 +192,182 @@ const DateInputField = ({ label, required, value, onChange, placeholder, error, 
       </div>
 
       {error && (
-        <p style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)', fontSize: '12px', marginTop: '4px' }}>
+        <p style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)', fontSize: 'var(--error-font-size)', marginTop: '4px' }}>
           {error}
         </p>
+      )}
+    </div>
+  );
+};
+
+const SelectField = ({ label, required, options = [], value, onChange, placeholder, searchable = false, disabled = false, error }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const selectRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isOpen && selectRef.current && !selectRef.current.contains(e.target)) {
+        setIsOpen(false);
+        setSearchText("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
+  // Filter options based on search text
+  const filteredOptions = searchable && searchText
+    ? options.filter(option =>
+        option.toLowerCase().includes(searchText.toLowerCase())
+      )
+    : options;
+
+  const handleSelect = (option) => {
+    onChange(option);
+    setIsOpen(false);
+    setSearchText("");
+  };
+
+  const handleInputChange = (e) => {
+    const text = e.target.value;
+    setSearchText(text);
+    if (!isOpen) setIsOpen(true);
+  };
+
+  const handleInputFocus = () => {
+    setIsOpen(true);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      setIsOpen(false);
+      setSearchText("");
+    } else if (e.key === 'Enter' && filteredOptions.length === 1) {
+      handleSelect(filteredOptions[0]);
+    }
+  };
+
+  return (
+    <div ref={selectRef} className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+      <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
+        <span>
+          {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
+        </span>
+      </label>
+      {searchable ? (
+        <input
+          type="text"
+          value={isOpen ? searchText : (value || "")}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          style={{
+            width: '100%',
+            height: 'var(--input-height)',
+            padding: 'var(--input-padding)',
+            paddingTop: '16px', // Extra top padding to accommodate the label
+            paddingRight: '40px', // Space for dropdown arrow
+            fontSize: 'var(--placeholder-font-size)',
+            fontFamily: 'var(--font-family)',
+            border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
+            borderRadius: 'var(--input-border-radius)',
+            backgroundColor: 'var(--input-bg-color)',
+            color: 'var(--input-text-color)',
+            outline: 'none',
+            transition: 'border-color 0.2s',
+          }}
+          onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
+        />
+      ) : (
+        <div
+          onClick={disabled ? undefined : () => setIsOpen(!isOpen)}
+          style={{
+            width: '100%',
+            height: 'var(--input-height)',
+            padding: 'var(--input-padding)',
+            paddingTop: '16px', // Extra top padding to accommodate the label
+            fontSize: 'var(--input-font-size)',
+            fontFamily: 'var(--font-family)',
+            border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
+            borderRadius: 'var(--input-border-radius)',
+            backgroundColor: disabled ? '#f9fafb' : 'var(--input-bg-color)',
+            color: value ? 'var(--input-text-color)' : 'var(--input-placeholder-color)',
+            outline: 'none',
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            transition: 'border-color 0.2s',
+            opacity: disabled ? 0.6 : 1,
+          }}
+        >
+          <span style={{
+            color: value ? 'var(--input-text-color)' : 'var(--input-placeholder-color)',
+            fontSize: 'var(--placeholder-font-size)',
+            fontFamily: 'var(--font-family)',
+          }}>
+            {value || placeholder}
+          </span>
+        </div>
+      )}
+
+      {/* Dropdown arrow - show for both searchable and non-searchable */}
+      <div
+        className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded ${isOpen ? 'rotate-180' : ''}`}
+        style={{
+          color: 'var(--input-text-color)',
+          transition: 'transform 0.2s',
+          pointerEvents: searchable ? 'none' : 'auto',
+          cursor: searchable ? 'default' : 'pointer'
+        }}
+        onClick={searchable ? undefined : () => setIsOpen(!isOpen)}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4 text-gray-400"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+        </svg>
+      </div>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-1 w-full">
+          {filteredOptions.length === 0 ? (
+            <div
+              style={{
+                padding: '8px 12px',
+                fontSize: 'var(--input-font-size)',
+                fontFamily: 'var(--font-family)',
+                color: 'var(--input-placeholder-color)',
+              }}
+            >
+              No matches found
+            </div>
+          ) : (
+            filteredOptions.map((option, index) => (
+              <div
+                key={index}
+                onClick={() => handleSelect(option)}
+                style={{
+                  padding: '8px 12px',
+                  fontSize: 'var(--input-font-size)',
+                  fontFamily: 'var(--font-family)',
+                  color: option === value ? 'var(--input-placeholder-color)' : 'var(--input-text-color)',
+                  cursor: 'pointer',
+                  backgroundColor: option === value ? '#f3f4f6' : 'transparent',
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = option === value ? '#f3f4f6' : 'transparent'}
+              >
+                {option}
+              </div>
+            ))
+          )}
+        </div>
       )}
     </div>
   );
@@ -262,6 +393,8 @@ const TaskInfo = ({ selectedTask, onClose }) => {
   const [isEditingTask, setIsEditingTask] = useState(false);
   const [editedTaskData, setEditedTaskData] = useState({});
   const [savingTask, setSavingTask] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [leads, setLeads] = useState([]);
 
   // PERFECT SCROLL REFS
   const chatContainerRef = useRef(null);
@@ -584,17 +717,48 @@ const TaskInfo = ({ selectedTask, onClose }) => {
     }
   };
 
+  // Fetch users and leads when editing starts
+  const fetchUsers = async () => {
+    try {
+      const userData = await apiService.getUsers();
+      const formattedUsers = userData.map(user => ({
+        id: user.id,
+        name: `${user.first_name} ${user.last_name}`
+      }));
+      setUsers(formattedUsers);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      setUsers([]);
+    }
+  };
+
+  const fetchLeads = async () => {
+    try {
+      const leadData = await apiService.getLeads();
+      setLeads(leadData);
+    } catch (error) {
+      console.error('Error fetching leads:', error);
+      setLeads([]);
+    }
+  };
+
   // Task editing functions
   const startEditingTask = () => {
+    // Fetch users and leads when starting edit
+    fetchUsers();
+    fetchLeads();
+
     setEditedTaskData({
       name: selectedTask.name,
       description: selectedTask.description,
       status: selectedTask.status,
       priority: selectedTask.priority,
       assignTo: selectedTask.assignTo,
+      assignBy: selectedTask.assignBy,
       projectName: selectedTask.projectName,
       leadName: selectedTask.leadName,
-      dueDate: selectedTask.dueDate
+      dueDate: selectedTask.dueDate,
+      relatedTo: selectedTask.relatedTo || ""
     });
     setIsEditingTask(true);
   };
@@ -835,23 +999,67 @@ const TaskInfo = ({ selectedTask, onClose }) => {
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                   <div className="flex flex-col space-y-2">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                      Assigned By
-                    </span>
-                    <span className="text-sm font-medium text-gray-900 break-words">
-                      {selectedTask.assignByName || selectedTask.assignBy}
-                    </span>
+                    {isEditingTask ? (
+                      user?.role?.toLowerCase() === 'admin' ? (
+                        <SelectField
+                          label="ASSIGNED BY"
+                          required
+                          value={users.find(u => u.id === parseInt(editedTaskData.assignBy))?.name || ""}
+                          onChange={(name) => {
+                            const user = users.find(u => u.name === name);
+                            setEditedTaskData(prev => ({ ...prev, assignBy: user ? user.id : "" }));
+                          }}
+                          options={users.map(user => user.name)}
+                          placeholder="Select assigned by"
+                          searchable={true}
+                        />
+                      ) : (
+                        <InputField
+                          label="ASSIGNED BY"
+                          required
+                          value={user ? `${user.firstName} ${user.lastName}` : "Current User"}
+                          readOnly
+                          placeholder="Auto-selected current user"
+                        />
+                      )
+                    ) : (
+                      <>
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Assigned By
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 break-words">
+                          {selectedTask.assignByName || selectedTask.assignBy}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
 
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                   <div className="flex flex-col space-y-2">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                      Assigned To
-                    </span>
-                    <span className="text-sm font-medium text-gray-900 break-words">
-                      {selectedTask.assignToName || selectedTask.assignTo}
-                    </span>
+                    {isEditingTask ? (
+                      <SelectField
+                        label="ASSIGNED TO"
+                        required
+                        value={users.find(u => u.id === parseInt(editedTaskData.assignTo))?.name || ""}
+                        onChange={(name) => {
+                          const user = users.find(u => u.name === name);
+                          setEditedTaskData(prev => ({ ...prev, assignTo: user ? user.id : "" }));
+                        }}
+                        options={users.map(user => user.name)}
+                        placeholder="Select assigned to"
+                        searchable={true}
+                      />
+                    ) : (
+                      <>
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Assigned To
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 break-words">
+                          {selectedTask.assignToName || selectedTask.assignTo}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -888,30 +1096,134 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                 </div>
               ) : null}
 
-              {/* Due Date + Created Date Row */}
+              {/* Created Date + Due Date Row */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                   <div className="flex flex-col space-y-2">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                      Due Date
-                    </span>
-                    <span className="text-sm font-medium text-gray-900 break-words">
-                      {formatDate(selectedTask.dueDate)}
-                    </span>
+                    {isEditingTask ? (
+                      <DateInputField
+                        label="CREATED DATE"
+                        required
+                        value={editedTaskData.createdDate}
+                        readOnly
+                        placeholder="Auto-selected date"
+                      />
+                    ) : (
+                      <>
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Created Date
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 break-words">
+                          {formatDate(selectedTask.createdDate)}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
 
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                   <div className="flex flex-col space-y-2">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                      Created Date
-                    </span>
-                    <span className="text-sm font-medium text-gray-900 break-words">
-                      {formatDate(selectedTask.createdDate)}
-                    </span>
+                    {isEditingTask ? (
+                      <DateInputField
+                        label="DUE DATE"
+                        required
+                        value={editedTaskData.dueDate}
+                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, dueDate: e.target.value }))}
+                        placeholder="Select due date"
+                      />
+                    ) : (
+                      <>
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Due Date
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 break-words">
+                          {formatDate(selectedTask.dueDate)}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
+
+              {/* Related To Row */}
+              <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                <div className="flex flex-col space-y-2">
+                  {isEditingTask ? (
+                    <SelectField
+                      label="RELATED TO"
+                      value={editedTaskData.relatedTo}
+                      onChange={(value) => {
+                        setEditedTaskData(prev => ({
+                          ...prev,
+                          relatedTo: value,
+                          // Clear conditional fields when changing relatedTo
+                          projectName: value !== "Project" ? "" : prev.projectName,
+                          leadName: value !== "Lead" ? "" : prev.leadName
+                        }));
+                      }}
+                      options={[
+                        { value: "", label: "" },
+                        { value: "Project", label: "Project" },
+                        { value: "Lead", label: "Lead" }
+                      ]}
+                      placeholder="Select what this task is related to"
+                    />
+                  ) : (
+                    <>
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Related To
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 break-words">
+                        {selectedTask.relatedTo || "N/A"}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Project Name / Lead Name Row - Conditional */}
+              {(isEditingTask ? editedTaskData.relatedTo : selectedTask.relatedTo) && (
+                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                  <div className="flex flex-col space-y-2">
+                    {isEditingTask ? (
+                      (editedTaskData.relatedTo === "Project") ? (
+                        <InputField
+                          label="PROJECT NAME"
+                          required
+                          value={editedTaskData.projectName}
+                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, projectName: e.target.value }))}
+                          placeholder="Enter project name"
+                        />
+                      ) : (editedTaskData.relatedTo === "Lead") ? (
+                        <SelectField
+                          label="LEAD NAME"
+                          required
+                          value={leads.find(lead => lead.id === parseInt(editedTaskData.leadName))?.contact_name || ""}
+                          onChange={(contactName) => {
+                            const lead = leads.find(l => l.contact_name === contactName);
+                            setEditedTaskData(prev => ({ ...prev, leadName: lead ? lead.id : "" }));
+                          }}
+                          options={leads.map(lead => lead.contact_name)}
+                          placeholder="Select lead name"
+                          searchable={true}
+                        />
+                      ) : null
+                    ) : (
+                      <>
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          {selectedTask.relatedTo === "Project" ? "Project Name" : "Lead Name"}
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 break-words">
+                          {selectedTask.relatedTo === "Project"
+                            ? (selectedTask.projectName || "N/A")
+                            : (selectedTask.leadName || "N/A")
+                          }
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Description Card - Full Width */}
               <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
@@ -1052,77 +1364,188 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                 {/* Row 3: Assigned By + Assigned To */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Assigned By
-                      </span>
-                      <span className="text-sm font-medium text-gray-900">
-                        {selectedTask.assignByName || selectedTask.assignBy}
-                      </span>
-                    </div>
+                    {isEditingTask ? (
+                      user?.role?.toLowerCase() === 'admin' ? (
+                        <SelectField
+                          label="ASSIGNED BY"
+                          required
+                          value={users.find(u => u.id === parseInt(editedTaskData.assignBy))?.name || ""}
+                          onChange={(name) => {
+                            const user = users.find(u => u.name === name);
+                            setEditedTaskData(prev => ({ ...prev, assignBy: user ? user.id : "" }));
+                          }}
+                          options={users.map(user => user.name)}
+                          placeholder="Select assigned by"
+                          searchable={true}
+                        />
+                      ) : (
+                        <InputField
+                          label="ASSIGNED BY"
+                          required
+                          value={user ? `${user.firstName} ${user.lastName}` : "Current User"}
+                          readOnly
+                          placeholder="Auto-selected current user"
+                        />
+                      )
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Assigned By
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {selectedTask.assignByName || selectedTask.assignBy}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Assigned To
-                      </span>
-                      <span className="text-sm font-medium text-gray-900">
-                        {selectedTask.assignToName || selectedTask.assignTo}
-                      </span>
-                    </div>
+                    {isEditingTask ? (
+                      <SelectField
+                        label="ASSIGNED TO"
+                        required
+                        value={users.find(u => u.id === parseInt(editedTaskData.assignTo))?.name || ""}
+                        onChange={(name) => {
+                          const user = users.find(u => u.name === name);
+                          setEditedTaskData(prev => ({ ...prev, assignTo: user ? user.id : "" }));
+                        }}
+                        options={users.map(user => user.name)}
+                        placeholder="Select assigned to"
+                        searchable={true}
+                      />
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Assigned To
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {selectedTask.assignToName || selectedTask.assignTo}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Row 4: Project Name + Lead Name */}
+                {/* Row 4: Created Date + Due Date */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Project Name
-                      </span>
-                      <span className="text-sm font-medium text-gray-900">
-                        {selectedTask.projectName || "N/A"}
-                      </span>
-                    </div>
+                    {isEditingTask ? (
+                      <DateInputField
+                        label="CREATED DATE"
+                        required
+                        value={editedTaskData.createdDate}
+                        readOnly
+                        placeholder="Auto-selected date"
+                      />
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Created Date
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {formatDate(selectedTask.createdDate)}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Lead Name
-                      </span>
-                      <span className="text-sm font-medium text-gray-900">
-                        {selectedTask.leadName || "N/A"}
-                      </span>
-                    </div>
+                    {isEditingTask ? (
+                      <DateInputField
+                        label="DUE DATE"
+                        required
+                        value={editedTaskData.dueDate}
+                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, dueDate: e.target.value }))}
+                        placeholder="Select due date"
+                      />
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Due Date
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {formatDate(selectedTask.dueDate)}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Row 5: Due Date + Created Date */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                {/* Row 5: Related To (full width) */}
+                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                  {isEditingTask ? (
+                    <SelectField
+                      label="RELATED TO"
+                      value={editedTaskData.relatedTo}
+                      onChange={(value) => {
+                        setEditedTaskData(prev => ({
+                          ...prev,
+                          relatedTo: value,
+                          // Clear conditional fields when changing relatedTo
+                          projectName: value !== "Project" ? "" : prev.projectName,
+                          leadName: value !== "Lead" ? "" : prev.leadName
+                        }));
+                      }}
+                      options={[
+                        { value: "", label: "" },
+                        { value: "Project", label: "Project" },
+                        { value: "Lead", label: "Lead" }
+                      ]}
+                      placeholder="Select what this task is related to"
+                    />
+                  ) : (
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Due Date
+                        Related To
                       </span>
                       <span className="text-sm font-medium text-gray-900">
-                        {formatDate(selectedTask.dueDate)}
+                        {selectedTask.relatedTo || "N/A"}
                       </span>
                     </div>
-                  </div>
-
-                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Created Date
-                      </span>
-                      <span className="text-sm font-medium text-gray-900">
-                        {formatDate(selectedTask.createdDate)}
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </div>
+
+                {/* Row 6: Project Name / Lead Name (conditional) */}
+                {(isEditingTask ? editedTaskData.relatedTo : selectedTask.relatedTo) && (
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    {isEditingTask ? (
+                      (editedTaskData.relatedTo === "Project") ? (
+                        <InputField
+                          label="PROJECT NAME"
+                          required
+                          value={editedTaskData.projectName}
+                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, projectName: e.target.value }))}
+                          placeholder="Enter project name"
+                        />
+                      ) : (editedTaskData.relatedTo === "Lead") ? (
+                        <SelectField
+                          label="LEAD NAME"
+                          required
+                          value={leads.find(lead => lead.id === parseInt(editedTaskData.leadName))?.contact_name || ""}
+                          onChange={(contactName) => {
+                            const lead = leads.find(l => l.contact_name === contactName);
+                            setEditedTaskData(prev => ({ ...prev, leadName: lead ? lead.id : "" }));
+                          }}
+                          options={leads.map(lead => lead.contact_name)}
+                          placeholder="Select lead name"
+                          searchable={true}
+                        />
+                      ) : null
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          {selectedTask.relatedTo === "Project" ? "Project Name" : "Lead Name"}
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {selectedTask.relatedTo === "Project"
+                            ? (selectedTask.projectName || "N/A")
+                            : (selectedTask.leadName || "N/A")
+                          }
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </div>
