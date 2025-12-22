@@ -605,29 +605,13 @@ export default function TaskFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
 
             {/* Row 2: ASSIGNED BY | ASSIGNED TO */}
             <div className="md:col-span-1">
-              {user?.role?.toLowerCase() === 'admin' ? (
-                <SelectField
-                  label="ASSIGNED BY"
-                  required
-                  options={users.map(user => user.name)}
-                  value={users.find(u => u.id === parseInt(assignBy || user?.id))?.name || ""}
-                  onChange={(name) => {
-                    const selectedUser = users.find(u => u.name === name);
-                    setAssignBy(selectedUser ? selectedUser.id : user?.id || 1);
-                  }}
-                  placeholder="Select assigned by"
-                  searchable={true}
-                  error={errors.assignBy}
-                />
-              ) : (
-                <InputField
-                  label="ASSIGNED BY"
-                  required
-                  value={user ? `${user.firstName} ${user.lastName}` : "Admin"}
-                  readOnly
-                  placeholder="Current user"
-                />
-              )}
+              <InputField
+                label="ASSIGNED BY"
+                required
+                value={user ? `${user.firstName} ${user.lastName}` : "Admin"}
+                readOnly
+                placeholder="Current user"
+              />
             </div>
             <div className="md:col-span-1">
               <SelectField
