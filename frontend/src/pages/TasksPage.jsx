@@ -1006,18 +1006,18 @@ const fetchTasks = async () => {
                             </div>
 
                             {/* Row 3: Priority, Due Date, and Edit button in 3 columns */}
-                            <div className="grid grid-cols-3 gap-1 text-xs text-gray-600" onClick={(e) => e.stopPropagation()}>
-                              <div className="flex flex-col items-center">
-                                <span className="font-medium text-center text-xs">Priority</span>
-                                <span className={`inline-flex px-1 py-0.5 text-xs font-medium rounded-full border text-xs ${getPriorityColor(task.priority)}`}>
+                            <div className="grid grid-cols-3 gap-0.5 text-xs text-gray-600 px-1" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex flex-col items-center py-1">
+                                <span className="font-medium text-center text-xs leading-tight">Priority</span>
+                                <span className={`inline-flex px-0.5 py-0.5 text-xs font-medium rounded border text-xs leading-tight ${getPriorityColor(task.priority)}`}>
                                   {task.priority}
                                 </span>
                               </div>
-                              <div className="flex flex-col items-center">
-                                <span className="font-medium text-center text-xs">Due</span>
+                              <div className="flex flex-col items-center py-1">
+                                <span className="font-medium text-center text-xs leading-tight">Due</span>
                                 <div className="flex items-center justify-center">
-                                  <FiCalendar className="text-orange-500 flex-shrink-0" size={10} />
-                                  <span className={`text-center text-xs ml-0.5 ${
+                                  <FiCalendar className="text-orange-500 flex-shrink-0" size={8} />
+                                  <span className={`text-center text-xs leading-tight ${
                                     task.dueDate &&
                                     new Date(task.dueDate) < new Date() &&
                                     task.status !== "Completed"
@@ -1028,8 +1028,8 @@ const fetchTasks = async () => {
                                   </span>
                                 </div>
                               </div>
-                              <div className="flex flex-col items-center">
-                                <span className="font-medium text-center text-xs">Action</span>
+                              <div className="flex flex-col items-center py-1">
+                                <span className="font-medium text-center text-xs leading-tight">Action</span>
                                 <TableActionButton
                                   icon={FiEdit2}
                                   type="edit"
