@@ -202,114 +202,56 @@ export default function MobileBottomNavbar({ activePage, onNavigate, onMenuToggl
 
             {/* Navigation buttons container */}
             <div className="flex items-center justify-around px-2 py-1 relative">
-              {/* Role-based navigation */}
-              {user?.role === 'Admin' ? (
-                <>
-                  {/* Admin Navigation: Dashboard, Users, Clients, All Tasks */}
-                  <div className="flex items-center justify-center flex-1">
-                    <BottomIcon
-                      label="Dashboard"
-                      icon={<LayoutDashboard className="h-6 w-6" />}
-                      onClick={() => go('dashboard')}
-                      active={activePage === 'dashboard'}
-                    />
-                  </div>
+              {/* Same navigation for all users: Dashboard, Leads, Clients, Tasks */}
+              <div className="flex items-center justify-center flex-1">
+                <BottomIcon
+                  label="Dashboard"
+                  icon={<LayoutDashboard className="h-6 w-6" />}
+                  onClick={() => go('dashboard')}
+                  active={activePage === 'dashboard'}
+                />
+              </div>
 
-                  <div className="flex items-center justify-center flex-1">
-                    <BottomIcon
-                      label="Users"
-                      icon={<Users className="h-6 w-6" />}
-                      onClick={() => go('users-management')}
-                      active={activePage === 'users-management'}
-                    />
-                  </div>
+              <div className="flex items-center justify-center flex-1">
+                <BottomIcon
+                  label="Leads"
+                  icon={<Users className="h-6 w-6" />}
+                  onClick={() => go('lead-management')}
+                  active={activePage === 'lead-management'}
+                />
+              </div>
 
-                  {/* Center floating button - positioned absolutely */}
-                  <div className="flex items-center justify-center flex-1 relative">
-                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                      <button
-                        type="button"
-                        onClick={() => setIsGridOpen(true)}
-                        className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white shadow-[0_4px_20px_rgba(34,137,255,0.4)] hover:shadow-[0_6px_24px_rgba(34,137,255,0.5)] transition-all duration-200 active:scale-95 border-4 border-white"
-                        aria-label="Open quick menu"
-                      >
-                        <Plus className="h-7 w-7" />
-                      </button>
-                    </div>
-                  </div>
+              {/* Center floating button - positioned absolutely */}
+              <div className="flex items-center justify-center flex-1 relative">
+                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
+                  <button
+                    type="button"
+                    onClick={() => setIsGridOpen(true)}
+                    className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white shadow-[0_4px_20px_rgba(34,137,255,0.4)] hover:shadow-[0_6px_24px_rgba(34,137,255,0.5)] transition-all duration-200 active:scale-95 border-4 border-white"
+                    aria-label="Open quick menu"
+                  >
+                    <Plus className="h-7 w-7" />
+                  </button>
+                </div>
+              </div>
 
-                  <div className="flex items-center justify-center flex-1">
-                    <BottomIcon
-                      label="Clients"
-                      icon={<UserCheck className="h-6 w-6" />}
-                      onClick={() => go('clients-management')}
-                      active={activePage === 'clients-management'}
-                    />
-                  </div>
+              <div className="flex items-center justify-center flex-1">
+                <BottomIcon
+                  label="Clients"
+                  icon={<UserCheck className="h-6 w-6" />}
+                  onClick={() => go('clients-management')}
+                  active={activePage === 'clients-management'}
+                />
+              </div>
 
-                  <div className="flex items-center justify-center flex-1">
-                    <BottomIcon
-                      label="All Tasks"
-                      icon={<ClipboardList className="h-6 w-6" />}
-                      onClick={() => go('my-tasks')}
-                      active={activePage === 'my-tasks'}
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  {/* Normal User Navigation: Dashboard, Leads, Clients, My Tasks */}
-                  <div className="flex items-center justify-center flex-1">
-                    <BottomIcon
-                      label="Dashboard"
-                      icon={<LayoutDashboard className="h-6 w-6" />}
-                      onClick={() => go('dashboard')}
-                      active={activePage === 'dashboard'}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-center flex-1">
-                    <BottomIcon
-                      label="Leads"
-                      icon={<Users className="h-6 w-6" />}
-                      onClick={() => go('lead-management')}
-                      active={activePage === 'lead-management'}
-                    />
-                  </div>
-
-                  {/* Center floating button - positioned absolutely */}
-                  <div className="flex items-center justify-center flex-1 relative">
-                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                      <button
-                        type="button"
-                        onClick={() => setIsGridOpen(true)}
-                        className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white shadow-[0_4px_20px_rgba(34,137,255,0.4)] hover:shadow-[0_6px_24px_rgba(34,137,255,0.5)] transition-all duration-200 active:scale-95 border-4 border-white"
-                        aria-label="Open quick menu"
-                      >
-                        <Plus className="h-7 w-7" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center flex-1">
-                    <BottomIcon
-                      label="Clients"
-                      icon={<UserCheck className="h-6 w-6" />}
-                      onClick={() => go('clients-management')}
-                      active={activePage === 'clients-management'}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-center flex-1">
-                    <BottomIcon
-                      label="My Tasks"
-                      icon={<ClipboardList className="h-6 w-6" />}
-                      onClick={() => go('my-tasks')}
-                      active={activePage === 'my-tasks'}
-                    />
-                  </div>
-                </>
-              )}
+              <div className="flex items-center justify-center flex-1">
+                <BottomIcon
+                  label={user?.role === 'Admin' ? "All Tasks" : "My Tasks"}
+                  icon={<ClipboardList className="h-6 w-6" />}
+                  onClick={() => go('my-tasks')}
+                  active={activePage === 'my-tasks'}
+                />
+              </div>
             </div>
           </div>
         </div>
