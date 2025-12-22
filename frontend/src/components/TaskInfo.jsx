@@ -475,16 +475,14 @@ const TaskInfo = ({ selectedTask, onClose }) => {
       </div>
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-light-gray-bg gap-2 sm:gap-0">
-        <div className="flex-1 min-w-0">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-light-gray-bg">
+        <div className="flex items-center gap-4 flex-1 min-w-0">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
             {selectedTask.name}
           </h2>
-          <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs sm:text-sm text-gray-500">
-              Assigned to: {selectedTask.assignToName || selectedTask.assignTo}
-            </span>
-          </div>
+          <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">
+            Assigned to: {selectedTask.assignToName || selectedTask.assignTo}
+          </span>
         </div>
       </div>
 
