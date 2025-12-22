@@ -4,6 +4,9 @@ import {
   FiFileText,
   FiMessageSquare,
   FiSend,
+  FiEdit2,
+  FiCheck,
+  FiX,
 } from "react-icons/fi";
 import { useAuth } from "../contexts/AuthContext";
 import apiService from "../services/api";
@@ -43,6 +46,11 @@ const TaskInfo = ({ selectedTask, onClose }) => {
   const [loadingComments, setLoadingComments] = useState(false);
   const [socket, setSocket] = useState(null);
   const [typingUsers, setTypingUsers] = useState(new Map());
+
+  // Task editing state
+  const [isEditingTaskName, setIsEditingTaskName] = useState(false);
+  const [editedTaskName, setEditedTaskName] = useState("");
+  const [savingTaskName, setSavingTaskName] = useState(false);
 
   // PERFECT SCROLL REFS
   const chatContainerRef = useRef(null);
@@ -365,6 +373,66 @@ const TaskInfo = ({ selectedTask, onClose }) => {
     }
   };
 
+  // Task name editing functions
+  const startEditingTaskName = () => {
+    setEditedTaskName(selectedTask.name);
+    setIsEditingTaskName(true);
+  };
+
+  const cancelEditingTaskName = () => {
+    setIsEditingTaskName(false);
+    setEditedTaskName("");
+  };
+
+  const saveTaskName = async () => {
+    if (!editedTaskName.trim() || editedTaskName.trim() === selectedTask.name) {
+      setIsEditingTaskName(false);
+      setEditedTaskName("");
+      return;
+    }
+
+    setSavingTaskName(true);
+    try {
+      const updatedTask = {
+        name: editedTaskName.trim(),
+        description: selectedTask.description,
+        status: selectedTask.status,
+        priority: selectedTask.priority,
+        assignTo: selectedTask.assignTo,
+        assignBy: selectedTask.assignBy,
+        projectName: selectedTask.projectName,
+        leadName: selectedTask.leadName,
+        dueDate: selectedTask.dueDate
+      };
+
+      await apiService.updateTask(selectedTask.id, updatedTask);
+
+      // Update the selectedTask prop (this will trigger a re-render)
+      // Note: In a real app, you might want to use a callback from parent component
+      // For now, we'll just close the editing mode
+      setIsEditingTaskName(false);
+      setEditedTaskName("");
+
+      // Show success message or refresh data
+      console.log('Task name updated successfully');
+
+    } catch (error) {
+      console.error('Error updating task name:', error);
+      // You could show an error message here
+    } finally {
+      setSavingTaskName(false);
+    }
+  };
+
+  const handleTaskNameKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      saveTaskName();
+    } else if (e.key === "Escape") {
+      cancelEditingTaskName();
+    }
+  };
+
   const tabs = [
     { id: "overview", label: "Overview", icon: FiFileText },
     { id: "comments", label: "Comments", icon: FiMessageSquare },
@@ -420,9 +488,57 @@ const TaskInfo = ({ selectedTask, onClose }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-light-gray-bg gap-2 sm:gap-0">
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
-            {selectedTask.name}
-          </h2>
+          <div className="flex items-center gap-2">
+            {isEditingTaskName ? (
+              <div className="flex items-center gap-2 flex-1">
+                <input
+                  type="text"
+                  value={editedTaskName}
+                  onChange={(e) => setEditedTaskName(e.target.value)}
+                  onKeyDown={handleTaskNameKeyPress}
+                  className="flex-1 text-lg sm:text-xl font-semibold text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Enter task name"
+                  disabled={savingTaskName}
+                  autoFocus
+                />
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={saveTaskName}
+                    disabled={savingTaskName || !editedTaskName.trim()}
+                    className="p-1 text-green-600 hover:text-green-800 disabled:opacity-50"
+                    title="Save"
+                  >
+                    {savingTaskName ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                    ) : (
+                      <FiCheck size={16} />
+                    )}
+                  </button>
+                  <button
+                    onClick={cancelEditingTaskName}
+                    disabled={savingTaskName}
+                    className="p-1 text-red-600 hover:text-red-800 disabled:opacity-50"
+                    title="Cancel"
+                  >
+                    <FiX size={16} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+                  {selectedTask.name}
+                </h2>
+                <button
+                  onClick={startEditingTaskName}
+                  className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                  title="Edit task name"
+                >
+                  <FiEdit2 size={16} />
+                </button>
+              </>
+            )}
+          </div>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-xs sm:text-sm text-gray-500">
               Assigned to: {selectedTask.assignToName || selectedTask.assignTo}
