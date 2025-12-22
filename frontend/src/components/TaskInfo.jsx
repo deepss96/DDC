@@ -1655,18 +1655,24 @@ const TaskInfo = ({ selectedTask, onClose }) => {
           {/* Input Area */}
           <div className="p-3 sm:p-4">
             <div className="flex gap-2">
-              <input
-                type="text"
+              <textarea
                 value={newComment}
                 onChange={handleInputChange}
-                onKeyPress={handleKeyPress}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendComment();
+                  }
+                }}
                 placeholder="Type your message..."
-                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                rows={2}
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                style={{ minHeight: '40px', maxHeight: '120px' }}
               />
               <button
                 onClick={handleSendComment}
                 disabled={!newComment.trim() || postingComment}
-                className="px-3 sm:px-4 py-2 sm:py-3 bg-primary text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                className="px-3 sm:px-4 py-2 sm:py-3 bg-primary text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors self-end"
               >
                 <FiSend size={14} className="sm:w-4 sm:h-4" />
               </button>
