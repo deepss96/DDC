@@ -484,48 +484,44 @@ const TaskInfo = ({ selectedTask, onClose }) => {
             Assigned to: {selectedTask.assignToName || selectedTask.assignTo}
           </span>
         </div>
+        {!isEditingTask ? (
+          <button
+            onClick={startEditingTask}
+            className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+          >
+            <FiEdit2 size={14} />
+            <span>Edit</span>
+          </button>
+        ) : (
+          <div className="flex gap-2">
+            <button
+              onClick={saveTask}
+              disabled={savingTask}
+              className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors text-sm"
+            >
+              {savingTask ? (
+                <div className="animate-spin rounded-full h-3 w-3 border-b border-white"></div>
+              ) : (
+                <FiCheck size={14} />
+              )}
+              <span>{savingTask ? 'Saving...' : 'Save'}</span>
+            </button>
+            <button
+              onClick={cancelEditingTask}
+              disabled={savingTask}
+              className="flex items-center gap-1 px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 transition-colors text-sm"
+            >
+              <FiX size={14} />
+              <span>Cancel</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Tab Content */}
       <div className={`flex-1 overflow-hidden ${activeTab === "comments" ? "pb-20" : ""}`}>
         {activeTab === "overview" && (
           <div className="p-4 sm:p-6 overflow-auto h-full">
-            {/* Edit Button */}
-            <div className="flex justify-end mb-4">
-              {!isEditingTask ? (
-                <button
-                  onClick={startEditingTask}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  <FiEdit2 size={16} />
-                  <span>Edit Task</span>
-                </button>
-              ) : (
-                <div className="flex gap-2">
-                  <button
-                    onClick={saveTask}
-                    disabled={savingTask}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors"
-                  >
-                    {savingTask ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    ) : (
-                      <FiCheck size={16} />
-                    )}
-                    <span>{savingTask ? 'Saving...' : 'Save'}</span>
-                  </button>
-                  <button
-                    onClick={cancelEditingTask}
-                    disabled={savingTask}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 transition-colors"
-                  >
-                    <FiX size={16} />
-                    <span>Cancel</span>
-                  </button>
-                </div>
-              )}
-            </div>
-
             {/* Mobile View - Vertical Card Stack */}
             <div className="block sm:hidden space-y-3">
               {/* Task Name Card */}
