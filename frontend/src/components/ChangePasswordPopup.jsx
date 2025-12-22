@@ -27,6 +27,11 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
         return null;
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        handleChangePassword();
+    };
+
     const handleChangePassword = async () => {
         setError("");
         setSuccess("");
@@ -131,72 +136,74 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
                             </div>
                         )}
 
-                        {/* New Password Field */}
-                        <div className="mb-4">
-                            <label className="block text-xs text-gray-500 uppercase font-medium mb-2 tracking-wide" style={{ fontFamily: 'var(--font-family)' }}>
-                                New Password
-                            </label>
-                            <div className="relative">
-                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                    <FiLock size={16} />
+                        <form onSubmit={handleSubmit}>
+                            {/* New Password Field */}
+                            <div className="mb-4">
+                                <label className="block text-xs text-gray-500 uppercase font-medium mb-2 tracking-wide" style={{ fontFamily: 'var(--font-family)' }}>
+                                    New Password
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                        <FiLock size={16} />
+                                    </div>
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        placeholder="Enter new password"
+                                        className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-amber-500 transition-colors text-sm"
+                                        style={{ fontFamily: 'var(--font-family)' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    >
+                                        {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                                    </button>
                                 </div>
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    placeholder="Enter new password"
-                                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-amber-500 transition-colors text-sm"
-                                    style={{ fontFamily: 'var(--font-family)' }}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                >
-                                    {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
-                                </button>
                             </div>
-                        </div>
 
-                        {/* Confirm Password Field */}
-                        <div className="mb-6">
-                            <label className="block text-xs text-gray-500 uppercase font-medium mb-2 tracking-wide" style={{ fontFamily: 'var(--font-family)' }}>
-                                Confirm Password
-                            </label>
-                            <div className="relative">
-                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                                    <FiLock size={16} />
+                            {/* Confirm Password Field */}
+                            <div className="mb-6">
+                                <label className="block text-xs text-gray-500 uppercase font-medium mb-2 tracking-wide" style={{ fontFamily: 'var(--font-family)' }}>
+                                    Confirm Password
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                        <FiLock size={16} />
+                                    </div>
+                                    <input
+                                        type={showConfirmPassword ? "text" : "password"}
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        placeholder="Confirm new password"
+                                        className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-amber-500 transition-colors text-sm"
+                                        style={{ fontFamily: 'var(--font-family)' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                    >
+                                        {showConfirmPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                                    </button>
                                 </div>
-                                <input
-                                    type={showConfirmPassword ? "text" : "password"}
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    placeholder="Confirm new password"
-                                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-amber-500 transition-colors text-sm"
-                                    style={{ fontFamily: 'var(--font-family)' }}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                                >
-                                    {showConfirmPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
-                                </button>
                             </div>
-                        </div>
 
-                        {/* Submit Button */}
-                        <button
-                            onClick={handleChangePassword}
-                            disabled={loading}
-                            className="w-full py-3 text-white rounded-xl transition-all hover:opacity-90 font-medium text-sm sm:text-base disabled:opacity-50"
-                            style={{
-                                backgroundColor: 'var(--primary-color)',
-                                fontFamily: 'var(--font-family)'
-                            }}
-                        >
-                            {loading ? "Updating..." : "Update Password"}
-                        </button>
+                            {/* Submit Button */}
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full py-3 text-white rounded-xl transition-all hover:opacity-90 font-medium text-sm sm:text-base disabled:opacity-50"
+                                style={{
+                                    backgroundColor: 'var(--primary-color)',
+                                    fontFamily: 'var(--font-family)'
+                                }}
+                            >
+                                {loading ? "Updating..." : "Update Password"}
+                            </button>
+                        </form>
 
                         <p className="text-xs text-gray-500 text-center mt-4" style={{ fontFamily: 'var(--font-family)' }}>
                             Password must be at least 6 characters long
