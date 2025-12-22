@@ -17,15 +17,65 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
         disabled={disabled}
         className={`
           w-full px-4 py-3 border rounded-xl transition-all duration-200 outline-none
-          ${disabled 
-            ? 'bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed' 
-            : error 
-              ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200' 
+          ${disabled
+            ? 'bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed'
+            : error
+              ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200'
               : 'border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 hover:border-gray-300'
           }
         `}
         {...rest}
       />
+      {!disabled && !error && (
+        <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-blue-100 pointer-events-none"></div>
+      )}
+    </div>
+    {error && (
+      <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
+        <FiX size={12} />
+        {error}
+      </p>
+    )}
+  </div>
+);
+
+const SelectField = ({ label, required, value, onChange, options, placeholder, error, disabled = false, ...rest }) => (
+  <div className="relative group">
+    <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-medium text-gray-600 uppercase tracking-wider z-10">
+      {label}{required && <span className="text-red-500 ml-1">*</span>}
+    </label>
+    <div className="relative">
+      <select
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        className={`
+          w-full px-4 py-3 border rounded-xl transition-all duration-200 outline-none appearance-none bg-white
+          ${disabled
+            ? 'bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed'
+            : error
+              ? 'border-red-300 focus:border-red-500 focus:ring-2 focus:ring-red-200'
+              : 'border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 hover:border-gray-300'
+          }
+        `}
+        {...rest}
+      >
+        {placeholder && (
+          <option value="" disabled>{placeholder}</option>
+        )}
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {!disabled && (
+        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      )}
       {!disabled && !error && (
         <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-blue-100 pointer-events-none"></div>
       )}
@@ -85,6 +135,8 @@ export default function ProfilePage() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [phone, setPhone] = useState("");
+  const [role, setRole] = useState("");
+  const [status, setStatus] = useState("");
 
   // Form validation state
   const [formErrors, setFormErrors] = useState({});
@@ -118,6 +170,8 @@ export default function ProfilePage() {
       setEmail(profileData.email || "");
       setUsername(profileData.username || "");
       setPhone(profileData.phone || "");
+      setRole(profileData.role || "");
+      setStatus(profileData.status || "");
     }
   }, [profileData]);
 
@@ -167,8 +221,8 @@ export default function ProfilePage() {
         email,
         username,
         phone,
-        role: profileData.role,
-        status: profileData.status,
+        role: role,
+        status: status,
         profile_image: imagePreview
       };
 
@@ -221,6 +275,8 @@ export default function ProfilePage() {
       setEmail(profileData.email || "");
       setUsername(profileData.username || "");
       setPhone(profileData.phone || "");
+      setRole(profileData.role || "");
+      setStatus(profileData.status || "");
     }
     setIsEditing(false);
   };
@@ -443,6 +499,36 @@ export default function ProfilePage() {
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="Enter phone number"
+                          />
+                        </div>
+                        <div>
+                          <SelectField
+                            label="ROLE"
+                            required
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                            options={[
+                              { value: "Admin", label: "Admin" },
+                              { value: "HR", label: "HR" },
+                              { value: "Site Manager", label: "Site Manager" },
+                              { value: "Office Staff", label: "Office Staff" },
+                              { value: "Field Rep", label: "Field Rep" }
+                            ]}
+                            placeholder="Select role"
+                          />
+                        </div>
+                        <div>
+                          <SelectField
+                            label="STATUS"
+                            required
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
+                            options={[
+                              { value: "Active", label: "Active" },
+                              { value: "Inactive", label: "Inactive" },
+                              { value: "Deleted", label: "Deleted" }
+                            ]}
+                            placeholder="Select status"
                           />
                         </div>
                       </div>
