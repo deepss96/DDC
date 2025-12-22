@@ -487,31 +487,34 @@ const TaskInfo = ({ selectedTask, onClose }) => {
         {!isEditingTask ? (
           <button
             onClick={startEditingTask}
-            className="flex items-center gap-2 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+            className="flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-blue-600 transition-colors text-xs"
+            style={{ fontFamily: 'var(--font-family)' }}
           >
-            <FiEdit2 size={14} />
+            <FiEdit2 size={12} />
             <span>Edit</span>
           </button>
         ) : (
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <button
               onClick={saveTask}
               disabled={savingTask}
-              className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors text-sm"
+              className="flex items-center gap-1 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 transition-colors text-xs"
+              style={{ fontFamily: 'var(--font-family)' }}
             >
               {savingTask ? (
-                <div className="animate-spin rounded-full h-3 w-3 border-b border-white"></div>
+                <div className="animate-spin rounded-full h-2.5 w-2.5 border-b border-white"></div>
               ) : (
-                <FiCheck size={14} />
+                <FiCheck size={12} />
               )}
               <span>{savingTask ? 'Saving...' : 'Save'}</span>
             </button>
             <button
               onClick={cancelEditingTask}
               disabled={savingTask}
-              className="flex items-center gap-1 px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 transition-colors text-sm"
+              className="flex items-center gap-1 px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50 transition-colors text-xs"
+              style={{ fontFamily: 'var(--font-family)' }}
             >
-              <FiX size={14} />
+              <FiX size={12} />
               <span>Cancel</span>
             </button>
           </div>
@@ -523,7 +526,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
         {activeTab === "overview" && (
           <div className="p-4 sm:p-6 overflow-auto h-full">
             {/* Mobile View - Vertical Card Stack */}
-            <div className="block sm:hidden space-y-3">
+            <div className="block sm:hidden space-y-2" style={{ fontFamily: 'var(--font-family)' }}>
               {/* Task Name Card */}
               <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                 <div className="flex flex-col space-y-2">
@@ -711,8 +714,8 @@ const TaskInfo = ({ selectedTask, onClose }) => {
             </div>
 
             {/* Desktop/Tablet View - Custom Grid Layout */}
-            <div className="hidden sm:block">
-              <div className="space-y-4 sm:space-y-6">
+            <div className="hidden sm:block" style={{ fontFamily: 'var(--font-family)' }}>
+              <div className="space-y-2 sm:space-y-3">
                 {/* Row 1: Task Name + Description (side by side) */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
