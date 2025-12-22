@@ -376,11 +376,8 @@ const LoginSignupPage = () => {
               >
                 {loading ? (
                   <>
-                    <FiLogIn size={20} />
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                     <span>Sign In</span>
-                    <span className="animate-pulse text-xl font-bold">.</span>
-                    <span className="animate-pulse text-xl font-bold delay-100">.</span>
-                    <span className="animate-pulse text-xl font-bold delay-200">.</span>
                   </>
                 ) : (
                   <>
