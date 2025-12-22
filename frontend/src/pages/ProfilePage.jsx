@@ -314,7 +314,13 @@ export default function ProfilePage() {
       {isChangePasswordOpen && (
         <ChangePasswordPopup
           user={user}
-          onPasswordChanged={() => setIsChangePasswordOpen(false)}
+          onPasswordChanged={() => {
+            setIsChangePasswordOpen(false);
+            setSuccessMessage('Password changed successfully!');
+            setTimeout(() => {
+              setSuccessMessage("");
+            }, 3000);
+          }}
         />
       )}
     </div>
@@ -437,10 +443,10 @@ export default function ProfilePage() {
                         </button>
                         <button
                           onClick={() => setIsEditing(true)}
-                          className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-2 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base"
+                          className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-2 py-1.5 md:px-4 md:py-2 rounde-lg md:rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base"
                         >
                           <FiEdit2 size={12} className="md:w-4 md:h-4" />
-                          <span className="hidden md:inline">Edit Profile</span>
+                          <span className="hidden md:inline">Edit</span>
                           <span className="md:hidden">Edit</span>
                         </button>
                       </div>
@@ -618,6 +624,20 @@ export default function ProfilePage() {
           </div>
         </main>
       </div>
+
+      {/* Change Password Popup */}
+      {isChangePasswordOpen && (
+        <ChangePasswordPopup
+          user={user}
+          onPasswordChanged={() => {
+            setIsChangePasswordOpen(false);
+            setSuccessMessage('Password changed successfully!');
+            setTimeout(() => {
+              setSuccessMessage("");
+            }, 3000);
+          }}
+        />
+      )}
     </div>
   );
 }

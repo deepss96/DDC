@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import { FiLock, FiEye, FiEyeOff, FiShield, FiCheckCircle } from "react-icons/fi";
 import apiService from "../services/api";
-import { useAuth } from "../contexts/AuthContext.jsx";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function ChangePasswordPopup({ user, onPasswordChanged }) {
-    const navigate = useNavigate();
     const { updateUser } = useAuth();
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -59,11 +58,10 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
             const updatedUser = { ...user, isTempPassword: false };
             updateUser(updatedUser);
 
-            // Close popup and navigate to profile page immediately
+            // Close popup - user is already on profile page
             if (onPasswordChanged) {
                 onPasswordChanged();
             }
-            navigate('/profile');
         } catch (err) {
             console.error("Error changing password:", err);
             setError(err.message || "Failed to change password. Please try again.");
@@ -72,11 +70,11 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
         }
     };
 
-    return (
+    return ReactDOM.createPortal(
         <>
             {/* Blur backdrop */}
             <div
-                className="fixed inset-0 z-[1001] pointer-events-none"
+                className="fixed inset-0 z-[9999] pointer-events-none"
                 style={{
                     backdropFilter: 'blur(6px)',
                     backgroundColor: 'rgba(0, 0, 0, 0.4)'
@@ -84,7 +82,7 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
             />
 
             {/* Password Change Card - positioned at center */}
-            <div className="fixed inset-0 flex items-center justify-center z-[1002] p-4">
+            <div className="fixed inset-0 flex items-center justify-center z-[10000] p-4">
                 <div
                     className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
                     style={{
@@ -105,16 +103,16 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
                                 Change Your Password
                             </h3>
                             <p className="text-white/80 text-sm" style={{ fontFamily: 'var(--font-family)' }}>
-                                You're using a temporary password
+                                Update your account password
                             </p>
                         </div>
                     </div>
 
                     {/* Body */}
                     <div className="p-5 sm:p-6">
-                        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                            <p className="text-sm text-amber-800" style={{ fontFamily: 'var(--font-family)' }}>
-                                <strong>Welcome, {user?.firstName || 'User'}!</strong> Please create a new password to secure your account.
+                        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-sm text-blue-800" style={{ fontFamily: 'var(--font-family)' }}>
+                                <strong>Hello, {user?.firstName || 'User'}!</strong> Enter your new password below to update your account security.
                             </p>
                         </div>
 
@@ -206,6 +204,7 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
                     </div>
                 </div>
             </div>
-        </>
+        </>,
+        document.body
     );
 }
