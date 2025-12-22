@@ -1005,8 +1005,8 @@ const fetchTasks = async () => {
                               </div>
                             </div>
 
-                            {/* Row 3: Priority, Due Date, and Action in 3-column grid layout */}
-                            <div className="grid grid-cols-3 gap-1 text-xs text-gray-600 px-1 py-1" onClick={(e) => e.stopPropagation()}>
+                            {/* Row 3: Priority, Due Date, Action, and Delete (if admin) in grid layout */}
+                            <div className={`grid ${user?.role?.toLowerCase() === 'admin' ? 'grid-cols-4' : 'grid-cols-3'} gap-1 text-xs text-gray-600 px-1 py-1`} onClick={(e) => e.stopPropagation()}>
                               <div className="flex flex-col items-start">
                                 <span className="font-medium text-xs leading-tight mb-0.5">Priority</span>
                                 <span className={`inline-flex px-1 py-0.5 text-xs font-medium rounded border text-xs leading-tight ${getPriorityColor(task.priority)}`}>
@@ -1039,20 +1039,20 @@ const fetchTasks = async () => {
                                   mobileSize={true}
                                 />
                               </div>
+                              {/* Admin Delete Button - Only show if admin */}
+                              {user?.role?.toLowerCase() === 'admin' && (
+                                <div className="flex flex-col items-start">
+                                  <span className="font-medium text-xs leading-tight mb-0.5">Delete</span>
+                                  <TableActionButton
+                                    icon={FiTrash2}
+                                    type="delete"
+                                    title="Delete"
+                                    onClick={() => handleDeleteRow(task.id)}
+                                    mobileSize={true}
+                                  />
+                                </div>
+                              )}
                             </div>
-
-                            {/* Admin Delete Button - Only show if admin */}
-                            {user?.role?.toLowerCase() === 'admin' && (
-                              <div className="flex justify-center mt-2" onClick={(e) => e.stopPropagation()}>
-                                <TableActionButton
-                                  icon={FiTrash2}
-                                  type="delete"
-                                  title="Delete"
-                                  onClick={() => handleDeleteRow(task.id)}
-                                  mobileSize={true}
-                                />
-                              </div>
-                            )}
                           </div>
                         ))}
                       </div>
