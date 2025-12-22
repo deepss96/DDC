@@ -376,12 +376,15 @@ const LoginSignupPage = () => {
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    <span>Signing in</span>
+                    <FiLogIn size={20} />
+                    <span>Sign In</span>
+                    <span className="animate-pulse text-xl font-bold">.</span>
+                    <span className="animate-pulse text-xl font-bold delay-100">.</span>
+                    <span className="animate-pulse text-xl font-bold delay-200">.</span>
                   </>
                 ) : (
                   <>
-                    {formType === 'login' && <><FiLogIn size={20} /> <span>Sign In</span></>}
+                    {formType === 'login' && <span>Signing in</span>}
                     {formType === 'forgot' && <><FiKey size={20} /> <span>Send Reset Link</span></>}
                   </>
                 )}
