@@ -1,4 +1,6 @@
 // Push Notification Service
+import config from '../config/config';
+
 class PushNotificationService {
   constructor() {
     this.registration = null;
@@ -38,7 +40,7 @@ class PushNotificationService {
   // Fetch VAPID public key from backend
   async fetchVapidPublicKey() {
     try {
-      const response = await fetch('/api/push/vapid-public-key');
+      const response = await fetch(`${config.api.baseUrl}/api/push/vapid-public-key`);
       if (response.ok) {
         const data = await response.json();
         this.vapidPublicKey = data.publicKey;
@@ -136,7 +138,7 @@ class PushNotificationService {
   // Send subscription to backend
   async sendSubscriptionToBackend(subscription) {
     try {
-      const response = await fetch('/api/push/subscribe', {
+      const response = await fetch(`${config.api.baseUrl}/api/push/subscribe`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -160,7 +162,7 @@ class PushNotificationService {
   // Remove subscription from backend
   async removeSubscriptionFromBackend() {
     try {
-      const response = await fetch('/api/push/unsubscribe', {
+      const response = await fetch(`${config.api.baseUrl}/api/push/unsubscribe`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
