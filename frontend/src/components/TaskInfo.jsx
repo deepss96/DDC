@@ -48,9 +48,9 @@ const TaskInfo = ({ selectedTask, onClose }) => {
   const [typingUsers, setTypingUsers] = useState(new Map());
 
   // Task editing state
-  const [isEditingTaskName, setIsEditingTaskName] = useState(false);
-  const [editedTaskName, setEditedTaskName] = useState("");
-  const [savingTaskName, setSavingTaskName] = useState(false);
+  const [isEditingTask, setIsEditingTask] = useState(false);
+  const [editedTaskData, setEditedTaskData] = useState({});
+  const [savingTask, setSavingTask] = useState(false);
 
   // PERFECT SCROLL REFS
   const chatContainerRef = useRef(null);
@@ -373,63 +373,52 @@ const TaskInfo = ({ selectedTask, onClose }) => {
     }
   };
 
-  // Task name editing functions
-  const startEditingTaskName = () => {
-    setEditedTaskName(selectedTask.name);
-    setIsEditingTaskName(true);
+  // Task editing functions
+  const startEditingTask = () => {
+    setEditedTaskData({
+      name: selectedTask.name,
+      description: selectedTask.description,
+      status: selectedTask.status,
+      priority: selectedTask.priority,
+      assignTo: selectedTask.assignTo,
+      projectName: selectedTask.projectName,
+      leadName: selectedTask.leadName,
+      dueDate: selectedTask.dueDate
+    });
+    setIsEditingTask(true);
   };
 
-  const cancelEditingTaskName = () => {
-    setIsEditingTaskName(false);
-    setEditedTaskName("");
+  const cancelEditingTask = () => {
+    setIsEditingTask(false);
+    setEditedTaskData({});
   };
 
-  const saveTaskName = async () => {
-    if (!editedTaskName.trim() || editedTaskName.trim() === selectedTask.name) {
-      setIsEditingTaskName(false);
-      setEditedTaskName("");
-      return;
-    }
-
-    setSavingTaskName(true);
+  const saveTask = async () => {
+    setSavingTask(true);
     try {
       const updatedTask = {
-        name: editedTaskName.trim(),
-        description: selectedTask.description,
-        status: selectedTask.status,
-        priority: selectedTask.priority,
-        assignTo: selectedTask.assignTo,
+        name: editedTaskData.name,
+        description: editedTaskData.description,
+        status: editedTaskData.status,
+        priority: editedTaskData.priority,
+        assignTo: editedTaskData.assignTo,
         assignBy: selectedTask.assignBy,
-        projectName: selectedTask.projectName,
-        leadName: selectedTask.leadName,
-        dueDate: selectedTask.dueDate
+        projectName: editedTaskData.projectName,
+        leadName: editedTaskData.leadName,
+        dueDate: editedTaskData.dueDate
       };
 
       await apiService.updateTask(selectedTask.id, updatedTask);
 
-      // Update the selectedTask prop (this will trigger a re-render)
-      // Note: In a real app, you might want to use a callback from parent component
-      // For now, we'll just close the editing mode
-      setIsEditingTaskName(false);
-      setEditedTaskName("");
+      setIsEditingTask(false);
+      setEditedTaskData({});
 
-      // Show success message or refresh data
-      console.log('Task name updated successfully');
+      console.log('Task updated successfully');
 
     } catch (error) {
-      console.error('Error updating task name:', error);
-      // You could show an error message here
+      console.error('Error updating task:', error);
     } finally {
-      setSavingTaskName(false);
-    }
-  };
-
-  const handleTaskNameKeyPress = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      saveTaskName();
-    } else if (e.key === "Escape") {
-      cancelEditingTaskName();
+      setSavingTask(false);
     }
   };
 
@@ -488,57 +477,9 @@ const TaskInfo = ({ selectedTask, onClose }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-light-gray-bg gap-2 sm:gap-0">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            {isEditingTaskName ? (
-              <div className="flex items-center gap-2 flex-1">
-                <input
-                  type="text"
-                  value={editedTaskName}
-                  onChange={(e) => setEditedTaskName(e.target.value)}
-                  onKeyDown={handleTaskNameKeyPress}
-                  className="flex-1 text-lg sm:text-xl font-semibold text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
-                  placeholder="Enter task name"
-                  disabled={savingTaskName}
-                  autoFocus
-                />
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={saveTaskName}
-                    disabled={savingTaskName || !editedTaskName.trim()}
-                    className="p-1 text-green-600 hover:text-green-800 disabled:opacity-50"
-                    title="Save"
-                  >
-                    {savingTaskName ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
-                    ) : (
-                      <FiCheck size={16} />
-                    )}
-                  </button>
-                  <button
-                    onClick={cancelEditingTaskName}
-                    disabled={savingTaskName}
-                    className="p-1 text-red-600 hover:text-red-800 disabled:opacity-50"
-                    title="Cancel"
-                  >
-                    <FiX size={16} />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
-                  {selectedTask.name}
-                </h2>
-                <button
-                  onClick={startEditingTaskName}
-                  className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
-                  title="Edit task name"
-                >
-                  <FiEdit2 size={16} />
-                </button>
-              </>
-            )}
-          </div>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+            {selectedTask.name}
+          </h2>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-xs sm:text-sm text-gray-500">
               Assigned to: {selectedTask.assignToName || selectedTask.assignTo}
@@ -551,6 +492,42 @@ const TaskInfo = ({ selectedTask, onClose }) => {
       <div className={`flex-1 overflow-hidden ${activeTab === "comments" ? "pb-20" : ""}`}>
         {activeTab === "overview" && (
           <div className="p-4 sm:p-6 overflow-auto h-full">
+            {/* Edit Button */}
+            <div className="flex justify-end mb-4">
+              {!isEditingTask ? (
+                <button
+                  onClick={startEditingTask}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  <FiEdit2 size={16} />
+                  <span>Edit Task</span>
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button
+                    onClick={saveTask}
+                    disabled={savingTask}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors"
+                  >
+                    {savingTask ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    ) : (
+                      <FiCheck size={16} />
+                    )}
+                    <span>{savingTask ? 'Saving...' : 'Save'}</span>
+                  </button>
+                  <button
+                    onClick={cancelEditingTask}
+                    disabled={savingTask}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 transition-colors"
+                  >
+                    <FiX size={16} />
+                    <span>Cancel</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Mobile View - Vertical Card Stack */}
             <div className="block sm:hidden space-y-3">
               {/* Task Name Card */}
@@ -559,9 +536,19 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                   <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                     Task Name
                   </span>
-                  <span className="text-sm font-medium text-gray-900 break-words">
-                    {selectedTask.name}
-                  </span>
+                  {isEditingTask ? (
+                    <input
+                      type="text"
+                      value={editedTaskData.name}
+                      onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
+                      className="text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="Enter task name"
+                    />
+                  ) : (
+                    <span className="text-sm font-medium text-gray-900 break-words">
+                      {selectedTask.name}
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -572,13 +559,27 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                     <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                       Status
                     </span>
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getStatusColor(
-                        selectedTask.status
-                      )}`}
-                    >
-                      {selectedTask.status}
-                    </span>
+                    {isEditingTask ? (
+                      <select
+                        value={editedTaskData.status}
+                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, status: e.target.value }))}
+                        className="text-xs font-medium bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
+                      >
+                        <option value="New">New</option>
+                        <option value="Working">Working</option>
+                        <option value="Completed">Completed</option>
+                        <option value="On Hold">On Hold</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    ) : (
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getStatusColor(
+                          selectedTask.status
+                        )}`}
+                      >
+                        {selectedTask.status}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -587,13 +588,25 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                     <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                       Priority
                     </span>
-                    <span
-                      className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getPriorityColor(
-                        selectedTask.priority
-                      )}`}
-                    >
-                      {selectedTask.priority}
-                    </span>
+                    {isEditingTask ? (
+                      <select
+                        value={editedTaskData.priority}
+                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, priority: e.target.value }))}
+                        className="text-xs font-medium bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
+                      >
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                      </select>
+                    ) : (
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getPriorityColor(
+                          selectedTask.priority
+                        )}`}
+                      >
+                        {selectedTask.priority}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -686,9 +699,19 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                   <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                     Description
                   </span>
-                  <span className="text-sm text-gray-900 break-words">
-                    {selectedTask.description || "N/A"}
-                  </span>
+                  {isEditingTask ? (
+                    <textarea
+                      value={editedTaskData.description}
+                      onChange={(e) => setEditedTaskData(prev => ({ ...prev, description: e.target.value }))}
+                      className="text-sm text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                      placeholder="Enter task description"
+                      rows={3}
+                    />
+                  ) : (
+                    <span className="text-sm text-gray-900 break-words">
+                      {selectedTask.description || "N/A"}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -703,9 +726,19 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                         Task Name
                       </span>
-                      <span className="text-sm font-medium text-gray-900">
-                        {selectedTask.name}
-                      </span>
+                      {isEditingTask ? (
+                        <input
+                          type="text"
+                          value={editedTaskData.name}
+                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
+                          className="text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary flex-1 ml-4"
+                          placeholder="Enter task name"
+                        />
+                      ) : (
+                        <span className="text-sm font-medium text-gray-900">
+                          {selectedTask.name}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -714,9 +747,19 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       <span className="text-xs text-gray-500 uppercase tracking-wide font-medium mr-4">
                         Description
                       </span>
-                      <span className="text-sm text-gray-900 flex-1">
-                        {selectedTask.description || "N/A"}
-                      </span>
+                      {isEditingTask ? (
+                        <textarea
+                          value={editedTaskData.description}
+                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, description: e.target.value }))}
+                          className="text-sm text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary flex-1 resize-none"
+                          placeholder="Enter task description"
+                          rows={2}
+                        />
+                      ) : (
+                        <span className="text-sm text-gray-900 flex-1">
+                          {selectedTask.description || "N/A"}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -728,13 +771,27 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                         Status
                       </span>
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                          selectedTask.status
-                        )}`}
-                      >
-                        {selectedTask.status}
-                      </span>
+                      {isEditingTask ? (
+                        <select
+                          value={editedTaskData.status}
+                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, status: e.target.value }))}
+                          className="text-xs font-medium bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                          <option value="New">New</option>
+                          <option value="Working">Working</option>
+                          <option value="Completed">Completed</option>
+                          <option value="On Hold">On Hold</option>
+                          <option value="Cancelled">Cancelled</option>
+                        </select>
+                      ) : (
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                            selectedTask.status
+                          )}`}
+                        >
+                          {selectedTask.status}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -743,13 +800,25 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
                         Priority
                       </span>
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(
-                          selectedTask.priority
-                        )}`}
-                      >
-                        {selectedTask.priority}
-                      </span>
+                      {isEditingTask ? (
+                        <select
+                          value={editedTaskData.priority}
+                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, priority: e.target.value }))}
+                          className="text-xs font-medium bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
+                        >
+                          <option value="Low">Low</option>
+                          <option value="Medium">Medium</option>
+                          <option value="High">High</option>
+                        </select>
+                      ) : (
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(
+                            selectedTask.priority
+                          )}`}
+                        >
+                          {selectedTask.priority}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
