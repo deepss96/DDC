@@ -122,6 +122,8 @@ export default function ProfilePage() {
   }, [profileData]);
 
   // Profile image handlers
+  // Note: Images are stored as base64 data URLs in the database
+  // Fixed: Previously corrupted due to VARCHAR(500) truncation, now uses LONGTEXT
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -129,7 +131,7 @@ export default function ProfilePage() {
         alert('File size should be less than 5MB');
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target.result);
