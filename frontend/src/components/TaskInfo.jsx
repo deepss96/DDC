@@ -7,11 +7,13 @@ import {
   FiEdit2,
   FiCheck,
   FiX,
+  FiCalendar,
 } from "react-icons/fi";
 import { useAuth } from "../contexts/AuthContext";
 import apiService from "../services/api";
 import io from 'socket.io-client';
 import config from '../config/config';
+import { formatDateForInput, formatDateForDisplay, parseDisplayDate } from "../utils/dateUtils.jsx";
 
 // Add wave animation for back button
 const waveStyles = `
@@ -30,6 +32,215 @@ if (typeof document !== 'undefined') {
   styleSheet.innerText = waveStyles;
   document.head.appendChild(styleSheet);
 }
+
+// Form Components - Similar to ProfilePage and TaskFormPopup
+const InputField = ({ label, required, type = "text", value, onChange, placeholder, error, ...rest }) => (
+  <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+    <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-medium text-gray-600 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)' }}>
+      <span>
+        {label}{required && <span style={{ color: 'var(--secondary-color)' }} className="ml-1">*</span>}
+      </span>
+    </label>
+    <input
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      style={{
+        width: '100%',
+        height: 'var(--input-height)',
+        padding: 'var(--input-padding)',
+        paddingTop: '16px',
+        fontSize: 'var(--placeholder-font-size)',
+        fontFamily: 'var(--font-family)',
+        border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
+        borderRadius: 'var(--input-border-radius)',
+        backgroundColor: 'var(--input-bg-color)',
+        color: 'var(--input-text-color)',
+        outline: 'none',
+        transition: 'border-color 0.2s',
+      }}
+      onFocus={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-focus-border-color)'}
+      onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
+      {...rest}
+    />
+    {error && (
+      <p style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)', fontSize: '12px', marginTop: '4px' }}>
+        {error}
+      </p>
+    )}
+  </div>
+);
+
+const SelectField = ({ label, required, value, onChange, options, placeholder, error, ...rest }) => (
+  <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+    <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-medium text-gray-600 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)' }}>
+      <span>
+        {label}{required && <span style={{ color: 'var(--secondary-color)' }} className="ml-1">*</span>}
+      </span>
+    </label>
+    <div className="relative">
+      <select
+        value={value}
+        onChange={onChange}
+        style={{
+          width: '100%',
+          height: 'var(--input-height)',
+          padding: 'var(--input-padding)',
+          paddingTop: '16px',
+          paddingRight: '40px',
+          fontSize: 'var(--placeholder-font-size)',
+          fontFamily: 'var(--font-family)',
+          border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
+          borderRadius: 'var(--input-border-radius)',
+          backgroundColor: 'var(--input-bg-color)',
+          color: 'var(--input-text-color)',
+          outline: 'none',
+          appearance: 'none',
+          transition: 'border-color 0.2s',
+        }}
+        onFocus={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-focus-border-color)'}
+        onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
+        {...rest}
+      >
+        {placeholder && <option value="" disabled>{placeholder}</option>}
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+    {error && (
+      <p style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)', fontSize: '12px', marginTop: '4px' }}>
+        {error}
+      </p>
+    )}
+  </div>
+);
+
+const TextAreaField = ({ label, value, onChange, placeholder, ...rest }) => (
+  <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+    <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-medium text-gray-600 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)' }}>
+      <span>{label}</span>
+    </label>
+    <textarea
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      rows={4}
+      style={{
+        width: '100%',
+        padding: 'var(--input-padding)',
+        paddingTop: '16px',
+        fontSize: 'var(--placeholder-font-size)',
+        fontFamily: 'var(--font-family)',
+        border: '1px solid var(--input-border-color)',
+        borderRadius: 'var(--input-border-radius)',
+        backgroundColor: 'var(--input-bg-color)',
+        color: 'var(--input-text-color)',
+        outline: 'none',
+        resize: 'vertical',
+        minHeight: '80px',
+        transition: 'border-color 0.2s',
+      }}
+      onFocus={(e) => e.target.style.borderColor = 'var(--input-focus-border-color)'}
+      onBlur={(e) => e.target.style.borderColor = 'var(--input-border-color)'}
+      {...rest}
+    />
+  </div>
+);
+
+const DateInputField = ({ label, required, value, onChange, placeholder, error, readOnly = false }) => {
+  const hiddenDateRef = useRef(null);
+
+  const handleTextChange = (e) => {
+    if (readOnly) return;
+    const inputValue = e.target.value;
+    const parsedValue = parseDisplayDate(inputValue);
+    onChange({ target: { value: parsedValue } });
+  };
+
+  const handleDateChange = (e) => {
+    if (readOnly) return;
+    const selectedDate = e.target.value;
+    onChange({ target: { value: selectedDate } });
+  };
+
+  const openDatePicker = () => {
+    if (!readOnly && hiddenDateRef.current) {
+      hiddenDateRef.current.showPicker();
+    }
+  };
+
+  return (
+    <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+      <label className="absolute -top-2 left-3 bg-white px-1 text-xs font-medium text-gray-600 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)' }}>
+        <span>
+          {label}{required && <span style={{ color: 'var(--secondary-color)' }} className="ml-1">*</span>}
+        </span>
+      </label>
+
+      {!readOnly && (
+        <input
+          ref={hiddenDateRef}
+          type="date"
+          value={value}
+          onChange={handleDateChange}
+          style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: '1px', height: '1px' }}
+        />
+      )}
+
+      <div className="relative">
+        <input
+          type="text"
+          value={formatDateForDisplay(value)}
+          onChange={handleTextChange}
+          placeholder={placeholder}
+          readOnly={readOnly}
+          style={{
+            width: '100%',
+            height: 'var(--input-height)',
+            padding: 'var(--input-padding)',
+            paddingTop: '16px',
+            paddingRight: '40px',
+            fontSize: 'var(--placeholder-font-size)',
+            fontFamily: 'var(--font-family)',
+            border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
+            borderRadius: 'var(--input-border-radius)',
+            backgroundColor: readOnly ? '#f9fafb' : 'var(--input-bg-color)',
+            color: 'var(--input-text-color)',
+            outline: 'none',
+            transition: 'border-color 0.2s',
+            cursor: readOnly ? 'default' : 'text',
+          }}
+          onFocus={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-focus-border-color)'}
+          onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
+        />
+
+        <div
+          className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded ${readOnly ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 cursor-pointer'}`}
+          style={{ color: 'var(--input-text-color)' }}
+          onClick={readOnly ? undefined : openDatePicker}
+          title={readOnly ? "Auto-selected date" : "Select date"}
+        >
+          <FiCalendar size={16} />
+        </div>
+      </div>
+
+      {error && (
+        <p style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)', fontSize: '12px', marginTop: '4px' }}>
+          {error}
+        </p>
+      )}
+    </div>
+  );
+};
 
 const TaskInfo = ({ selectedTask, onClose }) => {
   if (!selectedTask) return null;
@@ -530,21 +741,23 @@ const TaskInfo = ({ selectedTask, onClose }) => {
               {/* Task Name Card */}
               <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                 <div className="flex flex-col space-y-2">
-                  <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                    Task Name
-                  </span>
                   {isEditingTask ? (
-                    <input
-                      type="text"
+                    <InputField
+                      label="TASK NAME"
+                      required
                       value={editedTaskData.name}
                       onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
-                      className="text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="Enter task name"
                     />
                   ) : (
-                    <span className="text-sm font-medium text-gray-900 break-words">
-                      {selectedTask.name}
-                    </span>
+                    <>
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Task Name
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 break-words">
+                        {selectedTask.name}
+                      </span>
+                    </>
                   )}
                 </div>
               </div>
@@ -553,56 +766,66 @@ const TaskInfo = ({ selectedTask, onClose }) => {
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                   <div className="flex flex-col space-y-2">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                      Status
-                    </span>
                     {isEditingTask ? (
-                      <select
+                      <SelectField
+                        label="STATUS"
+                        required
                         value={editedTaskData.status}
-                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, status: e.target.value }))}
-                        className="text-xs font-medium bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
-                      >
-                        <option value="New">New</option>
-                        <option value="Working">Working</option>
-                        <option value="Completed">Completed</option>
-                        <option value="On Hold">On Hold</option>
-                        <option value="Cancelled">Cancelled</option>
-                      </select>
+                        onChange={(value) => setEditedTaskData(prev => ({ ...prev, status: value }))}
+                        options={[
+                          { value: "New", label: "New" },
+                          { value: "Working", label: "Working" },
+                          { value: "Completed", label: "Completed" },
+                          { value: "On Hold", label: "On Hold" },
+                          { value: "Cancelled", label: "Cancelled" }
+                        ]}
+                        placeholder="Select status"
+                      />
                     ) : (
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getStatusColor(
-                          selectedTask.status
-                        )}`}
-                      >
-                        {selectedTask.status}
-                      </span>
+                      <>
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Status
+                        </span>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getStatusColor(
+                            selectedTask.status
+                          )}`}
+                        >
+                          {selectedTask.status}
+                        </span>
+                      </>
                     )}
                   </div>
                 </div>
 
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                   <div className="flex flex-col space-y-2">
-                    <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                      Priority
-                    </span>
                     {isEditingTask ? (
-                      <select
+                      <SelectField
+                        label="PRIORITY"
+                        required
                         value={editedTaskData.priority}
-                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, priority: e.target.value }))}
-                        className="text-xs font-medium bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
-                      >
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                      </select>
+                        onChange={(value) => setEditedTaskData(prev => ({ ...prev, priority: value }))}
+                        options={[
+                          { value: "Low", label: "Low" },
+                          { value: "Medium", label: "Medium" },
+                          { value: "High", label: "High" }
+                        ]}
+                        placeholder="Select priority"
+                      />
                     ) : (
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getPriorityColor(
-                          selectedTask.priority
-                        )}`}
-                      >
-                        {selectedTask.priority}
-                      </span>
+                      <>
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Priority
+                        </span>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getPriorityColor(
+                            selectedTask.priority
+                          )}`}
+                        >
+                          {selectedTask.priority}
+                        </span>
+                      </>
                     )}
                   </div>
                 </div>
@@ -693,21 +916,22 @@ const TaskInfo = ({ selectedTask, onClose }) => {
               {/* Description Card - Full Width */}
               <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                 <div className="flex flex-col space-y-2">
-                  <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                    Description
-                  </span>
                   {isEditingTask ? (
-                    <textarea
+                    <TextAreaField
+                      label="DESCRIPTION"
                       value={editedTaskData.description}
                       onChange={(e) => setEditedTaskData(prev => ({ ...prev, description: e.target.value }))}
-                      className="text-sm text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                       placeholder="Enter task description"
-                      rows={3}
                     />
                   ) : (
-                    <span className="text-sm text-gray-900 break-words">
-                      {selectedTask.description || "N/A"}
-                    </span>
+                    <>
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Description
+                      </span>
+                      <span className="text-sm text-gray-900 break-words">
+                        {selectedTask.description || "N/A"}
+                      </span>
+                    </>
                   )}
                 </div>
               </div>
@@ -719,68 +943,70 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                 {/* Row 1: Task Name + Description (side by side) */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Task Name
-                      </span>
-                      {isEditingTask ? (
-                        <input
-                          type="text"
-                          value={editedTaskData.name}
-                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
-                          className="text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary flex-1 ml-4"
-                          placeholder="Enter task name"
-                        />
-                      ) : (
+                    {isEditingTask ? (
+                      <InputField
+                        label="TASK NAME"
+                        required
+                        value={editedTaskData.name}
+                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="Enter task name"
+                      />
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Task Name
+                        </span>
                         <span className="text-sm font-medium text-gray-900">
                           {selectedTask.name}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    <div className="flex justify-between items-start">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium mr-4">
-                        Description
-                      </span>
-                      {isEditingTask ? (
-                        <textarea
-                          value={editedTaskData.description}
-                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, description: e.target.value }))}
-                          className="text-sm text-gray-900 bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary flex-1 resize-none"
-                          placeholder="Enter task description"
-                          rows={2}
-                        />
-                      ) : (
+                    {isEditingTask ? (
+                      <TextAreaField
+                        label="DESCRIPTION"
+                        value={editedTaskData.description}
+                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Enter task description"
+                      />
+                    ) : (
+                      <div className="flex justify-between items-start">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium mr-4">
+                          Description
+                        </span>
                         <span className="text-sm text-gray-900 flex-1">
                           {selectedTask.description || "N/A"}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Row 2: Status + Priority */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Status
-                      </span>
-                      {isEditingTask ? (
-                        <select
-                          value={editedTaskData.status}
-                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, status: e.target.value }))}
-                          className="text-xs font-medium bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
-                        >
-                          <option value="New">New</option>
-                          <option value="Working">Working</option>
-                          <option value="Completed">Completed</option>
-                          <option value="On Hold">On Hold</option>
-                          <option value="Cancelled">Cancelled</option>
-                        </select>
-                      ) : (
+                    {isEditingTask ? (
+                      <SelectField
+                        label="STATUS"
+                        required
+                        value={editedTaskData.status}
+                        onChange={(value) => setEditedTaskData(prev => ({ ...prev, status: value }))}
+                        options={[
+                          { value: "New", label: "New" },
+                          { value: "Working", label: "Working" },
+                          { value: "Completed", label: "Completed" },
+                          { value: "On Hold", label: "On Hold" },
+                          { value: "Cancelled", label: "Cancelled" }
+                        ]}
+                        placeholder="Select status"
+                      />
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Status
+                        </span>
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
                             selectedTask.status
@@ -788,26 +1014,29 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         >
                           {selectedTask.status}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Priority
-                      </span>
-                      {isEditingTask ? (
-                        <select
-                          value={editedTaskData.priority}
-                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, priority: e.target.value }))}
-                          className="text-xs font-medium bg-white border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary"
-                        >
-                          <option value="Low">Low</option>
-                          <option value="Medium">Medium</option>
-                          <option value="High">High</option>
-                        </select>
-                      ) : (
+                    {isEditingTask ? (
+                      <SelectField
+                        label="PRIORITY"
+                        required
+                        value={editedTaskData.priority}
+                        onChange={(value) => setEditedTaskData(prev => ({ ...prev, priority: value }))}
+                        options={[
+                          { value: "Low", label: "Low" },
+                          { value: "Medium", label: "Medium" },
+                          { value: "High", label: "High" }
+                        ]}
+                        placeholder="Select priority"
+                      />
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Priority
+                        </span>
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(
                             selectedTask.priority
@@ -815,8 +1044,8 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         >
                           {selectedTask.priority}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
