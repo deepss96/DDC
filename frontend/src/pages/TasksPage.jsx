@@ -987,51 +987,63 @@ const fetchTasks = async () => {
                               </div>
                             </div>
 
-                            {/* Row 2: Assigned By and Assigned To */}
-                            <div className="flex justify-between items-center mb-2 text-xs text-gray-600">
-                              <div className="flex items-center gap-2 flex-1 min-w-0">
-                                <FiUser className="text-purple-600" size={14} />
-                                <span className="font-medium">By: {renderTaskCell('assignByName', task)}</span>
+                            {/* Row 2: Assigned By and Assigned To in same row with equal widths */}
+                            <div className="grid grid-cols-2 gap-2 mb-3 text-xs text-gray-600">
+                              <div className="flex items-center gap-2">
+                                <FiUser className="text-purple-600 flex-shrink-0" size={14} />
+                                <div className="min-w-0">
+                                  <div className="font-medium">By:</div>
+                                  <div className="truncate">{renderTaskCell('assignByName', task)}</div>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2 ml-3">
-                                <FiUserCheck className="text-blue-600" size={14} />
-                                <span className="truncate">To: {renderTaskCell('assignToName', task)}</span>
+                              <div className="flex items-center gap-2">
+                                <FiUserCheck className="text-blue-600 flex-shrink-0" size={14} />
+                                <div className="min-w-0">
+                                  <div className="font-medium">To:</div>
+                                  <div className="truncate">{renderTaskCell('assignToName', task)}</div>
+                                </div>
                               </div>
                             </div>
 
-                            {/* Row 3: Priority and Due Date */}
-                            <div className="flex justify-between items-center text-xs text-gray-600">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium">Priority:</span>
+                            {/* Row 3: Priority, Due Date, and Edit button in 3 columns */}
+                            <div className="grid grid-cols-3 gap-2 text-xs text-gray-600" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex flex-col items-center gap-1">
+                                <span className="font-medium text-center">Priority</span>
                                 <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getPriorityColor(task.priority)}`}>
                                   {task.priority}
                                 </span>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <FiCalendar className="text-orange-500" size={14} />
-                                <span className={
-                                  task.dueDate &&
-                                  new Date(task.dueDate) < new Date() &&
-                                  task.status !== "Completed"
-                                    ? "text-red-600 font-medium"
-                                    : ""
-                                }>
-                                  Due: {renderTaskCell('dueDate', task)}
-                                </span>
+                              <div className="flex flex-col items-center gap-1">
+                                <span className="font-medium text-center">Due</span>
+                                <div className="flex items-center gap-1">
+                                  <FiCalendar className="text-orange-500 flex-shrink-0" size={12} />
+                                  <span className={`text-center ${
+                                    task.dueDate &&
+                                    new Date(task.dueDate) < new Date() &&
+                                    task.status !== "Completed"
+                                      ? "text-red-600 font-medium"
+                                      : ""
+                                  }`}>
+                                    {renderTaskCell('dueDate', task)}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex flex-col items-center gap-1">
+                                <span className="font-medium text-center">Action</span>
+                                <TableActionButton
+                                  icon={FiEdit2}
+                                  type="edit"
+                                  title="Edit"
+                                  onClick={() => handleEditRow(task.id)}
+                                  disabled={task.status === "Completed"}
+                                  mobileSize={true}
+                                />
                               </div>
                             </div>
 
-                            {/* Row 4: Action Buttons */}
-                            <div className="flex justify-center items-center mt-2 gap-2" onClick={(e) => e.stopPropagation()}>
-                              <TableActionButton
-                                icon={FiEdit2}
-                                type="edit"
-                                title="Edit"
-                                onClick={() => handleEditRow(task.id)}
-                                disabled={task.status === "Completed"}
-                                mobileSize={true}
-                              />
-                              {user?.role?.toLowerCase() === 'admin' && (
+                            {/* Admin Delete Button - Only show if admin */}
+                            {user?.role?.toLowerCase() === 'admin' && (
+                              <div className="flex justify-center mt-2" onClick={(e) => e.stopPropagation()}>
                                 <TableActionButton
                                   icon={FiTrash2}
                                   type="delete"
@@ -1039,8 +1051,8 @@ const fetchTasks = async () => {
                                   onClick={() => handleDeleteRow(task.id)}
                                   mobileSize={true}
                                 />
-                              )}
-                            </div>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
