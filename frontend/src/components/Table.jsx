@@ -27,6 +27,7 @@ export default function Table({
   formatDate: customFormatDate,
   loadingMessage = "Loading data...",
   keyField = "id",
+  user, // Add user prop for role-based visibility
 }) {
   // Use custom formatDate or default
   const formatDateFunc = customFormatDate || formatDate;
@@ -116,17 +117,20 @@ export default function Table({
                             type="edit"
                             title="Edit"
                             onClick={() => onEdit?.(item[keyField])}
+                            disabled={item.status === "Completed"}
                             mobileSize={false}
                             extraSmall={true}
                           />
-                          <TableActionButton
-                            icon={FaTrash}
-                            type="delete"
-                            title="Delete"
-                            onClick={() => onDelete?.(item[keyField])}
-                            mobileSize={false}
-                            extraSmall={true}
-                          />
+                          {user?.role?.toLowerCase() === 'admin' && (
+                            <TableActionButton
+                              icon={FaTrash}
+                              type="delete"
+                              title="Delete"
+                              onClick={() => onDelete?.(item[keyField])}
+                              mobileSize={false}
+                              extraSmall={true}
+                            />
+                          )}
                         </div>
                       ) : renderCell ? (
                         renderCell(column.key, item)

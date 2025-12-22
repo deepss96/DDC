@@ -1028,15 +1028,18 @@ const fetchTasks = async () => {
                                 type="edit"
                                 title="Edit"
                                 onClick={() => handleEditRow(task.id)}
+                                disabled={task.status === "Completed"}
                                 mobileSize={true}
                               />
-                              <TableActionButton
-                                icon={FiTrash2}
-                                type="delete"
-                                title="Delete"
-                                onClick={() => handleDeleteRow(task.id)}
-                                mobileSize={true}
-                              />
+                              {user?.role?.toLowerCase() === 'admin' && (
+                                <TableActionButton
+                                  icon={FiTrash2}
+                                  type="delete"
+                                  title="Delete"
+                                  onClick={() => handleDeleteRow(task.id)}
+                                  mobileSize={true}
+                                />
+                              )}
                             </div>
                           </div>
                         ))}
@@ -1056,6 +1059,7 @@ const fetchTasks = async () => {
                     renderCell={renderTaskCell}
                     loadingMessage="Loading tasks..."
                     keyField="id"
+                    user={user}
                   />
                 </div>
               </>

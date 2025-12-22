@@ -94,3 +94,21 @@
 .table-action-btn:hover::before {
   left: 100%;
 }
+
+/* Disabled state */
+.table-action-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.table-action-btn.disabled:hover {
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.table-action-btn.disabled::before {
+  display: none;
+}
