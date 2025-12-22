@@ -144,9 +144,10 @@ const LoginSignupPage = () => {
         setDots(prev => {
           if (prev === '.') return '..';
           if (prev === '..') return '...';
+          if (prev === '...') return '....';
           return '.';
         });
-      }, 150); // Fast animation - 150ms intervals
+      }, 300); // Slower animation - 300ms intervals
 
       return () => clearInterval(interval);
     } else {
@@ -396,7 +397,7 @@ const LoginSignupPage = () => {
                 {loading ? (
                   <>
                     <FiLogIn size={20} />
-                    <span>Sign In{dots}</span>
+                    <span>Sign In<span className="text-sm font-light">{dots}</span></span>
                   </>
                 ) : (
                   <>
