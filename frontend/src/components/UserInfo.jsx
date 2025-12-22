@@ -174,7 +174,7 @@ const UserInfo = ({ selectedUser, onClose }) => {
                                 />
                                 <DisplayField
                                     label="PASSWORD"
-                                    value={selectedUser.password || "Not Available"}
+                                    value="*****"
                                     icon={FiLock}
                                 />
                                 <DisplayField
