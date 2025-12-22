@@ -11,6 +11,7 @@ const LoginSignupPage = () => {
   const [formType, setFormType] = useState('login'); // 'login', 'forgot'
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [dots, setDots] = useState('');
   const [formData, setFormData] = useState({
     // Login
     identifier: '',
@@ -134,6 +135,24 @@ const LoginSignupPage = () => {
     setErrors({});
     setMessage('');
   };
+
+  // Progressive dots animation effect
+  useEffect(() => {
+    if (loading) {
+      setDots('.');
+      const interval = setInterval(() => {
+        setDots(prev => {
+          if (prev === '.') return '..';
+          if (prev === '..') return '...';
+          return '.';
+        });
+      }, 150); // Fast animation - 150ms intervals
+
+      return () => clearInterval(interval);
+    } else {
+      setDots('');
+    }
+  }, [loading]);
 
   return (
     <div className="min-h-screen flex">
@@ -376,8 +395,8 @@ const LoginSignupPage = () => {
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    <span>Sign In</span>
+                    <FiLogIn size={20} />
+                    <span>Sign In{dots}</span>
                   </>
                 ) : (
                   <>
