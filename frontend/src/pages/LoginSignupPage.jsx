@@ -384,7 +384,7 @@ const LoginSignupPage = () => {
                   </>
                 ) : (
                   <>
-                    {formType === 'login' && <span>Signing in</span>}
+                    {formType === 'login' && <><FiLogIn size={20} /> <span>Signing in</span></>}
                     {formType === 'forgot' && <><FiKey size={20} /> <span>Send Reset Link</span></>}
                   </>
                 )}
