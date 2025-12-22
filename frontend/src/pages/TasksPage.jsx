@@ -1005,15 +1005,15 @@ const fetchTasks = async () => {
                               </div>
                             </div>
 
-                            {/* Row 3: Priority, Due Date, and Edit button in 3 columns */}
-                            <div className="grid grid-cols-3 gap-0.5 text-xs text-gray-600 px-1" onClick={(e) => e.stopPropagation()}>
-                              <div className="flex flex-col items-center py-1">
+                            {/* Row 3: Priority, Due Date, and Action in single row with reduced spacing */}
+                            <div className="flex justify-between items-center gap-1 text-xs text-gray-600 px-0.5 py-1" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex flex-col items-center flex-1 min-w-0">
                                 <span className="font-medium text-center text-xs leading-tight">Priority</span>
                                 <span className={`inline-flex px-0.5 py-0.5 text-xs font-medium rounded border text-xs leading-tight ${getPriorityColor(task.priority)}`}>
                                   {task.priority}
                                 </span>
                               </div>
-                              <div className="flex flex-col items-center py-1">
+                              <div className="flex flex-col items-center flex-1 min-w-0">
                                 <span className="font-medium text-center text-xs leading-tight">Due</span>
                                 <div className="flex items-center justify-center">
                                   <FiCalendar className="text-orange-500 flex-shrink-0" size={8} />
@@ -1028,7 +1028,7 @@ const fetchTasks = async () => {
                                   </span>
                                 </div>
                               </div>
-                              <div className="flex flex-col items-center py-1">
+                              <div className="flex flex-col items-center flex-shrink-0">
                                 <span className="font-medium text-center text-xs leading-tight">Action</span>
                                 <TableActionButton
                                   icon={FiEdit2}

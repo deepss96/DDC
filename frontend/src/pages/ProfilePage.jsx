@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { FiUser, FiMail, FiPhone, FiEdit2, FiSave, FiX, FiCalendar, FiHash, FiCheckCircle, FiLock, FiCamera, FiUpload, FiShield, FiClock } from "react-icons/fi";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../services/api";
+import ChangePasswordPopup from "../components/ChangePasswordPopup";
 
 const InputField = ({ label, required, type = "text", value, onChange, placeholder, error, disabled = false, ...rest }) => (
   <div className="relative group">
@@ -121,6 +122,7 @@ export default function ProfilePage() {
   const { user, updateUser } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
   const [successMessage, setSuccessMessage] = useState("");
@@ -305,11 +307,19 @@ export default function ProfilePage() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
               <p className="text-gray-600">Loading profile...</p>
             </div>
-          </main>
-        </div>
+        </main>
       </div>
-    );
-  }
+
+      {/* Change Password Popup */}
+      {isChangePasswordOpen && (
+        <ChangePasswordPopup
+          user={user}
+          onPasswordChanged={() => setIsChangePasswordOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
 
   if (!profileData) {
     return (
@@ -412,18 +422,28 @@ export default function ProfilePage() {
               <div className="xl:w-2/3 order-2 xl:order-2">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 h-full pb-24 md:pb-6">
 
-                  {/* Header with Edit Button */}
+                  {/* Header with Edit and Change Password Buttons */}
                   <div className="flex items-center justify-between mb-4 md:mb-6">
                     <h2 className="text-lg md:text-xl font-semibold text-gray-900">Profile Information</h2>
                     {!isEditing ? (
-                      <button
-                        onClick={() => setIsEditing(true)}
-                        className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-2 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base"
-                      >
-                        <FiEdit2 size={12} className="md:w-4 md:h-4" />
-                        <span className="hidden md:inline">Edit Profile</span>
-                        <span className="md:hidden">Edit</span>
-                      </button>
+                      <div className="flex gap-2 flex-wrap">
+                        <button
+                          onClick={() => setIsChangePasswordOpen(true)}
+                          className="flex items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-2 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base"
+                        >
+                          <FiLock size={12} className="md:w-4 md:h-4" />
+                          <span className="hidden md:inline">Change Password</span>
+                          <span className="md:hidden">Password</span>
+                        </button>
+                        <button
+                          onClick={() => setIsEditing(true)}
+                          className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-2 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base"
+                        >
+                          <FiEdit2 size={12} className="md:w-4 md:h-4" />
+                          <span className="hidden md:inline">Edit Profile</span>
+                          <span className="md:hidden">Edit</span>
+                        </button>
+                      </div>
                     ) : (
                       <div className="flex gap-2 flex-wrap">
                         <button
