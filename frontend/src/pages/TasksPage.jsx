@@ -1006,18 +1006,18 @@ const fetchTasks = async () => {
                             </div>
 
                             {/* Row 3: Priority, Due Date, and Edit button in 3 columns */}
-                            <div className="grid grid-cols-3 gap-2 text-xs text-gray-600" onClick={(e) => e.stopPropagation()}>
-                              <div className="flex flex-col items-center gap-1">
-                                <span className="font-medium text-center">Priority</span>
-                                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getPriorityColor(task.priority)}`}>
+                            <div className="grid grid-cols-3 gap-1 text-xs text-gray-600" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex flex-col items-center">
+                                <span className="font-medium text-center text-xs">Priority</span>
+                                <span className={`inline-flex px-1 py-0.5 text-xs font-medium rounded-full border text-xs ${getPriorityColor(task.priority)}`}>
                                   {task.priority}
                                 </span>
                               </div>
-                              <div className="flex flex-col items-center gap-1">
-                                <span className="font-medium text-center">Due</span>
-                                <div className="flex items-center gap-1">
-                                  <FiCalendar className="text-orange-500 flex-shrink-0" size={12} />
-                                  <span className={`text-center ${
+                              <div className="flex flex-col items-center">
+                                <span className="font-medium text-center text-xs">Due</span>
+                                <div className="flex items-center justify-center">
+                                  <FiCalendar className="text-orange-500 flex-shrink-0" size={10} />
+                                  <span className={`text-center text-xs ml-0.5 ${
                                     task.dueDate &&
                                     new Date(task.dueDate) < new Date() &&
                                     task.status !== "Completed"
@@ -1028,8 +1028,8 @@ const fetchTasks = async () => {
                                   </span>
                                 </div>
                               </div>
-                              <div className="flex flex-col items-center gap-1">
-                                <span className="font-medium text-center">Action</span>
+                              <div className="flex flex-col items-center">
+                                <span className="font-medium text-center text-xs">Action</span>
                                 <TableActionButton
                                   icon={FiEdit2}
                                   type="edit"
