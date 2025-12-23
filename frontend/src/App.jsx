@@ -326,11 +326,20 @@ function AppLayout() {
 
 function AppContent() {
   const { isAuthenticated, loading, user, showPasswordChange, hidePasswordChange, requiresPasswordChange } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Handle password change completion - just hide popup
   const handlePasswordChanged = () => {
     hidePasswordChange();
   };
+
+  // Redirect authenticated users to dashboard if they're not already there
+  useEffect(() => {
+    if (isAuthenticated() && location.pathname !== '/dashboard' && location.pathname !== '/') {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, location.pathname, navigate]);
 
   // Show loading screen while checking authentication
   if (loading) {
