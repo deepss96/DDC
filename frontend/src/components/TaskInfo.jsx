@@ -858,8 +858,8 @@ const TaskInfo = ({ selectedTask, onClose }) => {
         </nav>
       </div>
 
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-light-gray-bg">
+      {/* Header - Desktop */}
+      <div className="hidden sm:flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-light-gray-bg">
         <div className="flex items-center gap-4 flex-1 min-w-0">
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
             {selectedTask.name}
@@ -903,6 +903,59 @@ const TaskInfo = ({ selectedTask, onClose }) => {
             </button>
           </div>
         )}
+      </div>
+
+      {/* Mobile Header */}
+      <div className="block sm:hidden border-b border-gray-200 bg-light-gray-bg">
+        {/* Task Name */}
+        <div className="px-4 py-3 border-b border-gray-100">
+          <h2 className="text-lg font-semibold text-gray-900 break-words">
+            {selectedTask.name}
+          </h2>
+        </div>
+
+        {/* Assigned To + Edit Button Row */}
+        <div className="flex items-center justify-between px-4 py-2">
+          <span className="text-sm text-gray-600">
+            Assigned to: <span className="font-medium text-gray-900">{selectedTask.assignToName || selectedTask.assignTo}</span>
+          </span>
+          {activeTab === "overview" && !isEditingTask && (
+            <button
+              onClick={startEditingTask}
+              className="flex items-center gap-1 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+              style={{ fontFamily: 'var(--font-family)' }}
+            >
+              <FiEdit2 size={14} />
+              <span>Edit</span>
+            </button>
+          )}
+          {activeTab === "overview" && isEditingTask && (
+            <div className="flex gap-1">
+              <button
+                onClick={saveTask}
+                disabled={savingTask}
+                className="flex items-center gap-1 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 transition-colors text-xs"
+                style={{ fontFamily: 'var(--font-family)' }}
+              >
+                {savingTask ? (
+                  <div className="animate-spin rounded-full h-2.5 w-2.5 border-b border-white"></div>
+                ) : (
+                  <FiCheck size={12} />
+                )}
+                <span>{savingTask ? 'Saving...' : 'Save'}</span>
+              </button>
+              <button
+                onClick={cancelEditingTask}
+                disabled={savingTask}
+                className="flex items-center gap-1 px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50 transition-colors text-xs"
+                style={{ fontFamily: 'var(--font-family)' }}
+              >
+                <FiX size={12} />
+                <span>Cancel</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Tab Content */}
