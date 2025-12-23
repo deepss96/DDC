@@ -1252,26 +1252,61 @@ const TaskInfo = ({ selectedTask, onClose }) => {
             {/* Desktop/Tablet View - Custom Grid Layout */}
             <div className="hidden sm:block" style={{ fontFamily: 'var(--font-family)' }}>
               <div className="space-y-2 sm:space-y-3">
-                {/* Row 1: Task Name (full width) */}
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  {isEditingTask ? (
-                    <InputField
-                      label="TASK NAME"
-                      required
-                      value={editedTaskData.name}
-                      onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Enter task name"
-                    />
-                  ) : (
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Task Name
-                      </span>
-                      <span className="text-sm font-medium text-gray-900">
-                        {selectedTask.name}
-                      </span>
-                    </div>
-                  )}
+                {/* Row 1: Task Name + Related To (2 columns) */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    {isEditingTask ? (
+                      <InputField
+                        label="TASK NAME"
+                        required
+                        value={editedTaskData.name}
+                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="Enter task name"
+                      />
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Task Name
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {selectedTask.name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                    {isEditingTask ? (
+                      <SelectField
+                        label="RELATED TO"
+                        value={editedTaskData.relatedTo}
+                        onChange={(value) => {
+                          setEditedTaskData(prev => ({
+                            ...prev,
+                            relatedTo: value,
+                            // Clear conditional fields when changing relatedTo
+                            projectName: value !== "Project" ? "" : prev.projectName,
+                            leadName: value !== "Lead" ? "" : prev.leadName
+                          }));
+                        }}
+                        options={[
+                          { value: "", label: "" },
+                          { value: "Project", label: "Project" },
+                          { value: "Lead", label: "Lead" }
+                        ]}
+                        placeholder="Select what this task is related to"
+                      />
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                          Related To
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {selectedTask.relatedTo || "N/A"}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Row 2: Status + Priority */}
@@ -1449,39 +1484,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                   </div>
                 </div>
 
-                {/* Row 5: Related To (full width) */}
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  {isEditingTask ? (
-                    <SelectField
-                      label="RELATED TO"
-                      value={editedTaskData.relatedTo}
-                      onChange={(value) => {
-                        setEditedTaskData(prev => ({
-                          ...prev,
-                          relatedTo: value,
-                          // Clear conditional fields when changing relatedTo
-                          projectName: value !== "Project" ? "" : prev.projectName,
-                          leadName: value !== "Lead" ? "" : prev.leadName
-                        }));
-                      }}
-                      options={[
-                        { value: "", label: "" },
-                        { value: "Project", label: "Project" },
-                        { value: "Lead", label: "Lead" }
-                      ]}
-                      placeholder="Select what this task is related to"
-                    />
-                  ) : (
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                        Related To
-                      </span>
-                      <span className="text-sm font-medium text-gray-900">
-                        {selectedTask.relatedTo || "N/A"}
-                      </span>
-                    </div>
-                  )}
-                </div>
+
 
                 {/* Row 6: Project Name / Lead Name (conditional) */}
                 {(isEditingTask ? editedTaskData.relatedTo : selectedTask.relatedTo) && (
