@@ -1047,8 +1047,8 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                 </div>
 
                 {/* Assigned By and Assigned To - 2 Column Grid */}
-                <div className="grid grid-cols-1 gap-3">
-                  <div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex-1 min-w-0">
                     {isEditingTask ? (
                       user?.role?.toLowerCase() === 'admin' ? (
                         <SelectField
@@ -1072,7 +1072,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         />
                       )
                     ) : (
-                      <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="p-3 bg-gray-50 rounded-lg h-full">
                         <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                           Assigned By
                         </div>
@@ -1083,7 +1083,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                     )}
                   </div>
 
-                  <div>
+                  <div className="flex-1 min-w-0">
                     {isEditingTask ? (
                       <SelectField
                         label="ASSIGNED TO"
@@ -1097,7 +1097,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         searchable={true}
                       />
                     ) : (
-                      <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="p-3 bg-gray-50 rounded-lg h-full">
                         <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                           Assigned To
                         </div>
