@@ -1013,7 +1013,7 @@ const fetchTasks = async () => {
                                   {task.priority}
                                 </span>
                               </div>
-                              <div className="flex flex-col items-start">
+                              <div className="flex flex-col items-center">
                                 <span className="font-medium text-xs leading-tight mb-0.5">Due</span>
                                 <div className="flex items-center">
                                   <FiCalendar className="text-orange-500 flex-shrink-0 mr-0.5" size={8} />
@@ -1028,7 +1028,7 @@ const fetchTasks = async () => {
                                   </span>
                                 </div>
                               </div>
-                              <div className="flex flex-col items-start">
+                              <div className="flex flex-col items-end">
                                 <div className="flex items-center gap-1">
                                   <TableActionButton
                                     icon={FiEdit2}
