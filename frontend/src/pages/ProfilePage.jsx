@@ -441,22 +441,21 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between mb-4 md:mb-6">
                     <h2 className="text-lg md:text-xl font-semibold text-gray-900">Profile Information</h2>
                     {!isEditing ? (
-                      <div className="flex gap-2 flex-wrap">
+                      <div className="flex gap-2">
                         <button
                           onClick={() => setIsChangePasswordOpen(true)}
-                          className="flex items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-2 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base"
+                          className="flex items-center justify-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base min-w-[44px] h-11"
                         >
-                          <FiLock size={12} className="md:w-4 md:h-4" />
+                          <FiLock size={16} />
                           <span className="hidden md:inline">Change Password</span>
                           <span className="md:hidden">Password</span>
                         </button>
                         <button
                           onClick={() => setIsEditing(true)}
-                          className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-2 py-1.5 md:px-4 md:py-2 rounde-lg md:rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base"
+                          className="flex items-center justify-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base min-w-[44px] h-11"
                         >
-                          <FiEdit2 size={12} className="md:w-4 md:h-4" />
-                          <span className="hidden md:inline">Edit</span>
-                          <span className="md:hidden">Edit</span>
+                          <FiEdit2 size={16} />
+                          <span className="hidden">Edit</span>
                         </button>
                       </div>
                     ) : (
