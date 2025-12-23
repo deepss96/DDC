@@ -137,8 +137,6 @@ export default function ProfilePage() {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [phone, setPhone] = useState("");
-  const [role, setRole] = useState("");
-  const [status, setStatus] = useState("");
 
   // Form validation state
   const [formErrors, setFormErrors] = useState({});
@@ -172,8 +170,6 @@ export default function ProfilePage() {
       setEmail(profileData.email || "");
       setUsername(profileData.username || "");
       setPhone(profileData.phone || "");
-      setRole(profileData.role || "");
-      setStatus(profileData.status || "");
     }
   }, [profileData]);
 
@@ -201,13 +197,14 @@ export default function ProfilePage() {
 
   const validateForm = () => {
     const errors = {};
-    
+
     if (!firstName.trim()) errors.firstName = 'First name is required';
     if (!lastName.trim()) errors.lastName = 'Last name is required';
     if (!email.trim()) errors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(email)) errors.email = 'Email is invalid';
     if (!username.trim()) errors.username = 'Username is required';
-    
+    if (!phone.trim()) errors.phone = 'Phone is required';
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -223,8 +220,6 @@ export default function ProfilePage() {
         email,
         username,
         phone,
-        role: role,
-        status: status,
         profile_image: imagePreview
       };
 
@@ -277,8 +272,6 @@ export default function ProfilePage() {
       setEmail(profileData.email || "");
       setUsername(profileData.username || "");
       setPhone(profileData.phone || "");
-      setRole(profileData.role || "");
-      setStatus(profileData.status || "");
     }
     setIsEditing(false);
   };
@@ -522,39 +515,11 @@ export default function ProfilePage() {
                         <div>
                           <InputField
                             label="PHONE"
+                            required
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
                             placeholder="Enter phone number"
-                          />
-                        </div>
-                        <div>
-                          <SelectField
-                            label="ROLE"
-                            required
-                            value={role}
-                            onChange={(e) => setRole(e.target.value)}
-                            options={[
-                              { value: "Admin", label: "Admin" },
-                              { value: "HR", label: "HR" },
-                              { value: "Site Manager", label: "Site Manager" },
-                              { value: "Office Staff", label: "Office Staff" },
-                              { value: "Field Rep", label: "Field Rep" }
-                            ]}
-                            placeholder="Select role"
-                          />
-                        </div>
-                        <div>
-                          <SelectField
-                            label="STATUS"
-                            required
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                            options={[
-                              { value: "Active", label: "Active" },
-                              { value: "Inactive", label: "Inactive" },
-                              { value: "Deleted", label: "Deleted" }
-                            ]}
-                            placeholder="Select status"
+                            error={formErrors.phone}
                           />
                         </div>
                       </div>

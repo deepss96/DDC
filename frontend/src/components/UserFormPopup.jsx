@@ -194,6 +194,7 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [phone, setPhone] = useState("");
     const [role, setRole] = useState("");
     const [status, setStatus] = useState("Active");
@@ -208,6 +209,7 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
             setFirstName(editUser.first_name || editUser.firstName || "");
             setLastName(editUser.last_name || editUser.lastName || "");
             setEmail(editUser.email || "");
+            setUsername(editUser.username || editUser.email || "");
             setPhone(editUser.phone || "");
             setRole(editUser.role || "");
             setStatus(editUser.status || "Active");
@@ -216,10 +218,18 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
         }
     }, [editUser, isOpen]);
 
+    // Auto-populate username with email when creating new user
+    useEffect(() => {
+        if (!editUser && email.trim()) {
+            setUsername(email);
+        }
+    }, [email, editUser]);
+
     const resetForm = () => {
         setFirstName("");
         setLastName("");
         setEmail("");
+        setUsername("");
         setPhone("");
         setRole("");
         setStatus("Active");
@@ -234,6 +244,12 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
         }
         if (!email.trim()) {
             setErrorMessage('Email is required');
+            setShowErrorMessage(true);
+            setTimeout(() => setShowErrorMessage(false), 3000);
+            return;
+        }
+        if (!username.trim()) {
+            setErrorMessage('Username is required');
             setShowErrorMessage(true);
             setTimeout(() => setShowErrorMessage(false), 3000);
             return;
@@ -274,6 +290,7 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                 first_name: firstName,
                 last_name: lastName,
                 email,
+                username,
                 phone: phoneNumber,
                 role,
                 status
@@ -421,6 +438,15 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="Enter email address"
+                            />
+                        </div>
+                        <div>
+                            <InputField
+                                label="USERNAME"
+                                required
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Username will auto-populate from email"
                             />
                         </div>
                         <div>

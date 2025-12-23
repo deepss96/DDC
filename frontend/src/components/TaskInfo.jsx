@@ -1252,48 +1252,26 @@ const TaskInfo = ({ selectedTask, onClose }) => {
             {/* Desktop/Tablet View - Custom Grid Layout */}
             <div className="hidden sm:block" style={{ fontFamily: 'var(--font-family)' }}>
               <div className="space-y-2 sm:space-y-3">
-                {/* Row 1: Task Name + Description (side by side) */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    {isEditingTask ? (
-                      <InputField
-                        label="TASK NAME"
-                        required
-                        value={editedTaskData.name}
-                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="Enter task name"
-                      />
-                    ) : (
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                          Task Name
-                        </span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {selectedTask.name}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    {isEditingTask ? (
-                      <TextAreaField
-                        label="DESCRIPTION"
-                        value={editedTaskData.description}
-                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, description: e.target.value }))}
-                        placeholder="Enter task description"
-                      />
-                    ) : (
-                      <div className="flex justify-between items-start">
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium mr-4">
-                          Description
-                        </span>
-                        <span className="text-sm text-gray-900 flex-1">
-                          {selectedTask.description || "N/A"}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                {/* Row 1: Task Name (full width) */}
+                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                  {isEditingTask ? (
+                    <InputField
+                      label="TASK NAME"
+                      required
+                      value={editedTaskData.name}
+                      onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter task name"
+                    />
+                  ) : (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Task Name
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {selectedTask.name}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Row 2: Status + Priority */}
@@ -1546,6 +1524,27 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                     )}
                   </div>
                 )}
+
+                {/* Row 7: Related To (full width at bottom) */}
+                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                  {isEditingTask ? (
+                    <TextAreaField
+                      label="RELATED TO"
+                      value={editedTaskData.description}
+                      onChange={(e) => setEditedTaskData(prev => ({ ...prev, description: e.target.value }))}
+                      placeholder="Enter task description"
+                    />
+                  ) : (
+                    <div className="flex justify-between items-start">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium mr-4">
+                        Related To
+                      </span>
+                      <span className="text-sm text-gray-900 flex-1">
+                        {selectedTask.description || "N/A"}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

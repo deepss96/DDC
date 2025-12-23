@@ -300,7 +300,7 @@ const LoginSignupPage = () => {
                         className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:ring-4 focus:ring-blue-200 focus:border-transparent transition-all duration-300 ${
                           errors.identifier ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
                         }`}
-                        placeholder="Email/phone or username"
+                        placeholder="Enter email or phone"
                       />
                     </div>
                     {errors.identifier && (
