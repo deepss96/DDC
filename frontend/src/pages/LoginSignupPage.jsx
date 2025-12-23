@@ -89,16 +89,11 @@ const LoginSignupPage = () => {
         // Use auth context to handle login
         login(data.token, data.user);
 
-        // Check if user needs to change password
-        if (data.user.isTempPassword) {
-          setMessage('Login successful! Please change your password to continue.');
-        } else {
-          setMessage('Login successful! Redirecting...');
-          // Redirect to dashboard after successful login
-          setTimeout(() => {
-            navigate('/dashboard');
-          }, 1500);
-        }
+        setMessage('Login successful! Redirecting...');
+        // Always redirect to dashboard after successful login
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
       } else if (formType === 'forgot') {
         const data = await apiService.forgotPassword({
           email: formData.resetEmail
