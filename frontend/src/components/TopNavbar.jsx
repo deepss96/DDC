@@ -102,7 +102,7 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                   {user?.firstName} {user?.lastName}
                 </span>
                 <span className="text-xs text-gray-500">
-                  {user?.username}
+                  {user?.role}
                 </span>
               </div>
               <FiChevronDown
@@ -184,11 +184,11 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                 )}
               </div>
               <div className="flex flex-col items-start">
-                <span className="text-xs font-medium text-gray-900 leading-tight truncate max-w-[80px]">
+                <span className="text-xs font-medium text-gray-900 leading-tight truncate max-w-[120px]">
                   {user?.firstName} {user?.lastName}
                 </span>
-                <span className="text-[10px] text-gray-500 leading-tight truncate max-w-[80px]">
-                  @{user?.username}
+                <span className="text-[10px] text-gray-500 leading-tight truncate max-w-[120px]">
+                  {user?.role}
                 </span>
               </div>
               <FiChevronDown

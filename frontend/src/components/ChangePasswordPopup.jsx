@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
-import { FiLock, FiEye, FiEyeOff, FiShield, FiCheckCircle } from "react-icons/fi";
+import { FiLock, FiEye, FiEyeOff, FiShield, FiCheckCircle, FiX } from "react-icons/fi";
 import apiService from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 
-export default function ChangePasswordPopup({ user, onPasswordChanged }) {
+export default function ChangePasswordPopup({ user, onPasswordChanged, showCloseButton = false }) {
     const { updateUser } = useAuth();
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -97,20 +97,31 @@ export default function ChangePasswordPopup({ user, onPasswordChanged }) {
                 >
                     {/* Header */}
                     <div
-                        className="px-5 py-4 flex items-center gap-3"
+                        className="px-5 py-4 flex items-center justify-between"
                         style={{ background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}
                     >
-                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                            <FiShield className="text-white" size={20} />
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                <FiShield className="text-white" size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-white font-semibold text-base" style={{ fontFamily: 'var(--font-family)' }}>
+                                    Change Your Password
+                                </h3>
+                                <p className="text-white/80 text-sm" style={{ fontFamily: 'var(--font-family)' }}>
+                                    Update your account password
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="text-white font-semibold text-base" style={{ fontFamily: 'var(--font-family)' }}>
-                                Change Your Password
-                            </h3>
-                            <p className="text-white/80 text-sm" style={{ fontFamily: 'var(--font-family)' }}>
-                                Update your account password
-                            </p>
-                        </div>
+                        {showCloseButton && (
+                            <button
+                                onClick={onPasswordChanged}
+                                className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+                                title="Close"
+                            >
+                                <FiX size={16} />
+                            </button>
+                        )}
                     </div>
 
                     {/* Body */}

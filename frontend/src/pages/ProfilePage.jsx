@@ -90,7 +90,7 @@ const SelectField = ({ label, required, value, onChange, options, placeholder, e
   </div>
 );
 
-const InfoCard = ({ label, value, icon: Icon, color = "blue" }) => {
+const InfoCard = ({ label, value, icon: Icon, color = "blue", monospace = false }) => {
   const colorClasses = {
     blue: "bg-blue-50 border-blue-200 text-blue-700",
     green: "bg-green-50 border-green-200 text-green-700",
@@ -109,7 +109,7 @@ const InfoCard = ({ label, value, icon: Icon, color = "blue" }) => {
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
             {label}
           </p>
-          <p className="text-sm font-semibold text-gray-900 truncate">
+          <p className={`text-sm font-semibold text-gray-900 truncate ${monospace ? 'font-mono' : ''}`}>
             {value || 'Not specified'}
           </p>
         </div>
@@ -291,6 +291,14 @@ export default function ProfilePage() {
     });
   };
 
+  const maskPassword = (password) => {
+    if (!password || password.length <= 3) return '******';
+    const maskedLength = password.length - 3;
+    const asterisks = '*'.repeat(maskedLength);
+    const lastThree = password.slice(-3);
+    return asterisks + lastThree;
+  };
+
   if (fetchLoading) {
   return (
     <div className="flex-1 flex flex-col min-w-0">
@@ -307,6 +315,7 @@ export default function ProfilePage() {
       {isChangePasswordOpen && (
         <ChangePasswordPopup
           user={user}
+          showCloseButton={true}
           onPasswordChanged={() => {
             setIsChangePasswordOpen(false);
             setSuccessMessage('Password changed successfully!');
@@ -425,7 +434,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between mb-4 md:mb-6">
                     <h2 className="text-lg md:text-xl font-semibold text-gray-900">Profile Information</h2>
                     {!isEditing ? (
-                      <div className="flex gap-2 flex-wrap">
+                      <div className="flex gap-2 flex-wrap md:flex-nowrap">
                         <button
                           onClick={() => setIsChangePasswordOpen(true)}
                           className="flex items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white px-2 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base"
@@ -436,11 +445,11 @@ export default function ProfilePage() {
                         </button>
                         <button
                           onClick={() => setIsEditing(true)}
-                          className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-2 py-1.5 md:px-4 md:py-2 rounde-lg md:rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base"
+                          className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white px-2 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 text-xs md:text-base"
                         >
                           <FiEdit2 size={12} className="md:w-4 md:h-4" />
                           <span className="hidden md:inline">Edit</span>
-                          <span className="md:hidden">Edit</span>
+                          <span className="md:hidden hidden">Edit</span>
                         </button>
                       </div>
                     ) : (
@@ -558,9 +567,10 @@ export default function ProfilePage() {
                         />
                         <InfoCard
                           label="PASSWORD"
-                          value={profileData.password}
+                          value={maskPassword(profileData.password)}
                           icon={FiLock}
                           color="gray"
+                          monospace={true}
                         />
                         <InfoCard
                           label="ROLE"

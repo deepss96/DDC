@@ -399,11 +399,11 @@ const LoginSignupPage = () => {
                 {loading ? (
                   <>
                     <FiLogIn size={20} />
-                    <span>Sign In<span className="text-sm font-light">{dots}</span></span>
+                    <span>Signing in<span className="text-sm font-light">{dots}</span></span>
                   </>
                 ) : (
                   <>
-                    {formType === 'login' && <><FiLogIn size={20} /> <span>Signing in</span></>}
+                    {formType === 'login' && <><FiLogIn size={20} /> <span>Sign in</span></>}
                     {formType === 'forgot' && <><FiKey size={20} /> <span>Send Reset Link</span></>}
                   </>
                 )}
