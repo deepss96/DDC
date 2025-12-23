@@ -214,100 +214,114 @@ function AppLayout() {
           {/* PAGE CONTENT */}
           <div className="pt-16 md:pt-14" style={{ minHeight: '100vh' }}>
             <Routes>
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+              <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
               <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-              <Route path="/lead-management" element={<LeadsPage searchTerm={searchTerm} />} />
+              <Route path="/lead-management" element={<ProtectedRoute><LeadsPage searchTerm={searchTerm} /></ProtectedRoute>} />
               {/* Placeholder routes for other pages */}
-              <Route path="/clients-management" element={<ClientsPage searchTerm={searchTerm} />} />
-              <Route path="/my-tasks" element={<TasksPage searchTerm={searchTerm} />} />
-              <Route path="/task/:taskId" element={<TasksPage searchTerm={searchTerm} />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/clients-management" element={<ProtectedRoute><ClientsPage searchTerm={searchTerm} /></ProtectedRoute>} />
+              <Route path="/my-tasks" element={<ProtectedRoute><TasksPage searchTerm={searchTerm} /></ProtectedRoute>} />
+              <Route path="/task/:taskId" element={<ProtectedRoute><TasksPage searchTerm={searchTerm} /></ProtectedRoute>} />
+              <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
+              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
               <Route path="/projects-management" element={
-                <div className="flex-1 flex flex-col min-w-0">
-                  <div className="flex-1 flex overflow-hidden">
-                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
-                      <div className="text-center py-20">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Projects Management</h2>
-                        <p className="text-gray-600">This page is under development.</p>
-                      </div>
-                    </main>
+                <ProtectedRoute>
+                  <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex-1 flex overflow-hidden">
+                      <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                        <div className="text-center py-20">
+                          <h2 className="text-2xl font-bold text-gray-800 mb-4">Projects Management</h2>
+                          <p className="text-gray-600">This page is under development.</p>
+                        </div>
+                      </main>
+                    </div>
                   </div>
-                </div>
+                </ProtectedRoute>
               } />
-              <Route path="/users-management" element={<UsersPage searchTerm={searchTerm} />} />
+              <Route path="/users-management" element={<ProtectedRoute><UsersPage searchTerm={searchTerm} /></ProtectedRoute>} />
               <Route path="/employee-management" element={
-                <div className="flex-1 flex flex-col min-w-0">
-                  <div className="flex-1 flex overflow-hidden">
-                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
-                      <div className="text-center py-20">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Employee Management</h2>
-                        <p className="text-gray-600">This page is under development.</p>
-                      </div>
-                    </main>
+                <ProtectedRoute>
+                  <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex-1 flex overflow-hidden">
+                      <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                        <div className="text-center py-20">
+                          <h2 className="text-2xl font-bold text-gray-800 mb-4">Employee Management</h2>
+                          <p className="text-gray-600">This page is under development.</p>
+                        </div>
+                      </main>
+                    </div>
                   </div>
-                </div>
+                </ProtectedRoute>
               } />
               <Route path="/site-expenses" element={
-                <div className="flex-1 flex flex-col min-w-0">
-                  <div className="flex-1 flex overflow-hidden">
-                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
-                      <div className="text-center py-20">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Site Expenses</h2>
-                        <p className="text-gray-600">This page is under development.</p>
-                      </div>
-                    </main>
+                <ProtectedRoute>
+                  <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex-1 flex overflow-hidden">
+                      <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                        <div className="text-center py-20">
+                          <h2 className="text-2xl font-bold text-gray-800 mb-4">Site Expenses</h2>
+                          <p className="text-gray-600">This page is under development.</p>
+                        </div>
+                      </main>
+                    </div>
                   </div>
-                </div>
+                </ProtectedRoute>
               } />
               <Route path="/site-received" element={
-                <div className="flex-1 flex flex-col min-w-0">
-                  <div className="flex-1 flex overflow-hidden">
-                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
-                      <div className="text-center py-20">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Site Received</h2>
-                        <p className="text-gray-600">This page is under development.</p>
-                      </div>
-                    </main>
+                <ProtectedRoute>
+                  <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex-1 flex overflow-hidden">
+                      <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                        <div className="text-center py-20">
+                          <h2 className="text-2xl font-bold text-gray-800 mb-4">Site Received</h2>
+                          <p className="text-gray-600">This page is under development.</p>
+                        </div>
+                      </main>
+                    </div>
                   </div>
-                </div>
+                </ProtectedRoute>
               } />
               <Route path="/reports" element={
-                <div className="flex-1 flex flex-col min-w-0">
-                  <div className="flex-1 flex overflow-hidden">
-                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
-                      <div className="text-center py-20">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Reports</h2>
-                        <p className="text-gray-600">This page is under development.</p>
-                      </div>
-                    </main>
+                <ProtectedRoute>
+                  <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex-1 flex overflow-hidden">
+                      <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                        <div className="text-center py-20">
+                          <h2 className="text-2xl font-bold text-gray-800 mb-4">Reports</h2>
+                          <p className="text-gray-600">This page is under development.</p>
+                        </div>
+                      </main>
+                    </div>
                   </div>
-                </div>
+                </ProtectedRoute>
               } />
               <Route path="/settings" element={
-                <div className="flex-1 flex flex-col min-w-0">
-                  <div className="flex-1 flex overflow-hidden">
-                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
-                      <div className="text-center py-20">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Settings</h2>
-                        <p className="text-gray-600">This page is under development.</p>
-                      </div>
-                    </main>
+                <ProtectedRoute>
+                  <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex-1 flex overflow-hidden">
+                      <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                        <div className="text-center py-20">
+                          <h2 className="text-2xl font-bold text-gray-800 mb-4">Settings</h2>
+                          <p className="text-gray-600">This page is under development.</p>
+                        </div>
+                      </main>
+                    </div>
                   </div>
-                </div>
+                </ProtectedRoute>
               } />
               <Route path="/help-support" element={
-                <div className="flex-1 flex flex-col min-w-0">
-                  <div className="flex-1 flex overflow-hidden">
-                    <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
-                      <div className="text-center py-20">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">Help & Support</h2>
-                        <p className="text-gray-600">This page is under development.</p>
-                      </div>
-                    </main>
+                <ProtectedRoute>
+                  <div className="flex-1 flex flex-col min-w-0">
+                    <div className="flex-1 flex overflow-hidden">
+                      <main className="flex-1 overflow-auto px-4 sm:px-6 py-4">
+                        <div className="text-center py-20">
+                          <h2 className="text-2xl font-bold text-gray-800 mb-4">Help & Support</h2>
+                          <p className="text-gray-600">This page is under development.</p>
+                        </div>
+                      </main>
+                    </div>
                   </div>
-                </div>
+                </ProtectedRoute>
               } />
             </Routes>
           </div>
@@ -322,6 +336,20 @@ function AppLayout() {
       </div>
     </div>
   );
+}
+
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, loading } = useAuth();
+
+  // Prevent early render - return null while checking auth
+  if (loading) return null;
+
+  // If not authenticated, redirect to login
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
 }
 
 function AppContent() {
