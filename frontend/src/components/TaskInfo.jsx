@@ -1528,11 +1528,11 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                   </div>
                 )}
 
-                {/* Row 7: Related To (full width at bottom) */}
+                {/* Row 7: Description (full width at bottom) */}
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                   {isEditingTask ? (
                     <TextAreaField
-                      label="RELATED TO"
+                      label="DESCRIPTION"
                       value={editedTaskData.description}
                       onChange={(e) => setEditedTaskData(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="Enter task description"
@@ -1540,7 +1540,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                   ) : (
                     <div className="flex justify-between items-start">
                       <span className="text-xs text-gray-500 uppercase tracking-wide font-medium mr-4">
-                        Related To
+                        Description
                       </span>
                       <span className="text-sm text-gray-900 flex-1">
                         {selectedTask.description || "N/A"}
