@@ -601,12 +601,6 @@ export default function ProfilePage() {
                           color="blue"
                         />
                         <InfoCard
-                          label="PASSWORD"
-                          value={maskPassword(profileData.password)}
-                          icon={FiLock}
-                          color="gray"
-                        />
-                        <InfoCard
                           label="ROLE"
                           value={profileData.role}
                           icon={FiCheckCircle}

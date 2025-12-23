@@ -102,7 +102,7 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                   {user?.firstName} {user?.lastName}
                 </span>
                 <span className="text-xs text-gray-500">
-                  {user?.username}
+                  {user?.role}
                 </span>
               </div>
               <FiChevronDown
@@ -188,7 +188,7 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
                   {user?.firstName} {user?.lastName}
                 </span>
                 <span className="text-[10px] text-gray-500 leading-tight truncate max-w-[80px]">
-                  @{user?.username}
+                  {user?.role}
                 </span>
               </div>
               <FiChevronDown
