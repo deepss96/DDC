@@ -918,7 +918,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
 
         {/* Assigned To + Edit Button Row */}
         <div className="flex items-center justify-between px-4 py-2">
-          <span className="text-sm text-gray-600">
+          <span className="text-xs text-gray-600">
             Assigned to: <span className="font-medium text-gray-900">{selectedTask.assignToName || selectedTask.assignTo}</span>
           </span>
           {activeTab === "overview" && !isEditingTask && (
