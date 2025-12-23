@@ -16,6 +16,25 @@ import ChangePasswordPopup from './components/ChangePasswordPopup.jsx';
 import { useTranslation } from './services/translationService.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 
+// AuthBootstrap - Blocks ALL route rendering until auth is resolved
+function AuthBootstrap({ children }) {
+  const { loading } = useAuth();
+
+  // Block ALL rendering until auth is resolved
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return children;
+}
+
 
 
 function AppLayout() {
@@ -395,7 +414,9 @@ export default function App() {
   return (
     <AuthProvider>
       <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-        <AppContent />
+        <AuthBootstrap>
+          <AppContent />
+        </AuthBootstrap>
       </Router>
     </AuthProvider>
   );

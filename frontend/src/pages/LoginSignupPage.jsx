@@ -97,9 +97,9 @@ const LoginSignupPage = () => {
         login(data.token, data.user);
 
         setMessage('Login successful! Redirecting...');
-        // Always redirect to dashboard after successful login
+        // Hard redirect to dashboard to clear router memory
         setTimeout(() => {
-          navigate('/dashboard');
+          window.location.href = '/#/dashboard';
         }, 1500);
       } else if (formType === 'forgot') {
         const data = await apiService.forgotPassword({

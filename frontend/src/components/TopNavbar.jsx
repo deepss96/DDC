@@ -14,7 +14,8 @@ export default function TopNavbar({ title, subtitle, onMobileMenuToggle, onSearc
   const handleLogout = () => {
     logout();
     setShowUserMenu(false);
-    // Redirect to auth page will happen automatically due to auth check in App.jsx
+    // Hard redirect to clear router memory completely
+    window.location.href = '/#/login';
   };
 
   const getInitials = (firstName, lastName) => {
