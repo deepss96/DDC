@@ -155,6 +155,8 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Clear any stored redirect state
+    sessionStorage.removeItem('redirectAfterLogin');
   };
 
   const updateUser = (userData) => {

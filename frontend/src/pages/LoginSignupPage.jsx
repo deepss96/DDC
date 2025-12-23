@@ -8,6 +8,13 @@ import logo from '../assets/logo-big.png';
 const LoginSignupPage = () => {
   const { login, isAuthenticated, requiresPasswordChange } = useAuth();
   const navigate = useNavigate();
+
+  // If user is already authenticated, redirect to dashboard
+  useEffect(() => {
+    if (isAuthenticated()) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
   const [formType, setFormType] = useState('login'); // 'login', 'forgot'
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -410,12 +417,6 @@ const LoginSignupPage = () => {
       </div>
     </div>
   );
-  // Redirect authenticated users away from auth page
-  useEffect(() => {
-    if (isAuthenticated()) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
 };
 
 export default LoginSignupPage;
