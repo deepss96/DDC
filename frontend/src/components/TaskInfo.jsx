@@ -909,11 +909,11 @@ const TaskInfo = ({ selectedTask, onClose }) => {
       <div className={`flex-1 overflow-hidden ${activeTab === "comments" ? "pb-20" : ""}`}>
         {activeTab === "overview" && (
           <div className="p-4 sm:p-6 overflow-auto h-full">
-            {/* Mobile View - Vertical Card Stack */}
-            <div className="block sm:hidden space-y-2" style={{ fontFamily: 'var(--font-family)' }}>
-              {/* Task Name Card */}
-              <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                <div className="flex flex-col space-y-2">
+            {/* Mobile View - Responsive Form Layout */}
+            <div className="block sm:hidden" style={{ fontFamily: 'var(--font-family)' }}>
+              <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+                {/* Task Name - Full Width */}
+                <div>
                   {isEditingTask ? (
                     <InputField
                       label="TASK NAME"
@@ -923,22 +923,20 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       placeholder="Enter task name"
                     />
                   ) : (
-                    <>
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                         Task Name
-                      </span>
-                      <span className="text-sm font-medium text-gray-900 break-words">
+                      </div>
+                      <div className="text-sm font-medium text-gray-900 break-words">
                         {selectedTask.name}
-                      </span>
-                    </>
+                      </div>
+                    </div>
                   )}
                 </div>
-              </div>
 
-              {/* Status + Priority Row */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex flex-col space-y-2">
+                {/* Status and Priority - 2 Column Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
                     {isEditingTask ? (
                       <SelectField
                         label="STATUS"
@@ -955,24 +953,18 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         placeholder="Select status"
                       />
                     ) : (
-                      <>
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                      <div className="p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                           Status
-                        </span>
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getStatusColor(
-                            selectedTask.status
-                          )}`}
-                        >
+                        </div>
+                        <div className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(selectedTask.status)}`}>
                           {selectedTask.status}
-                        </span>
-                      </>
+                        </div>
+                      </div>
                     )}
                   </div>
-                </div>
 
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex flex-col space-y-2">
+                  <div>
                     {isEditingTask ? (
                       <SelectField
                         label="PRIORITY"
@@ -987,40 +979,34 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         placeholder="Select priority"
                       />
                     ) : (
-                      <>
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                      <div className="p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                           Priority
-                        </span>
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-medium rounded-full w-fit ${getPriorityColor(
-                            selectedTask.priority
-                          )}`}
-                        >
+                        </div>
+                        <div className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(selectedTask.priority)}`}>
                           {selectedTask.priority}
-                        </span>
-                      </>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
-              </div>
 
-              {/* Assigned By + Assigned To Row */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex flex-col space-y-2">
+                {/* Assigned By and Assigned To - 2 Column Grid */}
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
                     {isEditingTask ? (
                       user?.role?.toLowerCase() === 'admin' ? (
-                      <SelectField
-                        label="ASSIGNED BY"
-                        required
-                        value={users.find(u => u.id === parseInt(editedTaskData.assignBy))?.id || ""}
-                        onChange={(userId) => {
-                          setEditedTaskData(prev => ({ ...prev, assignBy: userId }));
-                        }}
-                        options={users.map(user => ({ value: user.id, label: user.name }))}
-                        placeholder="Select assigned by"
-                        searchable={true}
-                      />
+                        <SelectField
+                          label="ASSIGNED BY"
+                          required
+                          value={users.find(u => u.id === parseInt(editedTaskData.assignBy))?.id || ""}
+                          onChange={(userId) => {
+                            setEditedTaskData(prev => ({ ...prev, assignBy: userId }));
+                          }}
+                          options={users.map(user => ({ value: user.id, label: user.name }))}
+                          placeholder="Select assigned by"
+                          searchable={true}
+                        />
                       ) : (
                         <InputField
                           label="ASSIGNED BY"
@@ -1031,20 +1017,18 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         />
                       )
                     ) : (
-                      <>
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                      <div className="p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                           Assigned By
-                        </span>
-                        <span className="text-sm font-medium text-gray-900 break-words">
+                        </div>
+                        <div className="text-sm font-medium text-gray-900 break-words">
                           {selectedTask.assignByName || selectedTask.assignBy}
-                        </span>
-                      </>
+                        </div>
+                      </div>
                     )}
                   </div>
-                </div>
 
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex flex-col space-y-2">
+                  <div>
                     {isEditingTask ? (
                       <SelectField
                         label="ASSIGNED TO"
@@ -1058,55 +1042,21 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         searchable={true}
                       />
                     ) : (
-                      <>
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                      <div className="p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                           Assigned To
-                        </span>
-                        <span className="text-sm font-medium text-gray-900 break-words">
+                        </div>
+                        <div className="text-sm font-medium text-gray-900 break-words">
                           {selectedTask.assignToName || selectedTask.assignTo}
-                        </span>
-                      </>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
-              </div>
 
-              {/* Project Name + Lead Name Row - Only show if they have values */}
-              {(selectedTask.projectName && selectedTask.projectName !== "N/A") ||
-               (selectedTask.leadName && selectedTask.leadName !== "N/A") ? (
+                {/* Created Date and Due Date - 2 Column Grid */}
                 <div className="grid grid-cols-2 gap-3">
-                  {selectedTask.projectName && selectedTask.projectName !== "N/A" && (
-                    <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                      <div className="flex flex-col space-y-2">
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                          Project Name
-                        </span>
-                        <span className="text-sm font-medium text-gray-900 break-words">
-                          {selectedTask.projectName}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedTask.leadName && selectedTask.leadName !== "N/A" && (
-                    <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                      <div className="flex flex-col space-y-2">
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                          Lead Name
-                        </span>
-                        <span className="text-sm font-medium text-gray-900 break-words">
-                          {selectedTask.leadName}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : null}
-
-              {/* Created Date + Due Date Row */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex flex-col space-y-2">
+                  <div>
                     {isEditingTask ? (
                       <DateInputField
                         label="CREATED DATE"
@@ -1116,20 +1066,18 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         placeholder="Auto-selected date"
                       />
                     ) : (
-                      <>
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                      <div className="p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                           Created Date
-                        </span>
-                        <span className="text-sm font-medium text-gray-900 break-words">
+                        </div>
+                        <div className="text-sm font-medium text-gray-900 break-words">
                           {formatDate(selectedTask.createdDate)}
-                        </span>
-                      </>
+                        </div>
+                      </div>
                     )}
                   </div>
-                </div>
 
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex flex-col space-y-2">
+                  <div>
                     {isEditingTask ? (
                       <DateInputField
                         label="DUE DATE"
@@ -1139,22 +1087,20 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         placeholder="Select due date"
                       />
                     ) : (
-                      <>
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                      <div className="p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                           Due Date
-                        </span>
-                        <span className="text-sm font-medium text-gray-900 break-words">
+                        </div>
+                        <div className="text-sm font-medium text-gray-900 break-words">
                           {formatDate(selectedTask.dueDate)}
-                        </span>
-                      </>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
-              </div>
 
-              {/* Related To Row */}
-              <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                <div className="flex flex-col space-y-2">
+                {/* Related To - Full Width */}
+                <div>
                   {isEditingTask ? (
                     <SelectField
                       label="RELATED TO"
@@ -1176,22 +1122,20 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       placeholder="Select what this task is related to"
                     />
                   ) : (
-                    <>
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                         Related To
-                      </span>
-                      <span className="text-sm font-medium text-gray-900 break-words">
+                      </div>
+                      <div className="text-sm font-medium text-gray-900 break-words">
                         {selectedTask.relatedTo || "N/A"}
-                      </span>
-                    </>
+                      </div>
+                    </div>
                   )}
                 </div>
-              </div>
 
-              {/* Project Name / Lead Name Row - Conditional */}
-              {(isEditingTask ? editedTaskData.relatedTo : selectedTask.relatedTo) && (
-                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                  <div className="flex flex-col space-y-2">
+                {/* Project Name / Lead Name - Conditional */}
+                {(isEditingTask ? editedTaskData.relatedTo : selectedTask.relatedTo) && (
+                  <div>
                     {isEditingTask ? (
                       (editedTaskData.relatedTo === "Project") ? (
                         <InputField
@@ -1216,25 +1160,23 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         />
                       ) : null
                     ) : (
-                      <>
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                      <div className="p-3 bg-gray-50 rounded-lg">
+                        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                           {selectedTask.relatedTo === "Project" ? "Project Name" : "Lead Name"}
-                        </span>
-                        <span className="text-sm font-medium text-gray-900 break-words">
+                        </div>
+                        <div className="text-sm font-medium text-gray-900 break-words">
                           {selectedTask.relatedTo === "Project"
                             ? (selectedTask.projectName || "N/A")
                             : (selectedTask.leadName || "N/A")
                           }
-                        </span>
-                      </>
+                        </div>
+                      </div>
                     )}
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Description Card - Full Width */}
-              <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                <div className="flex flex-col space-y-2">
+                {/* Description - Full Width */}
+                <div>
                   {isEditingTask ? (
                     <TextAreaField
                       label="DESCRIPTION"
@@ -1243,14 +1185,14 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       placeholder="Enter task description"
                     />
                   ) : (
-                    <>
-                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
                         Description
-                      </span>
-                      <span className="text-sm text-gray-900 break-words">
+                      </div>
+                      <div className="text-sm text-gray-900 break-words">
                         {selectedTask.description || "N/A"}
-                      </span>
-                    </>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
