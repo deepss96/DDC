@@ -298,6 +298,14 @@ export default function ProfilePage() {
     });
   };
 
+  const maskPassword = (password) => {
+    if (!password || password.length <= 3) return '******';
+    const maskedLength = password.length - 3;
+    const asterisks = '*'.repeat(maskedLength);
+    const lastThree = password.slice(-3);
+    return asterisks + lastThree;
+  };
+
   if (fetchLoading) {
   return (
     <div className="flex-1 flex flex-col min-w-0">
@@ -314,6 +322,7 @@ export default function ProfilePage() {
       {isChangePasswordOpen && (
         <ChangePasswordPopup
           user={user}
+          showCloseButton={true}
           onPasswordChanged={() => {
             setIsChangePasswordOpen(false);
             setSuccessMessage('Password changed successfully!');
@@ -593,7 +602,7 @@ export default function ProfilePage() {
                         />
                         <InfoCard
                           label="PASSWORD"
-                          value={profileData.password}
+                          value={maskPassword(profileData.password)}
                           icon={FiLock}
                           color="gray"
                         />
