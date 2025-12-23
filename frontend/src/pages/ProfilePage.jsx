@@ -90,7 +90,7 @@ const SelectField = ({ label, required, value, onChange, options, placeholder, e
   </div>
 );
 
-const InfoCard = ({ label, value, icon: Icon, color = "blue" }) => {
+const InfoCard = ({ label, value, icon: Icon, color = "blue", monospace = false }) => {
   const colorClasses = {
     blue: "bg-blue-50 border-blue-200 text-blue-700",
     green: "bg-green-50 border-green-200 text-green-700",
@@ -109,7 +109,7 @@ const InfoCard = ({ label, value, icon: Icon, color = "blue" }) => {
           <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
             {label}
           </p>
-          <p className="text-sm font-semibold text-gray-900 truncate">
+          <p className={`text-sm font-semibold text-gray-900 truncate ${monospace ? 'font-mono' : ''}`}>
             {value || 'Not specified'}
           </p>
         </div>
@@ -605,6 +605,7 @@ export default function ProfilePage() {
                           value={maskPassword(profileData.password)}
                           icon={FiLock}
                           color="gray"
+                          monospace={true}
                         />
                         <InfoCard
                           label="ROLE"
