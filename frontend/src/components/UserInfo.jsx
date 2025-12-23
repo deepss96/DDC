@@ -174,7 +174,7 @@ const UserInfo = ({ selectedUser, onClose }) => {
                                 />
                                 <DisplayField
                                     label="PASSWORD"
-                                    value="*****"
+                                    value={selectedUser.is_temp_password === 1 ? selectedUser.password : "*****"}
                                     icon={FiLock}
                                 />
                                 <DisplayField
