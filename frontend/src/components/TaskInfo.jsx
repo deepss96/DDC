@@ -758,6 +758,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
       projectName: selectedTask.projectName,
       leadName: selectedTask.leadName,
       dueDate: selectedTask.dueDate,
+      createdDate: selectedTask.createdDate,
       relatedTo: selectedTask.relatedTo || ""
     });
     setIsEditingTask(true);
@@ -777,10 +778,11 @@ const TaskInfo = ({ selectedTask, onClose }) => {
         status: editedTaskData.status,
         priority: editedTaskData.priority,
         assignTo: editedTaskData.assignTo,
-        assignBy: selectedTask.assignBy,
+        assignBy: editedTaskData.assignBy,
         projectName: editedTaskData.projectName,
         leadName: editedTaskData.leadName,
-        dueDate: editedTaskData.dueDate
+        dueDate: editedTaskData.dueDate,
+        relatedTo: editedTaskData.relatedTo
       };
 
       await apiService.updateTask(selectedTask.id, updatedTask);
