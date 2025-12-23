@@ -861,47 +861,49 @@ const TaskInfo = ({ selectedTask, onClose }) => {
       {/* Header - Desktop */}
       <div className="hidden sm:flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-light-gray-bg">
         <div className="flex items-center gap-4 flex-1 min-w-0">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate" style={{ fontFamily: 'var(--font-family)' }}>
             {selectedTask.name}
           </h2>
-          <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap">
+          <span className="text-xs sm:text-sm text-gray-500 whitespace-nowrap" style={{ fontFamily: 'var(--font-family)' }}>
             Assigned to: {selectedTask.assignToName || selectedTask.assignTo}
           </span>
         </div>
-        {!isEditingTask ? (
-          <button
-            onClick={startEditingTask}
-            className="flex items-center gap-1 px-2 py-1 bg-primary text-white rounded hover:bg-blue-600 transition-colors text-xs"
-            style={{ fontFamily: 'var(--font-family)' }}
-          >
-            <FiEdit2 size={12} />
-            <span>Edit</span>
-          </button>
-        ) : (
-          <div className="flex gap-1">
+        {activeTab === "overview" && (
+          !isEditingTask ? (
             <button
-              onClick={saveTask}
-              disabled={savingTask}
-              className="flex items-center gap-1 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 transition-colors text-xs"
+              onClick={startEditingTask}
+              className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
               style={{ fontFamily: 'var(--font-family)' }}
             >
-              {savingTask ? (
-                <div className="animate-spin rounded-full h-2.5 w-2.5 border-b border-white"></div>
-              ) : (
-                <FiCheck size={12} />
-              )}
-              <span>{savingTask ? 'Saving...' : 'Save'}</span>
+              <FiEdit2 size={16} />
+              <span>Edit</span>
             </button>
-            <button
-              onClick={cancelEditingTask}
-              disabled={savingTask}
-              className="flex items-center gap-1 px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50 transition-colors text-xs"
-              style={{ fontFamily: 'var(--font-family)' }}
-            >
-              <FiX size={12} />
-              <span>Cancel</span>
-            </button>
-          </div>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={saveTask}
+                disabled={savingTask}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors text-sm font-medium"
+                style={{ fontFamily: 'var(--font-family)' }}
+              >
+                {savingTask ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                ) : (
+                  <FiCheck size={16} />
+                )}
+                <span>{savingTask ? 'Saving...' : 'Save'}</span>
+              </button>
+              <button
+                onClick={cancelEditingTask}
+                disabled={savingTask}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:opacity-50 transition-colors text-sm font-medium"
+                style={{ fontFamily: 'var(--font-family)' }}
+              >
+                <FiX size={16} />
+                <span>Cancel</span>
+              </button>
+            </div>
+          )
         )}
       </div>
 
