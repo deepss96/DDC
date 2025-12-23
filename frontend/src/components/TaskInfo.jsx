@@ -1386,18 +1386,17 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                   <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
                     {isEditingTask ? (
                       user?.role?.toLowerCase() === 'admin' ? (
-                        <SelectField
-                          label="ASSIGNED BY"
-                          required
-                          value={users.find(u => u.id === parseInt(editedTaskData.assignBy))?.name || ""}
-                          onChange={(name) => {
-                            const user = users.find(u => u.name === name);
-                            setEditedTaskData(prev => ({ ...prev, assignBy: user ? user.id : "" }));
-                          }}
-                          options={users.map(user => user.name)}
-                          placeholder="Select assigned by"
-                          searchable={true}
-                        />
+                      <SelectField
+                        label="ASSIGNED BY"
+                        required
+                        value={users.find(u => u.id === parseInt(editedTaskData.assignBy))?.id || ""}
+                        onChange={(userId) => {
+                          setEditedTaskData(prev => ({ ...prev, assignBy: userId }));
+                        }}
+                        options={users.map(user => ({ value: user.id, label: user.name }))}
+                        placeholder="Select assigned by"
+                        searchable={true}
+                      />
                       ) : (
                         <InputField
                           label="ASSIGNED BY"
@@ -1424,12 +1423,11 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       <SelectField
                         label="ASSIGNED TO"
                         required
-                        value={users.find(u => u.id === parseInt(editedTaskData.assignTo))?.name || ""}
-                        onChange={(name) => {
-                          const user = users.find(u => u.name === name);
-                          setEditedTaskData(prev => ({ ...prev, assignTo: user ? user.id : "" }));
+                        value={users.find(u => u.id === parseInt(editedTaskData.assignTo))?.id || ""}
+                        onChange={(userId) => {
+                          setEditedTaskData(prev => ({ ...prev, assignTo: userId }));
                         }}
-                        options={users.map(user => user.name)}
+                        options={users.map(user => ({ value: user.id, label: user.name }))}
                         placeholder="Select assigned to"
                         searchable={true}
                       />
