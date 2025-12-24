@@ -78,7 +78,7 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
 
 // TextAreaField component for description
 const TextAreaField = ({ label, required, value, onChange, placeholder, ...rest }) => (
-  <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+  <div className="relative">
     <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
       <span>
         {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
