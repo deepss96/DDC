@@ -664,10 +664,11 @@ const fetchTasks = async () => {
                           </span>
                         </button>
                         {isViewDropdownOpen && (
-                          <div className="absolute top-full mt-1 left-0 z-50 bg-white border border-gray-200 rounded-md shadow-lg w-24 py-1">
+                          <div className="view-dropdown absolute top-full mt-1 left-0 z-50 bg-white border border-gray-200 rounded-md shadow-lg w-24 py-1">
                             {taskViews.map((view) => (
                               <button
                                 key={view.id}
+                                data-dropdown-option="true"
                                 onClick={() => {
                                   setCurrentViewId(view.id);
                                   setIsViewDropdownOpen(false);
@@ -820,10 +821,11 @@ const fetchTasks = async () => {
                           </span>
                         </button>
                         {isViewDropdownOpen && (
-                          <div className="absolute top-full mt-2 left-0 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-40 py-1">
+                          <div className="view-dropdown absolute top-full mt-2 left-0 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-40 py-1">
                             {taskViews.map((view) => (
                               <button
                                 key={view.id}
+                                data-dropdown-option="true"
                                 onClick={() => {
                                   setCurrentViewId(view.id);
                                   setIsViewDropdownOpen(false);
