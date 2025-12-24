@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "clean-phones": "node src/scripts/cleanPhoneNumbers.js",
+    "check-db": "node src/scripts/checkDatabase.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

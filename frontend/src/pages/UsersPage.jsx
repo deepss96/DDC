@@ -190,7 +190,7 @@ const fetchUsers = async () => {
 
       // Show credentials to admin
       const { credentials } = result;
-      console.log(`User created successfully!\n\nLogin Credentials:\nEmail: ${credentials.email}\nPhone: +${credentials.phone.slice(0, 2)} ${credentials.phone.slice(2)}\nTemporary Password: ${credentials.temporaryPassword}\n\nPlease share these credentials with the user.`);
+      console.log(`User created successfully!\n\nLogin Credentials:\nEmail: ${credentials.email}\nPhone: ${credentials.phone}\nTemporary Password: ${credentials.temporaryPassword}\n\nPlease share these credentials with the user.`);
 
       // Refresh the users list
       fetchUsers();
@@ -295,7 +295,7 @@ const fetchUsers = async () => {
       case 'email':
         return <span style={{ fontFamily: 'var(--font-family)' }}>{user.email}</span>;
       case 'phone':
-        return <span style={{ fontFamily: 'var(--font-family)' }}>{user.phone ? `+${user.phone.slice(0, 2)} ${user.phone.slice(2)}` : ''}</span>;
+        return <span style={{ fontFamily: 'var(--font-family)' }}>{user.phone || ''}</span>;
       case 'role':
         return <span style={{ fontFamily: 'var(--font-family)' }}>{user.role}</span>;
       case 'status':
@@ -522,7 +522,7 @@ const fetchUsers = async () => {
                               <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center">
                                 <FiPhone size={10} className="text-blue-600" />
                               </div>
-                              <span className="truncate" style={{ fontFamily: 'var(--font-family)' }}>{user.phone ? `+${user.phone.slice(0, 2)} ${user.phone.slice(2)}` : ''}</span>
+                              <span className="truncate" style={{ fontFamily: 'var(--font-family)' }}>{user.phone || ''}</span>
                             </div>
                           </div>
 

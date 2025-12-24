@@ -53,7 +53,7 @@ exports.createUser = async (req, res) => {
         return res.status(400).json({ error: 'Email is required' });
     }
 
-    if (!phone || phone.length !== 12) {
+    if (!phone || phone.length !== 10) {
         return res.status(400).json({ error: 'Please enter a valid 10-digit phone number' });
     }
 

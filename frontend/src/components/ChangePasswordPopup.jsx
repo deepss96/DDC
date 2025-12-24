@@ -1,10 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { FiLock, FiEye, FiEyeOff, FiShield, FiCheckCircle, FiX } from "react-icons/fi";
 import apiService from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function ChangePasswordPopup({ user, onPasswordChanged, showCloseButton = false }) {
+  // Prevent closing if it's a temporary password (showCloseButton = false)
+  const handleCloseAttempt = () => {
+    if (showCloseButton) {
+      onPasswordChanged();
+    }
+    // If showCloseButton is false, don't allow closing
+  };
+
+  // Prevent Escape key from closing when it's a temporary password
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && !showCloseButton) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    if (!showCloseButton) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [showCloseButton]);
     const { updateUser } = useAuth();
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -79,11 +101,12 @@ export default function ChangePasswordPopup({ user, onPasswordChanged, showClose
         <>
             {/* Blur backdrop */}
             <div
-                className="fixed inset-0 z-[9999] pointer-events-none"
+                className={`fixed inset-0 z-[9999] ${showCloseButton ? 'cursor-pointer' : 'pointer-events-none'}`}
                 style={{
                     backdropFilter: 'blur(6px)',
                     backgroundColor: 'rgba(0, 0, 0, 0.4)'
                 }}
+                onClick={showCloseButton ? handleCloseAttempt : undefined}
             />
 
             {/* Password Change Card - positioned at center */}

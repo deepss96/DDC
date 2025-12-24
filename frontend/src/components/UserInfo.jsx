@@ -169,12 +169,12 @@ const UserInfo = ({ selectedUser, onClose }) => {
                                 />
                                 <DisplayField
                                     label="PHONE NUMBER"
-                                    value={selectedUser.phone ? `+${selectedUser.phone.slice(0, 2)} ${selectedUser.phone.slice(2)}` : "Not Available"}
+                                    value={selectedUser.phone || "Not Available"}
                                     icon={FiPhone}
                                 />
                                 <DisplayField
-                                    label="PASSWORD"
-                                    value={selectedUser.is_temp_password === 1 ? selectedUser.password : "*****"}
+                                    label="PASSWORD STATUS"
+                                    value={selectedUser.is_temp_password === 1 ? "Temporary password (needs to be changed)" : "Password set"}
                                     icon={FiLock}
                                 />
                                 <DisplayField

@@ -604,12 +604,27 @@ export default function ProfilePage() {
       {isChangePasswordOpen && (
         <ChangePasswordPopup
           user={user}
+          showCloseButton={user?.isTempPassword === 0 || user?.is_temp_password === 0}
           onPasswordChanged={() => {
             setIsChangePasswordOpen(false);
             setSuccessMessage('Password changed successfully!');
             setTimeout(() => {
               setSuccessMessage("");
             }, 3000);
+          }}
+        />
+      )}
+
+      {/* Force Password Change Popup for Temp Password Users */}
+      {user && (user.isTempPassword === 1 || user.is_temp_password === 1) && !isChangePasswordOpen && (
+        <ChangePasswordPopup
+          user={user}
+          showCloseButton={false}
+          onPasswordChanged={() => {
+            setSuccessMessage('Password changed successfully! You can now use all features.');
+            setTimeout(() => {
+              setSuccessMessage("");
+            }, 5000);
           }}
         />
       )}

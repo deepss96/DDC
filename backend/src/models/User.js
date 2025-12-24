@@ -11,7 +11,7 @@ class User {
 
   // Get full user profile by ID (for profile page)
   static getFullProfileById(id, callback) {
-    const sql = 'SELECT id, first_name, last_name, email, username, phone, password, role, status, profile_image, created_at, is_temp_password FROM users WHERE id = ?';
+    const sql = 'SELECT id, first_name, last_name, email, username, phone, role, status, profile_image, created_at, is_temp_password FROM users WHERE id = ?';
     db.query(sql, [id], callback);
   }
 
@@ -60,7 +60,7 @@ class User {
 
   // Get all users (for user management) - exclude soft deleted users
   static getAll(callback) {
-    const sql = `SELECT id, first_name, last_name, email, phone, username, password, role, status, created_at, is_temp_password
+    const sql = `SELECT id, first_name, last_name, email, phone, username, role, status, created_at, is_temp_password
              FROM users
              WHERE status != 'Deleted'
              ORDER BY created_at DESC`;
