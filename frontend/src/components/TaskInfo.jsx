@@ -7,6 +7,8 @@ import config from '../config/config';
 import { formatDateForDisplay, parseDisplayDate } from '../utils/dateUtils';
 import { FiFileText, FiMessageSquare, FiEdit2, FiCheck, FiX, FiCalendar, FiSend } from 'react-icons/fi';
 
+
+
 // InputField component for basic text inputs
 const InputField = ({ label, required, value, onChange, placeholder, readOnly = false, error, ...rest }) => (
   <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
@@ -399,6 +401,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
   const typingTimeoutRef = useRef(null);
 
   // ====== Utils ======
+  const formatDate = (dateString) => formatDateForDisplay(dateString);
 
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
@@ -779,6 +782,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
     setSavingTask(true);
     try {
       const updatedTask = {
+        taskNumber: editedTaskData.taskNumber || selectedTask.taskNumber,
         name: editedTaskData.name,
         description: editedTaskData.description,
         status: editedTaskData.status,
@@ -787,7 +791,8 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
         assignBy: editedTaskData.assignBy,
         projectName: editedTaskData.projectName,
         leadName: editedTaskData.leadName,
-        dueDate: editedTaskData.dueDate
+        dueDate: editedTaskData.dueDate,
+        createdDate: editedTaskData.createdDate
       };
 
       const result = await apiService.updateTask(selectedTask.id, updatedTask);
@@ -1032,7 +1037,6 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                         options={[
                           { value: "Low", label: "Low" },
                           { value: "Medium", label: "Medium" },
-                          { value: "High", label: "High" }
                         ]}
                         placeholder="Select priority"
                       />
@@ -1129,7 +1133,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                           Created Date
                         </div>
                         <div className="text-sm font-medium text-gray-900 break-words">
-                          {formatDateForDisplay(selectedTask.createdDate)}
+                          {formatDate(selectedTask.createdDate)}
                         </div>
                       </div>
                     )}
@@ -1286,7 +1290,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                         placeholder="Select assigned by"
                         searchable={true}
                       />
-                    ) : (
+                      ) : (
                         <InputField
                           label="ASSIGNED BY"
                           required
@@ -1350,7 +1354,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                           Created Date
                         </span>
                         <span className="text-sm font-medium text-gray-900">
-                          {formatDateForDisplay(selectedTask.createdDate)}
+                          {formatDate(selectedTask.createdDate)}
                         </span>
                       </div>
                     )}
@@ -1371,7 +1375,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                           Due Date
                         </span>
                         <span className="text-sm font-medium text-gray-900">
-                          {formatDateForDisplay(selectedTask.dueDate)}
+                          {formatDate(selectedTask.dueDate)}
                         </span>
                       </div>
                     )}
