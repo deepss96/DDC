@@ -35,7 +35,7 @@ if (typeof document !== 'undefined') {
 
 // Form Components - Exact copy from TaskFormPopup.jsx
 const InputField = ({ label, required, type = "text", value, onChange, placeholder, error, ...rest }) => (
-  <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+  <div className="relative" >
     <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
       <span>
         {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
@@ -135,7 +135,7 @@ const DateInputField = ({ label, required, value, onChange, placeholder, error, 
   };
 
   return (
-    <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+    <div className="relative" >
       <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
         <span>
           {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
@@ -263,7 +263,7 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
   const selectedOption = normalizedOptions.find(option => option.value === value);
 
   return (
-    <div ref={selectRef} className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+    <div ref={selectRef} className="relative">
       <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
         <span>
           {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
