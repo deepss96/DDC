@@ -36,6 +36,9 @@ const DisplayField = ({ label, value, icon: Icon, fullWidth = false }) => (
 const UserInfo = ({ selectedUser, onClose }) => {
     if (!selectedUser) return null;
 
+    console.log('UserInfo received selectedUser:', selectedUser);
+    console.log('Username value:', selectedUser.username);
+
     const { user: currentUser } = useAuth();
     const [activeTab, setActiveTab] = useState("overview");
 
