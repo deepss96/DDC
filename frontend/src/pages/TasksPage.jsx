@@ -174,9 +174,11 @@ export default function TasksPage({ searchTerm = '' }) {
   // Handle clicks outside the date filter dropdown to close it
   useEffect(() => {
     const handleClickOutsideDate = (event) => {
-      if (!event.target.closest('.date-filter-dropdown')) {
-        setIsDateFilterPopupOpen(false);
+      // Don't close if clicking on the date filter button or dropdown
+      if (event.target.closest('[data-date-filter-button]') || event.target.closest('.date-filter-dropdown')) {
+        return;
       }
+      setIsDateFilterPopupOpen(false);
     };
 
     if (isDateFilterPopupOpen) {
@@ -191,9 +193,11 @@ export default function TasksPage({ searchTerm = '' }) {
   // Handle clicks outside the view dropdown to close it
   useEffect(() => {
     const handleClickOutsideView = (event) => {
-      if (!event.target.closest('.view-dropdown')) {
-        setIsViewDropdownOpen(false);
+      // Don't close if clicking on the view filter button or dropdown
+      if (event.target.closest('[data-view-filter-button]') || event.target.closest('.view-dropdown')) {
+        return;
       }
+      setIsViewDropdownOpen(false);
     };
 
     if (isViewDropdownOpen) {
@@ -644,6 +648,7 @@ const fetchTasks = async () => {
                       {/* View Filter */}
                       <div className="relative flex-shrink-0">
                         <button
+                          data-view-filter-button="true"
                           onClick={() => setIsViewDropdownOpen(!isViewDropdownOpen)}
                           className="flex items-center gap-0 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm"
                           style={{ height: '28px', width: '90px' }}
@@ -688,6 +693,7 @@ const fetchTasks = async () => {
                       {/* Date Filter */}
                       <div className="relative flex-shrink-0">
                         <button
+                          data-date-filter-button="true"
                           onClick={() => setIsDateFilterPopupOpen(!isDateFilterPopupOpen)}
                           className="flex items-center gap-0 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm"
                           style={{ height: '28px', fontSize: '10px' }}
@@ -736,6 +742,7 @@ const fetchTasks = async () => {
                       {/* Status Filter */}
                       <div className="relative flex-shrink-0">
                         <button
+                          data-filter-button="true"
                           onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
                           className={`flex items-center justify-center w-8 h-7 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 active:shadow-md transition-all shadow-sm ${selectedStatus !== 'All' ? 'bg-blue-50 border-blue-300' : ''}`}
                           title="Filter by status"
