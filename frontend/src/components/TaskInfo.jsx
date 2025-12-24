@@ -50,7 +50,8 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
         width: '100%',
         height: 'var(--input-height)',
         padding: 'var(--input-padding)',
-        paddingTop: '16px', // Extra top padding to accommodate the label
+        paddingTop: '20px', // Extra top padding to accommodate the label and center text
+        paddingBottom: '8px', // Add bottom padding for better centering
         fontSize: 'var(--placeholder-font-size)',
         fontFamily: 'var(--font-family)',
         fontWeight: 'normal',
@@ -60,6 +61,8 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
         color: 'var(--input-text-color)',
         outline: 'none',
         transition: 'border-color 0.2s',
+        boxSizing: 'border-box',
+        lineHeight: '1.2', // Better line height for centering
       }}
       onFocus={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-focus-border-color)'}
       onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
@@ -162,7 +165,8 @@ const DateInputField = ({ label, required, value, onChange, placeholder, error, 
             width: '100%',
             height: 'var(--input-height)',
             padding: 'var(--input-padding)',
-            paddingTop: '16px', // Extra top padding to accommodate the label
+            paddingTop: '20px', // Extra top padding to accommodate the label and center text
+            paddingBottom: '8px', // Add bottom padding for better centering
             paddingRight: '40px', // Always space for calendar icon
             fontSize: 'var(--placeholder-font-size)',
             fontFamily: 'var(--font-family)',
@@ -174,6 +178,8 @@ const DateInputField = ({ label, required, value, onChange, placeholder, error, 
             outline: 'none',
             transition: 'border-color 0.2s',
             cursor: readOnly ? 'default' : 'text',
+            boxSizing: 'border-box',
+            lineHeight: '1.2', // Better line height for centering
           }}
           onFocus={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-focus-border-color)'}
           onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
@@ -275,7 +281,8 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
             width: '100%',
             height: 'var(--input-height)',
             padding: 'var(--input-padding)',
-            paddingTop: '16px', // Extra top padding to accommodate the label
+            paddingTop: '20px', // Extra top padding to accommodate the label and center text
+            paddingBottom: '8px', // Add bottom padding for better centering
             paddingRight: '40px', // Space for dropdown arrow
             fontSize: 'var(--placeholder-font-size)',
             fontFamily: 'var(--font-family)',
@@ -285,6 +292,8 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
             color: 'var(--input-text-color)',
             outline: 'none',
             transition: 'border-color 0.2s',
+            boxSizing: 'border-box',
+            lineHeight: '1.2', // Better line height for centering
           }}
           onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
         />
@@ -295,8 +304,9 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
             width: '100%',
             height: 'var(--input-height)',
             padding: 'var(--input-padding)',
-            paddingTop: '16px', // Extra top padding to accommodate the label
-            fontSize: 'var(--input-font-size)',
+            paddingTop: '20px', // Extra top padding to accommodate the label and center text
+            paddingBottom: '8px', // Add bottom padding for better centering
+            fontSize: 'var(--placeholder-font-size)',
             fontFamily: 'var(--font-family)',
             border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
             borderRadius: 'var(--input-border-radius)',
@@ -309,6 +319,8 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
             justifyContent: 'space-between',
             transition: 'border-color 0.2s',
             opacity: disabled ? 0.6 : 1,
+            boxSizing: 'border-box',
+            lineHeight: '1.2', // Better line height for centering
           }}
         >
           <span style={{
