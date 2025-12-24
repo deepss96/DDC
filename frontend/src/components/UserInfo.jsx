@@ -137,7 +137,7 @@ const UserInfo = ({ selectedUser, onClose }) => {
                         <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
                             {selectedUser.first_name} {selectedUser.last_name}
                         </h2>
-                        <p className="text-sm text-gray-600">@{selectedUser.username || 'username'}</p>
+                        <p className="text-sm text-gray-600">{selectedUser.role}</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
