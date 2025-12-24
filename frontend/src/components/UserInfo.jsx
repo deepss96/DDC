@@ -21,17 +21,20 @@ if (typeof document !== 'undefined') {
 }
 
 // DisplayField component for consistent styling
-const DisplayField = ({ label, value, icon: Icon, fullWidth = false }) => (
-  <div className={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg ${fullWidth ? 'md:col-span-2' : ''}`}>
-    {Icon && <Icon size={16} className="text-gray-500" />}
-    <div className="flex-1">
-      <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-        {label}
-      </label>
-      <p className="text-sm text-gray-900 font-medium">{value || 'N/A'}</p>
+const DisplayField = ({ label, value, icon: Icon, fullWidth = false }) => {
+  console.log(`DisplayField rendering: ${label} = ${value}`);
+  return (
+    <div className={`flex items-center gap-3 p-3 bg-gray-50 rounded-lg ${fullWidth ? 'md:col-span-2' : ''}`}>
+      {Icon && <Icon size={16} className="text-gray-500" />}
+      <div className="flex-1">
+        <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+          {label}
+        </label>
+        <p className="text-sm text-gray-900 font-medium">{value || 'N/A'}</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const UserInfo = ({ selectedUser, onClose }) => {
     if (!selectedUser) return null;
