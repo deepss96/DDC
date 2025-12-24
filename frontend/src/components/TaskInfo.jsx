@@ -700,17 +700,32 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
         id: saved?.id ?? Date.now(),
         userName: user ? `${user.firstName} ${user.lastName}`.trim() : 'Unknown User',
         message: newComment.trim(),
+        parent_comment_id: replyingTo || null,
         created_at: saved?.created_at ?? new Date().toISOString(),
-        replies: [],
       };
 
-      setComments((prev) =>
-        sortByCreatedAt([...prev, newItem])
-      );
+      if (replyingTo) {
+        // Add as reply to parent comment
+        setComments((prev) =>
+          prev.map(comment =>
+            comment.id === replyingTo
+              ? {
+                  ...comment,
+                  replies: [...(comment.replies || []), newItem]
+                }
+              : comment
+          )
+        );
+      } else {
+        // Add as new top-level comment
+        setComments((prev) =>
+          sortByCreatedAt([...prev, { ...newItem, replies: [] }])
+        );
+      }
 
       setNewComment("");
       setReplyingTo(null);
-      
+
     } catch (error) {
       console.error("Error posting comment:", error);
     } finally {
@@ -1504,6 +1519,27 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
       {/* Chat Input - Fixed at bottom when comments tab is active */}
       {activeTab === "comments" && (
         <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
+          {/* Reply Indicator */}
+          {replyingTo && (
+            <div className="px-3 sm:px-4 py-2 text-xs text-gray-600 bg-blue-50 border-b border-gray-200 flex items-center justify-between">
+              <span>
+                Replying to{' '}
+                <span className="font-medium">
+                  {comments.find(c => c.id === replyingTo)?.userName || 'Unknown User'}
+                </span>
+              </span>
+              <button
+                onClick={() => setReplyingTo(null)}
+                className="text-gray-400 hover:text-gray-600 ml-2"
+                title="Cancel reply"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
           {/* Typing Indicators */}
           {typingUsers.size > 0 && (
             <div className="px-3 sm:px-4 py-2 text-xs text-gray-500 bg-gray-50 border-b border-gray-200">
@@ -1530,7 +1566,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                     handleSendComment();
                   }
                 }}
-                placeholder="Type your message..."
+                placeholder={replyingTo ? "Type your reply..." : "Type your message..."}
                 rows={1}
                 className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                 style={{ minHeight: '40px', maxHeight: '120px' }}
