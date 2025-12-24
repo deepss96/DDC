@@ -343,7 +343,7 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
       </div>
 
       {isOpen && (
-        <div className="absolute top-full left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto mt-1 w-full">
+        <div className="absolute top-full left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto mt-1 w-full">
           {filteredOptions.length === 0 ? (
             <div
               style={{
