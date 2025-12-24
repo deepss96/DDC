@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { io } from 'socket.io-client';
 import apiService from '../services/api';
 import config from '../config/config';
+import { formatDateForDisplay, parseDisplayDate } from '../utils/dateUtils';
 import { FiFileText, FiMessageSquare, FiEdit2, FiCheck, FiX, FiCalendar, FiSend } from 'react-icons/fi';
 
 // InputField component for basic text inputs
@@ -85,39 +86,6 @@ const TextAreaField = ({ label, required, value, onChange, placeholder, ...rest 
     />
   </div>
 );
-
-// Date parsing utility for display format
-const parseDisplayDate = (displayDate) => {
-  if (!displayDate) return "";
-  
-  // Try to parse DD-MMM-YY format
-  const parts = displayDate.split('-');
-  if (parts.length === 3) {
-    const day = parts[0];
-    const month = parts[1];
-    const year = parts[2];
-    
-    // Convert month abbreviation to number
-    const monthMap = {
-      'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
-      'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
-      'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
-    };
-    
-    const monthNum = monthMap[month] || month;
-    const fullYear = year.length === 2 ? `20${year}` : year;
-    
-    return `${fullYear}-${monthNum}-${day.padStart(2, '0')}`;
-  }
-  
-  // Try to parse as regular date
-  const date = new Date(displayDate);
-  if (!isNaN(date.getTime())) {
-    return date.toISOString().split('T')[0];
-  }
-  
-  return displayDate;
-};
 
 // Custom DateInputField that shows dates in consistent DD-MMM-YY format across devices with optional date picker
 const DateInputField = ({ label, required, value, onChange, placeholder, error, readOnly = false, ...rest }) => {
@@ -431,17 +399,6 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
   const typingTimeoutRef = useRef(null);
 
   // ====== Utils ======
-  const formatDateForDisplay = (dateString) => {
-    if (!dateString) return "No date";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
-  const formatDate = (dateString) => formatDateForDisplay(dateString);
 
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
@@ -1172,7 +1129,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                           Created Date
                         </div>
                         <div className="text-sm font-medium text-gray-900 break-words">
-                          {formatDate(selectedTask.createdDate)}
+                          {formatDateForDisplay(selectedTask.createdDate)}
                         </div>
                       </div>
                     )}
@@ -1329,7 +1286,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                         placeholder="Select assigned by"
                         searchable={true}
                       />
-                      ) : (
+                    ) : (
                         <InputField
                           label="ASSIGNED BY"
                           required
@@ -1393,7 +1350,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                           Created Date
                         </span>
                         <span className="text-sm font-medium text-gray-900">
-                          {formatDate(selectedTask.createdDate)}
+                          {formatDateForDisplay(selectedTask.createdDate)}
                         </span>
                       </div>
                     )}
@@ -1414,7 +1371,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                           Due Date
                         </span>
                         <span className="text-sm font-medium text-gray-900">
-                          {formatDate(selectedTask.dueDate)}
+                          {formatDateForDisplay(selectedTask.dueDate)}
                         </span>
                       </div>
                     )}
