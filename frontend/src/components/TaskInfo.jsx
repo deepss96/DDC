@@ -1,40 +1,13 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useLocation } from "react-router-dom";
-import {
-  FiFileText,
-  FiMessageSquare,
-  FiSend,
-  FiEdit2,
-  FiCheck,
-  FiX,
-  FiCalendar,
-} from "react-icons/fi";
-import { useAuth } from "../contexts/AuthContext";
-import apiService from "../services/api";
-import io from 'socket.io-client';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { io } from 'socket.io-client';
+import apiService from '../services/api';
 import config from '../config/config';
-import { formatDateForInput, formatDateForDisplay, parseDisplayDate } from "../utils/dateUtils.jsx";
+import { FiFileText, FiMessageSquare, FiEdit2, FiCheck, FiX, FiCalendar, FiSend } from 'react-icons/fi';
 
-// Add wave animation for back button
-const waveStyles = `
-  @keyframes wave {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    50% { transform: translateX(3px); }
-    75% { transform: translateX(-3px); }
-  }
-`;
-
-// Inject wave animation styles
-if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement("style");
-  styleSheet.type = "text/css";
-  styleSheet.innerText = waveStyles;
-  document.head.appendChild(styleSheet);
-}
-
-// Form Components - Exact copy from TaskFormPopup.jsx
-const InputField = ({ label, required, type = "text", value, onChange, placeholder, error, ...rest }) => (
+// InputField component for basic text inputs
+const InputField = ({ label, required, value, onChange, placeholder, readOnly = false, error, ...rest }) => (
   <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
     <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
       <span>
@@ -42,27 +15,29 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
       </span>
     </label>
     <input
-      type={type}
+      type="text"
       value={value}
       onChange={onChange}
       placeholder={placeholder}
+      readOnly={readOnly}
       style={{
         width: '100%',
         height: 'var(--input-height)',
         padding: 'var(--input-padding)',
-        paddingTop: '20px', // Extra top padding to accommodate the label and center text
-        paddingBottom: '8px', // Add bottom padding for better centering
+        paddingTop: '20px',
+        paddingBottom: '8px',
         fontSize: 'var(--placeholder-font-size)',
         fontFamily: 'var(--font-family)',
         fontWeight: 'normal',
         border: `1px solid ${error ? 'var(--secondary-color)' : 'var(--input-border-color)'}`,
         borderRadius: 'var(--input-border-radius)',
-        backgroundColor: 'var(--input-bg-color)',
+        backgroundColor: readOnly ? '#f9fafb' : 'var(--input-bg-color)',
         color: 'var(--input-text-color)',
         outline: 'none',
         transition: 'border-color 0.2s',
+        cursor: readOnly ? 'default' : 'text',
         boxSizing: 'border-box',
-        lineHeight: '1.2', // Better line height for centering
+        lineHeight: '1.2',
       }}
       onFocus={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-focus-border-color)'}
       onBlur={(e) => e.target.style.borderColor = error ? 'var(--secondary-color)' : 'var(--input-border-color)'}
@@ -78,7 +53,7 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
 
 // TextAreaField component for description
 const TextAreaField = ({ label, required, value, onChange, placeholder, ...rest }) => (
-  <div className="relative" >
+  <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
     <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
       <span>
         {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
@@ -111,6 +86,39 @@ const TextAreaField = ({ label, required, value, onChange, placeholder, ...rest 
   </div>
 );
 
+// Date parsing utility for display format
+const parseDisplayDate = (displayDate) => {
+  if (!displayDate) return "";
+  
+  // Try to parse DD-MMM-YY format
+  const parts = displayDate.split('-');
+  if (parts.length === 3) {
+    const day = parts[0];
+    const month = parts[1];
+    const year = parts[2];
+    
+    // Convert month abbreviation to number
+    const monthMap = {
+      'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+      'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+      'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+    };
+    
+    const monthNum = monthMap[month] || month;
+    const fullYear = year.length === 2 ? `20${year}` : year;
+    
+    return `${fullYear}-${monthNum}-${day.padStart(2, '0')}`;
+  }
+  
+  // Try to parse as regular date
+  const date = new Date(displayDate);
+  if (!isNaN(date.getTime())) {
+    return date.toISOString().split('T')[0];
+  }
+  
+  return displayDate;
+};
+
 // Custom DateInputField that shows dates in consistent DD-MMM-YY format across devices with optional date picker
 const DateInputField = ({ label, required, value, onChange, placeholder, error, readOnly = false, ...rest }) => {
   const hiddenDateRef = useRef(null);
@@ -135,7 +143,7 @@ const DateInputField = ({ label, required, value, onChange, placeholder, error, 
   };
 
   return (
-    <div className="relative">
+    <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
       <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
         <span>
           {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
@@ -263,7 +271,7 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
   const selectedOption = normalizedOptions.find(option => option.value === value);
 
   return (
-    <div ref={selectRef} className="relative" >
+    <div ref={selectRef} className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
       <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
         <span>
           {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
@@ -1192,8 +1200,6 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                   </div>
                 </div>
 
-
-
                 {/* Description - Full Width */}
                 <div>
                   {isEditingTask ? (
@@ -1414,10 +1420,6 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                     )}
                   </div>
                 </div>
-
-
-
-
 
                 {/* Row 7: Description (full width at bottom) */}
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
