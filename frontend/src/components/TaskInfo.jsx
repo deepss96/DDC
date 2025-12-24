@@ -216,15 +216,20 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
+  // Normalize options to objects with value and label
+  const normalizedOptions = options.map(option =>
+    typeof option === 'string' ? { value: option, label: option } : option
+  );
+
   // Filter options based on search text
   const filteredOptions = searchable && searchText
-    ? options.filter(option =>
-        option.toLowerCase().includes(searchText.toLowerCase())
+    ? normalizedOptions.filter(option =>
+        option.label.toLowerCase().includes(searchText.toLowerCase())
       )
-    : options;
+    : normalizedOptions;
 
   const handleSelect = (option) => {
-    onChange(option);
+    onChange(option.value);
     setIsOpen(false);
     setSearchText("");
   };
@@ -248,6 +253,9 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
     }
   };
 
+  // Find the selected option to display its label
+  const selectedOption = normalizedOptions.find(option => option.value === value);
+
   return (
     <div ref={selectRef} className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
       <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
@@ -258,7 +266,7 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
       {searchable ? (
         <input
           type="text"
-          value={isOpen ? searchText : (value || "")}
+          value={isOpen ? searchText : (selectedOption?.label || "")}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onKeyDown={handleKeyDown}
@@ -308,7 +316,7 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
             fontSize: 'var(--placeholder-font-size)',
             fontFamily: 'var(--font-family)',
           }}>
-            {value || placeholder}
+            {selectedOption?.label || placeholder}
           </span>
         </div>
       )}
@@ -356,14 +364,14 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
                   padding: '8px 12px',
                   fontSize: 'var(--input-font-size)',
                   fontFamily: 'var(--font-family)',
-                  color: option === value ? 'var(--input-placeholder-color)' : 'var(--input-text-color)',
+                  color: option.value === value ? 'var(--input-placeholder-color)' : 'var(--input-text-color)',
                   cursor: 'pointer',
-                  backgroundColor: option === value ? '#f3f4f6' : 'transparent',
+                  backgroundColor: option.value === value ? '#f3f4f6' : 'transparent',
                 }}
                 onMouseEnter={(e) => e.target.style.backgroundColor = '#f9fafb'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = option === value ? '#f3f4f6' : 'transparent'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = option.value === value ? '#f3f4f6' : 'transparent'}
               >
-                {option}
+                {option.label}
               </div>
             ))
           )}
