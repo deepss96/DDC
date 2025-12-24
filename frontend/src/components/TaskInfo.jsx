@@ -381,7 +381,7 @@ const SelectField = ({ label, required, options = [], value, onChange, placehold
   );
 };
 
-const TaskInfo = ({ selectedTask, onClose }) => {
+const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
   if (!selectedTask) return null;
 
   const { user, token } = useAuth();
