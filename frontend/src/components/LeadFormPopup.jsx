@@ -44,13 +44,6 @@ export default function LeadFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
-  const [countryCode, setCountryCode] = useState("+91");
-  const [countryFlag, setCountryFlag] = useState("🇮🇳");
-  const [openCountryDropdown, setOpenCountryDropdown] = useState(false);
-  const [countries, setCountries] = useState([]);
-  const countryRef = useRef(null);
-  const [countryQuery, setCountryQuery] = useState("");
-  const countrySearchRef = useRef(null);
 
   // ---- Added states for previously non-editable fields ----
   const [address, setAddress] = useState("");
@@ -69,9 +62,7 @@ export default function LeadFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
     if (isEdit && editLead) {
       setContactName(editLead.contact_name || '');
       setDate(editLead.date || '');
-      const phoneParts = editLead.phone ? editLead.phone.split(' ') : ['', ''];
-      setCountryCode(phoneParts[0] || '+91');
-      setPhone(phoneParts.slice(1).join(' ') || '');
+      setPhone(editLead.phone || '');
       setEmail(editLead.email || '');
       setCompany(editLead.company_name || '');
       setAddress(editLead.address || '');
@@ -107,7 +98,7 @@ export default function LeadFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
     const leadData = {
       contact_name: contactName,
       date,
-      phone: `${countryCode} ${phone}`.trim(),
+      phone: phone,
       email,
       company_name: company,
       address,
@@ -139,71 +130,7 @@ export default function LeadFormPopup({ isOpen, onClose, onSubmit, isEdit = fals
     }
   };
 
-  useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      try {
-        const res = await fetch("https://restcountries.com/v3.1/all?fields=name,flags,idd,cca2");
-        const data = await res.json();
-        const mapped = (Array.isArray(data) ? data : []).map((c) => {
-          const root = (c.idd && c.idd.root) || "";
-          const suff = c.idd && Array.isArray(c.idd.suffixes) && c.idd.suffixes.length ? c.idd.suffixes[0] : "";
-          const code = `${root}${suff}`.trim();
-          return {
-            name: (c.name && c.name.common) || "",
-            code: code || "",
-            flag: (c.flags && (c.flags.svg || c.flags.png)) || "",
-            cca2: c.cca2 || "",
-          };
-        }).filter((c) => c.code.startsWith("+"));
 
-        mapped.sort((a, b) => a.name.localeCompare(b.name));
-        if (mounted) setCountries(mapped);
-
-        const india = mapped.find((c) => c.cca2 === "IN") || mapped.find((c) => c.code.startsWith("+91"));
-        if (india && mounted) {
-          setCountryCode(india.code);
-          setCountryFlag(india.flag || "🇮🇳");
-        }
-      } catch {}
-    };
-    load();
-    return () => { mounted = false; };
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (openCountryDropdown && countryRef.current && !countryRef.current.contains(e.target)) {
-        setOpenCountryDropdown(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [openCountryDropdown]);
-
-  useEffect(() => {
-    if (openCountryDropdown && countrySearchRef.current) {
-      countrySearchRef.current.focus();
-    }
-  }, [openCountryDropdown]);
-
-  const filteredCountries = (() => {
-    const q = countryQuery.trim().toLowerCase();
-    const rank = (c) => {
-      if (!q) return 10;
-      const digits = (c.code || "").replace(/\+/g, "");
-      const name = (c.name || "").toLowerCase();
-      if (digits.startsWith(q)) return 0;
-      if (digits.includes(q)) return 1;
-      if (name.startsWith(q)) return 2;
-      if (name.includes(q)) return 3;
-      return 99;
-    };
-    return countries
-      .map((c) => ({ ...c, _r: rank(c) }))
-      .filter((c) => c._r !== 99)
-      .sort((a, b) => a._r - b._r || a.name.localeCompare(b.name));
-  })();
 
   const SelectField = ({ label, options = [], value, onChange, placeholder }) => {
     const [isOpen, setIsOpen] = useState(false);

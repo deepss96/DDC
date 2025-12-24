@@ -24,9 +24,9 @@ class User {
     let values;
 
     if (isPhoneNumber) {
-      // If it's a 10-digit number, check both with and without +91 prefix
-      sql = 'SELECT * FROM users WHERE phone = ? OR phone = ?';
-      values = [identifier, `91${identifier}`];
+      // If it's a 10-digit number, check phone field
+      sql = 'SELECT * FROM users WHERE phone = ?';
+      values = [identifier];
     } else {
       // Assume it's email, check email and phone (in case phone is stored as email format, but unlikely)
       sql = 'SELECT * FROM users WHERE email = ? OR phone = ?';
@@ -76,10 +76,10 @@ class User {
     let values;
 
     if (isPhoneNumber) {
-      // If it's a 10-digit number, check both with and without +91 prefix
+      // If it's a 10-digit number, check phone field
       sql = `SELECT id, first_name, last_name, email, username, password, role, status, is_temp_password
-             FROM users WHERE email = ? OR username = ? OR phone = ? OR phone = ?`;
-      values = [identifier, identifier, identifier, `91${identifier}`];
+             FROM users WHERE phone = ?`;
+      values = [identifier];
     } else {
       // For username/email, check all three fields
       sql = `SELECT id, first_name, last_name, email, username, password, role, status, is_temp_password
@@ -94,12 +94,9 @@ class User {
   static createManagement(userData, callback) {
     const { first_name, last_name, email, username, password, role, status, phone } = userData;
 
-    // Generate a unique phone number if not provided
-    const phoneNumber = phone || `+91-${Date.now().toString().slice(-10)}`;
-
     const sql = `INSERT INTO users (first_name, last_name, email, phone, username, password, role, status, is_temp_password)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const values = [first_name, last_name, email, phoneNumber, username, password, role || 'Field', status || 'Active', 1];
+    const values = [first_name, last_name, email, phone, username, password, role || 'Field', status || 'Active', 1];
     db.query(sql, values, callback);
   }
 

@@ -140,10 +140,12 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
   const PhoneField = ({ label, required, value, onChange, placeholder, error }) => {
     const handlePhoneChange = (e) => {
       let input = e.target.value.replace(/\D/g, ''); // Remove non-digits
+      // Limit to 10 digits
+      if (input.length > 10) {
+        input = input.slice(0, 10);
+      }
       onChange({ target: { value: input } });
     };
-
-    const displayValue = value && value.startsWith('91') && value.length === 12 ? value.slice(2) : value;
 
     return (
       <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
@@ -151,12 +153,9 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
           <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider z-10" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
             {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
           </label>
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium z-10" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--placeholder-font-size)' }}>
-            +91
-          </span>
           <input
             type="text"
-            value={displayValue}
+            value={value}
             onChange={handlePhoneChange}
             placeholder={placeholder}
             maxLength={10} // 10 digits for phone number
@@ -165,7 +164,7 @@ const InputField = ({ label, required, type = "text", value, onChange, placehold
               height: 'var(--input-height)',
               padding: 'var(--input-padding)',
               paddingTop: '16px',
-              paddingLeft: '50px', // Make room for +91 prefix
+              paddingLeft: '12px', // Normal left padding
               fontSize: 'var(--placeholder-font-size)',
               fontFamily: 'var(--font-family)',
               fontWeight: 'normal',
@@ -273,12 +272,8 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
             return;
         }
 
-        // Ensure phone number has 91 prefix for database storage
-        let phoneNumber = phone;
-        if (!phoneNumber.startsWith('91')) {
-            phoneNumber = '91' + phoneNumber;
-        }
-        if (phoneNumber.length !== 12) {
+        // Validate phone number is exactly 10 digits
+        if (phone.length !== 10) {
             setErrorMessage('Please enter a valid 10-digit phone number');
             setShowErrorMessage(true);
             setTimeout(() => setShowErrorMessage(false), 3000);
@@ -291,7 +286,7 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                 last_name: lastName,
                 email,
                 username,
-                phone: phoneNumber,
+                phone: phone,
                 role,
                 status
             };
