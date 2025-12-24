@@ -1537,7 +1537,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
 
           {/* Input Area */}
           <div className="p-3 sm:p-4">
-            <div className="flex gap-2">
+            <div className="flex">
               <textarea
                 value={newComment}
                 onChange={handleInputChange}
@@ -1549,13 +1549,14 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                 }}
                 placeholder={replyingTo ? "Type your reply..." : "Type your message..."}
                 rows={1}
-                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                 style={{ minHeight: '40px', maxHeight: '120px' }}
               />
               <button
                 onClick={handleSendComment}
                 disabled={!newComment.trim() || postingComment}
-                className="px-3 sm:px-4 py-2 sm:py-3 bg-primary text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors self-end"
+                className="px-3 sm:px-4 py-2 sm:py-3 bg-primary text-white rounded-r-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                style={{ minHeight: '40px' }}
               >
                 <FiSend size={14} className="sm:w-4 sm:h-4" />
               </button>

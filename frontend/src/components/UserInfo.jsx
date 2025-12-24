@@ -155,6 +155,11 @@ const UserInfo = ({ selectedUser, onClose }) => {
                         <div className="max-w-5xl mx-auto">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <DisplayField
+                                    label="USERNAME"
+                                    value={`${selectedUser.first_name} ${selectedUser.last_name}`}
+                                    icon={FiUser}
+                                />
+                                <DisplayField
                                     label="FIRST NAME"
                                     value={selectedUser.first_name}
                                     icon={FiUser}
