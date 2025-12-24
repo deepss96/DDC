@@ -134,6 +134,11 @@ exports.updateUser = async (req, res) => {
     const { id } = req.params;
     const { first_name, last_name, email, phone, role, status, profile_image } = req.body;
 
+    console.log('UPDATE USER REQUEST:');
+    console.log('ID:', id);
+    console.log('Request body:', req.body);
+    console.log('Extracted role:', role);
+
     // FIRST: Check task restrictions (most important business rule)
     if (status === 'Inactive') {
         User.checkUserIncompleteTasks(id, (taskErr, taskResults) => {
