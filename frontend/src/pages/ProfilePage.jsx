@@ -220,6 +220,8 @@ export default function ProfilePage() {
         email,
         username,
         phone,
+        role: profileData.role,
+        status: profileData.status,
         profile_image: imagePreview
       };
 
