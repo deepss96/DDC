@@ -490,9 +490,9 @@ const fetchUsers = async () => {
                           style={{ fontFamily: 'var(--font-family)' }}
                           onClick={() => setSelectedUser(user)}
                         >
-                          {/* Row 1: Name and Status */}
+                          {/* Row 1: Name (left) and Status (right) */}
                           <div className="flex justify-between items-center mb-3">
-                            <div className="flex-1 min-w-0 flex items-center gap-3">
+                            <div className="flex-1 min-w-0">
                               <h3
                                 className="text-sm font-semibold hover:underline transition-colors cursor-pointer"
                                 style={{
@@ -504,10 +504,10 @@ const fetchUsers = async () => {
                               >
                                 {`${user.first_name} ${user.last_name}`}
                               </h3>
-                              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(user.status)}`} style={{ fontFamily: 'var(--font-family)' }}>
-                                {user.status}
-                              </span>
                             </div>
+                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(user.status)}`} style={{ fontFamily: 'var(--font-family)' }}>
+                              {user.status}
+                            </span>
                           </div>
 
                           {/* Row 2: Email and Phone */}
@@ -569,6 +569,7 @@ const fetchUsers = async () => {
                   renderCell={renderUserCell}
                   loadingMessage="Loading users..."
                   keyField="id"
+                  user={user}
                 />
                 </div>
               </>
