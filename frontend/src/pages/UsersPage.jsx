@@ -286,7 +286,7 @@ const fetchUsers = async () => {
             }}
             title={fullName}
             onClick={() => setSelectedUser(user)}
-            onMouseEnter={(e) => e.target.style.color = 'var(--secondary-color)'}
+            onMouseEnter={(e) => e.target.style.color = '#1d4ed8'}
             onMouseLeave={(e) => e.target.style.color = 'var(--primary-color)'}
           >
             {fullName}
