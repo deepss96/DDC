@@ -11,7 +11,7 @@ import { FiFileText, FiMessageSquare, FiEdit2, FiCheck, FiX, FiCalendar, FiSend 
 
 // InputField component for basic text inputs
 const InputField = ({ label, required, value, onChange, placeholder, readOnly = false, error, ...rest }) => (
-  <div className="relative" style={{ marginBottom: 'var(--form-margin-bottom)' }}>
+  <div className="relative" >
     <label className="absolute -top-2 left-3 bg-white px-1 text-gray-500 uppercase tracking-wider" style={{ fontFamily: 'var(--font-family)', fontSize: 'var(--label-font-size)', fontWeight: 'var(--label-font-weight)' }}>
       <span>
         {label}{required && <span style={{ color: 'var(--secondary-color)', fontFamily: 'var(--font-family)' }} className="ml-1">*</span>}
@@ -924,15 +924,20 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
           </h2>
         </div>
 
-        {/* Assigned To + Edit Button Row */}
-        <div className="flex items-center justify-between px-4 py-2">
-          <span className="text-xs text-gray-600">
-            Assigned to: <span className="font-medium text-gray-900">{selectedTask.assignToName || selectedTask.assignTo}</span>
-          </span>
+        {/* Assigned To Info + Edit Button Row */}
+        <div className="flex items-start justify-between px-4 py-3">
+          <div className="flex flex-col">
+            <span className="text-sm text-gray-600" style={{ fontFamily: 'var(--font-family)' }}>
+              Assigned to:
+            </span>
+            <span className="text-sm text-gray-900 font-medium" style={{ fontFamily: 'var(--font-family)' }}>
+              {selectedTask.assignToName || selectedTask.assignTo}
+            </span>
+          </div>
           {activeTab === "overview" && !isEditingTask && (
             <button
               onClick={startEditingTask}
-              className="flex items-center gap-1 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+              className="flex items-center gap-1 px-3 py-1.5 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors text-sm ml-4"
               style={{ fontFamily: 'var(--font-family)' }}
             >
               <FiEdit2 size={14} />
@@ -940,7 +945,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
             </button>
           )}
           {activeTab === "overview" && isEditingTask && (
-            <div className="flex gap-1">
+            <div className="flex gap-1 ml-4">
               <button
                 onClick={saveTask}
                 disabled={savingTask}
@@ -1037,6 +1042,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
                         options={[
                           { value: "Low", label: "Low" },
                           { value: "Medium", label: "Medium" },
+                          { value: "High", label: "High" },
                         ]}
                         placeholder="Select priority"
                       />
