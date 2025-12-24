@@ -54,7 +54,7 @@ self.addEventListener('push', (event) => {
         try {
           // Create audio context and play sound
           const audio = new Audio('/sounds/Sound-1.mp3');
-          audio.volume = 0.5; // Set volume to 50%
+          audio.volume = 1.0; // Set volume to 100%
           audio.play().then(() => {
             console.log('Notification sound played successfully');
             resolve();
