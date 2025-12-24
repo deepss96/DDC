@@ -60,7 +60,7 @@ class User {
 
   // Get all users (for user management) - exclude soft deleted users
   static getAll(callback) {
-    const sql = `SELECT id, first_name, last_name, email, phone, username, role, status, created_at, is_temp_password
+    const sql = `SELECT id, first_name, last_name, email, phone, username, role, status, created_at, is_temp_password, password
              FROM users
              WHERE status != 'Deleted'
              ORDER BY created_at DESC`;

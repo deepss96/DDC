@@ -106,6 +106,13 @@ export default function NotificationsPage() {
     }
   }, [user]);
 
+  // Mark all notifications as read when page loads
+  useEffect(() => {
+    if (!loading && notifications.length > 0 && notifications.some(n => !n.is_read)) {
+      markAllAsRead();
+    }
+  }, [loading, notifications]);
+
   return (
     <div className="flex-1 flex flex-col hero-section">
       <div className="flex-1 flex">

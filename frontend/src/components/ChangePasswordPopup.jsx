@@ -7,12 +7,8 @@ import { useAuth } from "../contexts/AuthContext";
 export default function ChangePasswordPopup({ user, onPasswordChanged, onClose, showCloseButton = false }) {
   // Prevent closing if it's a temporary password (showCloseButton = false)
   const handleCloseAttempt = () => {
-    if (showCloseButton) {
-      if (onClose) {
-        onClose();
-      } else if (onPasswordChanged) {
-        onPasswordChanged();
-      }
+    if (showCloseButton && onClose) {
+      onClose();
     }
     // If showCloseButton is false, don't allow closing
   };
@@ -145,8 +141,6 @@ export default function ChangePasswordPopup({ user, onPasswordChanged, onClose, 
                                 onClick={() => {
                                     if (onClose) {
                                         onClose();
-                                    } else if (onPasswordChanged) {
-                                        onPasswordChanged();
                                     }
                                 }}
                                 className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors"

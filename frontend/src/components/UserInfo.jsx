@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { FiFileText, FiUser, FiMail, FiPhone, FiLock, FiShield, FiActivity, FiCalendar } from "react-icons/fi";
+import { useAuth } from "../contexts/AuthContext";
 
 // Add wave animation for back button
 const waveStyles = `
@@ -35,6 +36,7 @@ const DisplayField = ({ label, value, icon: Icon, fullWidth = false }) => (
 const UserInfo = ({ selectedUser, onClose }) => {
     if (!selectedUser) return null;
 
+    const { user: currentUser } = useAuth();
     const [activeTab, setActiveTab] = useState("overview");
 
     const getInitials = (firstName, lastName) => {
@@ -172,11 +174,13 @@ const UserInfo = ({ selectedUser, onClose }) => {
                                     value={selectedUser.phone || "Not Available"}
                                     icon={FiPhone}
                                 />
-                                <DisplayField
-                                    label="PASSWORD STATUS"
-                                    value={selectedUser.is_temp_password === 1 ? "Temporary password (needs to be changed)" : "Password set"}
-                                    icon={FiLock}
-                                />
+                                {currentUser?.role?.toLowerCase() === 'admin' && (
+                                    <DisplayField
+                                        label="PASSWORD"
+                                        value={selectedUser.is_temp_password === 1 ? selectedUser.password : "*****"}
+                                        icon={FiLock}
+                                    />
+                                )}
                                 <DisplayField
                                     label="ROLE"
                                     value={

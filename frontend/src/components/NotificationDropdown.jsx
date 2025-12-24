@@ -341,6 +341,13 @@ const NotificationDropdown = ({ size = 20 }) => {
     }
   }, [user]);
 
+  // Mark all notifications as read when dropdown is opened
+  useEffect(() => {
+    if (isOpen && unreadCount > 0) {
+      markAllAsRead();
+    }
+  }, [isOpen]);
+
   // Note: Sound is played in the socket 'new-notification' event handler
   // No need for additional sound playing logic here
 
