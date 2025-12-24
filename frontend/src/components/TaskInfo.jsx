@@ -765,8 +765,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
       projectName: selectedTask.projectName,
       leadName: selectedTask.leadName,
       dueDate: formatDateForInput(selectedTask.dueDate),
-      createdDate: formatDateForInput(selectedTask.createdDate),
-      relatedTo: selectedTask.relatedTo || ""
+      createdDate: formatDateForInput(selectedTask.createdDate)
     });
     setIsEditingTask(true);
   };
@@ -788,8 +787,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
         assignBy: editedTaskData.assignBy,
         projectName: editedTaskData.projectName,
         leadName: editedTaskData.leadName,
-        dueDate: editedTaskData.dueDate,
-        relatedTo: editedTaskData.relatedTo
+        dueDate: editedTaskData.dueDate
       };
 
       await apiService.updateTask(selectedTask.id, updatedTask);
@@ -1054,7 +1052,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                         <SelectField
                           label="ASSIGNED BY"
                           required
-                          value={users.find(u => u.id === parseInt(editedTaskData.assignBy))?.id || ""}
+                          value={editedTaskData.assignBy || ""}
                           onChange={(userId) => {
                             setEditedTaskData(prev => ({ ...prev, assignBy: userId }));
                           }}
@@ -1088,7 +1086,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       <SelectField
                         label="ASSIGNED TO"
                         required
-                        value={users.find(u => u.id === parseInt(editedTaskData.assignTo))?.id || ""}
+                        value={editedTaskData.assignTo || ""}
                         onChange={(userId) => {
                           setEditedTaskData(prev => ({ ...prev, assignTo: userId }));
                         }}
@@ -1154,81 +1152,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                   </div>
                 </div>
 
-                {/* Related To - Full Width */}
-                <div>
-                  {isEditingTask ? (
-                    <SelectField
-                      label="RELATED TO"
-                      value={editedTaskData.relatedTo}
-                      onChange={(value) => {
-                        setEditedTaskData(prev => ({
-                          ...prev,
-                          relatedTo: value,
-                          // Clear conditional fields when changing relatedTo
-                          projectName: value !== "Project" ? "" : prev.projectName,
-                          leadName: value !== "Lead" ? "" : prev.leadName
-                        }));
-                      }}
-                      options={[
-                        { value: "", label: "" },
-                        { value: "Project", label: "Project" },
-                        { value: "Lead", label: "Lead" }
-                      ]}
-                      placeholder="Select what this task is related to"
-                    />
-                  ) : (
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
-                        Related To
-                      </div>
-                      <div className="text-sm font-medium text-gray-900 break-words">
-                        {selectedTask.relatedTo || "N/A"}
-                      </div>
-                    </div>
-                  )}
-                </div>
 
-                {/* Project Name / Lead Name - Conditional */}
-                {(isEditingTask ? editedTaskData.relatedTo : selectedTask.relatedTo) && (
-                  <div>
-                    {isEditingTask ? (
-                      (editedTaskData.relatedTo === "Project") ? (
-                        <InputField
-                          label="PROJECT NAME"
-                          required
-                          value={editedTaskData.projectName}
-                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, projectName: e.target.value }))}
-                          placeholder="Enter project name"
-                        />
-                      ) : (editedTaskData.relatedTo === "Lead") ? (
-                        <SelectField
-                          label="LEAD NAME"
-                          required
-                          value={leads.find(lead => lead.id === parseInt(editedTaskData.leadName))?.contact_name || ""}
-                          onChange={(contactName) => {
-                            const lead = leads.find(l => l.contact_name === contactName);
-                            setEditedTaskData(prev => ({ ...prev, leadName: lead ? lead.id : "" }));
-                          }}
-                          options={leads.map(lead => lead.contact_name)}
-                          placeholder="Select lead name"
-                          searchable={true}
-                        />
-                      ) : null
-                    ) : (
-                      <div className="p-3 bg-gray-50 rounded-lg">
-                        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium mb-1">
-                          {selectedTask.relatedTo === "Project" ? "Project Name" : "Lead Name"}
-                        </div>
-                        <div className="text-sm font-medium text-gray-900 break-words">
-                          {selectedTask.relatedTo === "Project"
-                            ? (selectedTask.projectName || "N/A")
-                            : (selectedTask.leadName || "N/A")
-                          }
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
 
                 {/* Description - Full Width */}
                 <div>
@@ -1256,61 +1180,26 @@ const TaskInfo = ({ selectedTask, onClose }) => {
             {/* Desktop/Tablet View - Custom Grid Layout */}
             <div className="hidden sm:block" style={{ fontFamily: 'var(--font-family)' }}>
               <div className="space-y-2 sm:space-y-3">
-                {/* Row 1: Task Name + Related To (2 columns) */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    {isEditingTask ? (
-                      <InputField
-                        label="TASK NAME"
-                        required
-                        value={editedTaskData.name}
-                        onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="Enter task name"
-                      />
-                    ) : (
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                          Task Name
-                        </span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {selectedTask.name}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    {isEditingTask ? (
-                      <SelectField
-                        label="RELATED TO"
-                        value={editedTaskData.relatedTo}
-                        onChange={(value) => {
-                          setEditedTaskData(prev => ({
-                            ...prev,
-                            relatedTo: value,
-                            // Clear conditional fields when changing relatedTo
-                            projectName: value !== "Project" ? "" : prev.projectName,
-                            leadName: value !== "Lead" ? "" : prev.leadName
-                          }));
-                        }}
-                        options={[
-                          { value: "", label: "" },
-                          { value: "Project", label: "Project" },
-                          { value: "Lead", label: "Lead" }
-                        ]}
-                        placeholder="Select what this task is related to"
-                      />
-                    ) : (
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                          Related To
-                        </span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {selectedTask.relatedTo || "N/A"}
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                {/* Row 1: Task Name (full width) */}
+                <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
+                  {isEditingTask ? (
+                    <InputField
+                      label="TASK NAME"
+                      required
+                      value={editedTaskData.name}
+                      onChange={(e) => setEditedTaskData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter task name"
+                    />
+                  ) : (
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                        Task Name
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {selectedTask.name}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Row 2: Status + Priority */}
@@ -1386,7 +1275,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       <SelectField
                         label="ASSIGNED BY"
                         required
-                        value={users.find(u => u.id === parseInt(editedTaskData.assignBy))?.id || ""}
+                        value={editedTaskData.assignBy || ""}
                         onChange={(userId) => {
                           setEditedTaskData(prev => ({ ...prev, assignBy: userId }));
                         }}
@@ -1420,7 +1309,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
                       <SelectField
                         label="ASSIGNED TO"
                         required
-                        value={users.find(u => u.id === parseInt(editedTaskData.assignTo))?.id || ""}
+                        value={editedTaskData.assignTo || ""}
                         onChange={(userId) => {
                           setEditedTaskData(prev => ({ ...prev, assignTo: userId }));
                         }}
@@ -1488,47 +1377,7 @@ const TaskInfo = ({ selectedTask, onClose }) => {
 
 
 
-                {/* Row 6: Project Name / Lead Name (conditional) */}
-                {(isEditingTask ? editedTaskData.relatedTo : selectedTask.relatedTo) && (
-                  <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
-                    {isEditingTask ? (
-                      (editedTaskData.relatedTo === "Project") ? (
-                        <InputField
-                          label="PROJECT NAME"
-                          required
-                          value={editedTaskData.projectName}
-                          onChange={(e) => setEditedTaskData(prev => ({ ...prev, projectName: e.target.value }))}
-                          placeholder="Enter project name"
-                        />
-                      ) : (editedTaskData.relatedTo === "Lead") ? (
-                        <SelectField
-                          label="LEAD NAME"
-                          required
-                          value={leads.find(lead => lead.id === parseInt(editedTaskData.leadName))?.contact_name || ""}
-                          onChange={(contactName) => {
-                            const lead = leads.find(l => l.contact_name === contactName);
-                            setEditedTaskData(prev => ({ ...prev, leadName: lead ? lead.id : "" }));
-                          }}
-                          options={leads.map(lead => lead.contact_name)}
-                          placeholder="Select lead name"
-                          searchable={true}
-                        />
-                      ) : null
-                    ) : (
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
-                          {selectedTask.relatedTo === "Project" ? "Project Name" : "Lead Name"}
-                        </span>
-                        <span className="text-sm font-medium text-gray-900">
-                          {selectedTask.relatedTo === "Project"
-                            ? (selectedTask.projectName || "N/A")
-                            : (selectedTask.leadName || "N/A")
-                          }
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
+
 
                 {/* Row 7: Description (full width at bottom) */}
                 <div className="bg-light-gray-bg rounded-lg p-4 border border-gray-200">
