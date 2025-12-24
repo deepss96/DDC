@@ -50,8 +50,8 @@ const playNotificationSoundHTML5 = () => {
     // Example with data URI (embedded sound):
     // audio.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmQdBzaO1fLOfTIFJHfH8N2QQAoUXrTp66hVFApGn+DyvmQdBzaO1fLOfTIFJHfH8N2QQAoUXrTp66hVFApGn+DyvmQdBzaO1fLOfTI=';
 
-    // For now, using a simple beep - replace with your sound file
-    audio.src = '/sounds/notification.mp3'; // Place sound files in public/sounds/
+    // Using Sound-1.mp3 as requested
+    audio.src = '/sounds/Sound-1.mp3'; // Place sound files in public/sounds/
 
     audio.volume = 0.5; // 50% volume
     audio.play().catch(e => console.log('Audio play failed:', e));
@@ -89,7 +89,7 @@ const playNotificationSound = () => {
   try {
     // Try HTML5 Audio first (more reliable for notifications)
     const audio = new Audio();
-    audio.src = '/sounds/Sound-4.mp3';
+    audio.src = '/sounds/Sound-1.mp3';
     audio.volume = 1.0; // 100% volume
     audio.preload = 'auto';
 
