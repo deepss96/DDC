@@ -612,6 +612,9 @@ export default function ProfilePage() {
               setSuccessMessage("");
             }, 3000);
           }}
+          onClose={() => {
+            setIsChangePasswordOpen(false);
+          }}
         />
       )}
 
