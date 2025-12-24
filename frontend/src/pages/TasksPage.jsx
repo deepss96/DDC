@@ -629,7 +629,11 @@ const fetchTasks = async () => {
           {/* TASKS TABLE */}
           <div className="bg-white rounded-xl border borderr flex flex-col overflow-hidden" style={{ height: window.innerWidth < 640 ? 'calc(100vh - 180px)' : 'calc(100vh - 90px)' }}>
             {selectedTask ? (
-              <TaskInfo selectedTask={selectedTask} onClose={() => setSelectedTask(null)} />
+              <TaskInfo
+                selectedTask={selectedTask}
+                onClose={() => setSelectedTask(null)}
+                onTaskUpdate={(updatedTask) => setSelectedTask(updatedTask)}
+              />
             ) : (
               <>
                 {/* FIXED FILTER HEADER */}

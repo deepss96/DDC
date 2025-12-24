@@ -798,7 +798,12 @@ const TaskInfo = ({ selectedTask, onClose }) => {
         dueDate: editedTaskData.dueDate
       };
 
-      await apiService.updateTask(selectedTask.id, updatedTask);
+      const result = await apiService.updateTask(selectedTask.id, updatedTask);
+
+      // Update the local selectedTask with the returned data
+      if (result && onTaskUpdate) {
+        onTaskUpdate(result);
+      }
 
       setIsEditingTask(false);
       setEditedTaskData({});
