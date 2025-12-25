@@ -161,7 +161,7 @@ const fetchUsers = async () => {
       console.error('Error response data:', error.response?.data);
 
   // Handle task validation errors with detailed information
-  if (error.response?.data?.taskDetails) {
+  if (error.response?.data?.pendingTasks) {
     console.log('Task validation error detected for delete');
     // Use the message from backend directly, as it already includes task details
     const taskMessage = error.response.data.message || 'Cannot delete this user because they have pending tasks.';

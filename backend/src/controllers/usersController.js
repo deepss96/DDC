@@ -227,11 +227,20 @@ function formatTaskList(tasks) {
     let message = `\n\nPending Tasks (${tasks.length}):`;
 
     tasks.forEach((task, index) => {
-        const taskType = task.taskType === 'assigned_to_you' ? 'Assigned to you' : 'Assigned by you';
         const assignedBy = task.assignedBy || 'Unknown';
         const dueDate = task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date';
+        const taskType = task.taskType;
 
-        message += `\n${index + 1}. "${task.name}" (${taskType} by ${assignedBy}) - Due: ${dueDate}`;
+        let assignmentText;
+        if (taskType === 'assigned_to_you') {
+            assignmentText = `Assigned to you by ${assignedBy}`;
+        } else if (taskType === 'assigned_by_you') {
+            assignmentText = `Assigned by you to ${assignedBy}`;
+        } else {
+            assignmentText = `Assigned to you by ${assignedBy}`; // fallback
+        }
+
+        message += `\n${index + 1}. "${task.name}" (${assignmentText}) - Due: ${dueDate}`;
     });
 
     return message;

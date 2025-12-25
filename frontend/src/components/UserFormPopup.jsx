@@ -321,29 +321,15 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
             console.error('Error response data:', error.response?.data);
 
             // Handle task validation errors
-            if (error.response?.data?.taskDetails) {
+            if (error.response?.data?.pendingTasks) {
                 console.log('Task validation error detected');
-                const { assignedTo, assignedBy } = error.response.data.taskDetails;
-                let taskMessage = error.response.data.message || 'Cannot perform this action due to pending tasks.';
-
-                // Add task details
-                const taskList = [];
-                if (assignedTo && assignedTo.length > 0) {
-                    taskList.push(...assignedTo.map(task => `• "${task.name}" (assigned by ${task.assignedBy})`));
-                }
-                if (assignedBy && assignedBy.length > 0) {
-                    taskList.push(...assignedBy.map(task => `• "${task.name}" (assigned to ${task.assignedTo})`));
-                }
-
-                if (taskList.length > 0) {
-                    taskMessage += '\n\nPending Tasks:\n' + taskList.join('\n');
-                }
-
+                // Use the message from backend directly, as it already includes task details
+                const taskMessage = error.response.data.message || 'Cannot perform this action due to pending tasks.';
                 console.log('Setting task error message:', taskMessage);
                 setErrorMessage(taskMessage);
             } else {
                 // Handle other errors
-                const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message || 'Error saving user. Please try again.';
+                const errorMsg = error.response?.data?.message || error.response?.data?.error || error.message || 'Error updating user. Please try again.';
                 console.log('Setting generic error message:', errorMsg);
                 setErrorMessage(errorMsg);
             }
@@ -466,7 +452,7 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="text-sm font-medium text-red-800 mb-1" style={{ fontFamily: 'var(--font-family)' }}>
-                                        Cannot Save User
+                                        Cannot Update User
                                     </h4>
                                     <div className="text-sm text-red-700 whitespace-pre-line" style={{ fontFamily: 'var(--font-family)' }}>
                                         {errorMessage}
