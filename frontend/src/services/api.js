@@ -195,6 +195,10 @@ class ApiService {
     return this.request('/api/users');
   }
 
+  async checkUserDeletion(id) {
+    return this.request(`/api/users/${id}/check-deletion`);
+  }
+
   async createUser(userData) {
     return this.request('/api/users', {
       method: 'POST',

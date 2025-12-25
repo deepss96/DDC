@@ -246,6 +246,40 @@ function formatTaskList(tasks) {
     return message;
 }
 
+// Check if user can be deleted (for frontend validation)
+exports.checkUserDeletion = (req, res) => {
+    const { id } = req.params;
+
+    console.log("CHECK USER DELETION ID:", id);
+
+    // Check if user has incomplete tasks
+    User.checkUserIncompleteTasks(id, (err, results) => {
+        if (err) {
+            console.error('Error checking tasks:', err);
+            return res.status(500).json({ error: 'Failed to check user deletion' });
+        }
+
+        console.log("PENDING TASK COUNT:", results.length);
+
+        // If any task is NOT completed → Cannot delete
+        if (results.length > 0) {
+            const taskList = formatTaskList(results);
+            return res.status(400).json({
+                canDelete: false,
+                error: 'User cannot be deleted',
+                message: `This user has ${results.length} pending task(s). Complete all tasks before deleting the user.${taskList}`,
+                pendingTasks: results
+            });
+        }
+
+        // No pending tasks → Can delete
+        res.json({
+            canDelete: true,
+            message: 'User can be deleted'
+        });
+    });
+};
+
 // Delete user
 exports.deleteUser = (req, res) => {
     const { id } = req.params;

@@ -115,23 +115,22 @@ const fetchUsers = async () => {
     const user = usersData.find(u => u.id === id);
     if (!user) return;
 
-    // First check if user has pending tasks
+    // First check if user can be deleted (has pending tasks)
     try {
-      // We'll make a test delete call to check for pending tasks
-      // The backend will return an error if there are pending tasks
-      await apiService.deleteUser(id);
+      const checkResult = await apiService.checkUserDeletion(id);
 
-      // If we reach here, no pending tasks - proceed with confirmation
+      // If we reach here, user can be deleted (no pending tasks)
       setUserToDelete(user);
+      setDeleteError(null); // Clear any previous error
       setShowDeleteConfirm(true);
     } catch (error) {
-      // If there are pending tasks, show the error directly
+      // If there are pending tasks or other issues, show the error
       if (error.response?.data?.pendingTasks) {
         setUserToDelete(user);
         setDeleteError(error.response.data.message);
         setShowDeleteConfirm(true);
       } else {
-        // For other errors, show generic error
+        // Handle other errors
         setUserToDelete(user);
         setDeleteError(error.response?.data?.message || 'Unable to check user status. Please try again.');
         setShowDeleteConfirm(true);
