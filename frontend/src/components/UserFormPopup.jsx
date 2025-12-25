@@ -212,6 +212,9 @@ export default function UserFormPopup({ isOpen, onClose, onSubmit, editUser }) {
             setPhone(editUser.phone || "");
             setRole(editUser.role || "");
             setStatus(editUser.status || "Active");
+            // Clear any previous error messages when reopening for edit
+            setShowErrorMessage(false);
+            setErrorMessage("");
         } else {
             resetForm();
         }
