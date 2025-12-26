@@ -45,8 +45,29 @@ self.addEventListener('push', (event) => {
     renotify: true
   };
 
+  // Play notification sound
   event.waitUntil(
-    self.registration.showNotification(data.title || 'NirmaanTrack', options)
+    Promise.all([
+      self.registration.showNotification(data.title || 'NirmaanTrack', options),
+      // Play notification sound
+      new Promise((resolve) => {
+        try {
+          // Create audio context and play sound
+          const audio = new Audio('/sounds/Sound-1.mp3');
+          audio.volume = 1.0; // Set volume to 100%
+          audio.play().then(() => {
+            console.log('Notification sound played successfully');
+            resolve();
+          }).catch((error) => {
+            console.log('Could not play notification sound:', error);
+            resolve(); // Resolve anyway to not block notification
+          });
+        } catch (error) {
+          console.log('Audio playback not supported:', error);
+          resolve();
+        }
+      })
+    ])
   );
 });
 
