@@ -4,10 +4,14 @@ const db = require('../config/database');
 class TaskController {
   // Get all tasks
   static getAllTasks(req, res) {
+    const currentUser = req.user;
     const { user_id } = req.query;
 
-    if (user_id) {
-      // Filter tasks for the current user: tasks they created OR tasks assigned to them
+    // Check if current user is admin
+    const isAdmin = currentUser && currentUser.role?.toLowerCase() === 'admin';
+
+    if (isAdmin && !user_id) {
+      // Admin user requesting all tasks - return ALL tasks
       const sql = `
         SELECT
           t.*,
@@ -18,11 +22,10 @@ class TaskController {
         FROM tasks t
         LEFT JOIN users u1 ON t.assignBy = u1.id
         LEFT JOIN users u2 ON t.assignTo = u2.id
-        WHERE t.assignBy = ? OR t.assignTo = ?
         ORDER BY t.createdDate DESC
       `;
 
-      db.query(sql, [user_id, user_id], (err, results) => {
+      db.query(sql, (err, results) => {
         if (err) {
           return res.status(500).json({ error: err.message });
         }
@@ -41,7 +44,9 @@ class TaskController {
         res.json(formattedResults);
       });
     } else {
-      // No user_id provided - return ALL tasks (for admin)
+      // Non-admin user or admin filtering for specific user - show only relevant tasks
+      const targetUserId = user_id || currentUser.id;
+
       const sql = `
         SELECT
           t.*,
@@ -52,10 +57,11 @@ class TaskController {
         FROM tasks t
         LEFT JOIN users u1 ON t.assignBy = u1.id
         LEFT JOIN users u2 ON t.assignTo = u2.id
+        WHERE t.assignBy = ? OR t.assignTo = ?
         ORDER BY t.createdDate DESC
       `;
 
-      db.query(sql, (err, results) => {
+      db.query(sql, [targetUserId, targetUserId], (err, results) => {
         if (err) {
           return res.status(500).json({ error: err.message });
         }

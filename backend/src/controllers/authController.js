@@ -7,16 +7,19 @@ class AuthController {
   // Register User
   static async register(req, res) {
     try {
-      const { firstName, lastName, email, username, password } = req.body;
+      const { firstName, lastName, email, password } = req.body;
 
       // Validation
-      if (!firstName || !lastName || !email || !username || !password) {
+      if (!firstName || !lastName || !email || !password) {
         return res.status(400).json({ error: 'All fields are required' });
       }
 
       if (password.length < 6) {
         return res.status(400).json({ error: 'Password must be at least 6 characters long' });
       }
+
+      // Set username to be the same as email
+      const username = email;
 
       // Check if user already exists
       User.checkExists(email, username, async (err, results) => {
@@ -70,7 +73,7 @@ class AuthController {
       }
 
       // Find user by identifier
-      User.getByIdentifier(identifier, async (err, results) => {
+      User.getByEmailOrUsername(identifier, async (err, results) => {
         if (err) {
           console.error('Database error in login:', err);
           return res.status(500).json({ error: 'Database error' });

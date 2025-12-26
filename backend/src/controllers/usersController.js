@@ -65,8 +65,8 @@ exports.createUser = async (req, res) => {
         return res.status(400).json({ error: 'Status is required' });
     }
 
-    // Generate username from email (part before @)
-    const username = email.split('@')[0];
+    // Set username to be the same as email
+    const username = email;
 
     // Generate temporary password automatically
     const tempPassword = generateTempPassword(8);
