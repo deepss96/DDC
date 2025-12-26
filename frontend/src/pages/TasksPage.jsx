@@ -319,16 +319,19 @@ export default function TasksPage({ searchTerm = '' }) {
 
 const fetchTasks = async () => {
   try {
-    // Always fetch all tasks for the current user (both assigned to and assigned by)
-    // The frontend filtering will handle the "My Tasks" vs "All Tasks" view
-    const params = { user_id: user.id };
+    // Check if user is admin
+    const isAdmin = user?.role?.toLowerCase() === 'admin';
 
-    console.log('TasksPage fetchTasks - User ID:', user?.id, 'params:', params);
+    // For admin users, don't send user_id to get all tasks
+    // For regular users, send user_id to get their tasks
+    const params = isAdmin ? {} : { user_id: user.id };
+
+    console.log('TasksPage fetchTasks - User:', user?.id, 'Role:', user?.role, 'Is Admin:', isAdmin, 'params:', params);
 
     const tasks = await apiService.getTasks(params);
     const sortedTasks = tasks.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
     setTasksData(sortedTasks);
-    console.log("Tasks fetched:", sortedTasks);
+    console.log("Tasks fetched:", sortedTasks.length, "tasks");
   } catch (error) {
     console.error("Error fetching tasks:", error);
   } finally {
