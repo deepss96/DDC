@@ -209,22 +209,28 @@ export default function TasksPage({ searchTerm = '' }) {
     };
   }, [isViewDropdownOpen]);
 
-  // Socket.IO connection for real-time task updates
+  // Socket.IO connection for real-time task updates - DISABLED
+  // Uncomment below code if you want to enable real-time notifications
+  /*
   useEffect(() => {
     if (user && user.id) {
       console.log('🔌 Initializing Socket.IO connection for TasksPage user:', user.id);
 
       const socketConnection = io(config.socket.url, {
         transports: ['websocket', 'polling'],
-        timeout: 20000,
-        forceNew: true
+        timeout: 45000,
+        forceNew: true,
+        reconnection: true,
+        reconnectionAttempts: 10,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        randomizationFactor: 0.5
       });
 
       setSocket(socketConnection);
 
       socketConnection.on('connect', () => {
         console.log('✅ TasksPage Socket.IO connected successfully:', socketConnection.id);
-        // Join user-specific room for task updates
         socketConnection.emit('join-user-room', user.id);
       });
 
@@ -234,6 +240,23 @@ export default function TasksPage({ searchTerm = '' }) {
 
       socketConnection.on('disconnect', (reason) => {
         console.log('🔌 TasksPage Socket.IO disconnected:', reason);
+        if (reason === 'io server disconnect') {
+          setTimeout(() => {
+            socketConnection.connect();
+          }, 1000);
+        }
+      });
+
+      socketConnection.on('reconnect', (attemptNumber) => {
+        console.log('🔄 TasksPage Socket.IO reconnected after', attemptNumber, 'attempts');
+      });
+
+      socketConnection.on('reconnect_error', (error) => {
+        console.error('❌ TasksPage Socket.IO reconnection failed:', error);
+      });
+
+      socketConnection.on('reconnect_failed', () => {
+        console.error('❌ TasksPage Socket.IO reconnection failed permanently');
       });
 
       // Listen for real-time task creation
@@ -241,18 +264,15 @@ export default function TasksPage({ searchTerm = '' }) {
         console.log('📝 New task created via Socket.IO:', data);
         const { task } = data;
 
-        // Check if this task should be visible to current user
         const isAdmin = user?.role?.toLowerCase() === 'admin';
         const shouldShowTask = isAdmin || task.assignBy === user?.id || task.assignTo === user?.id;
 
         if (shouldShowTask) {
-          // Add new task to the list and sort
           setTasksData(prevTasks => {
             const updatedTasks = [...prevTasks, task].sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
             return updatedTasks;
           });
 
-          // Only show notification to the assigned user, not success messages
           if (task.assignTo === user?.id) {
             setSuccessMessage(`New task "${task.name}" has been assigned to you!`);
             setShowSuccessMessage(true);
@@ -269,12 +289,10 @@ export default function TasksPage({ searchTerm = '' }) {
         console.log('📝 Task updated via Socket.IO:', data);
         const { task } = data;
 
-        // Check if this task should be visible to current user
         const isAdmin = user?.role?.toLowerCase() === 'admin';
         const shouldShowTask = isAdmin || task.assignBy === user?.id || task.assignTo === user?.id;
 
         if (shouldShowTask) {
-          // Update the task in the list
           setTasksData(prevTasks => {
             const updatedTasks = prevTasks.map(t =>
               t.id === task.id ? { ...task } : t
@@ -282,7 +300,6 @@ export default function TasksPage({ searchTerm = '' }) {
             return updatedTasks;
           });
 
-          // If the currently selected task is updated, update it too
           if (selectedTask && selectedTask.id === task.id) {
             setSelectedTask(task);
           }
@@ -294,19 +311,16 @@ export default function TasksPage({ searchTerm = '' }) {
         console.log('🗑️ Task deleted via Socket.IO:', data);
         const { taskId } = data;
 
-        // Remove the task from the list
         setTasksData(prevTasks => {
           const filteredTasks = prevTasks.filter(t => t.id !== parseInt(taskId));
           return filteredTasks;
         });
 
-        // If the currently selected task is deleted, close it
         if (selectedTask && selectedTask.id === parseInt(taskId)) {
           setSelectedTask(null);
         }
       });
 
-      // Cleanup on unmount or user change
       return () => {
         console.log('🔌 Cleaning up TasksPage Socket.IO connection');
         socketConnection.emit('leave-user-room', user.id);
@@ -314,6 +328,7 @@ export default function TasksPage({ searchTerm = '' }) {
       };
     }
   }, [user]);
+  */
 
   // ⬇️ Reusable function to fetch tasks
 

@@ -545,22 +545,28 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
     }
   }, [comments, activeTab, scrollToBottom, isNearBottom]);
 
-  // Socket.IO connection for real-time comments
+  // Socket.IO connection for real-time comments - DISABLED
+  // Uncomment below code if you want to enable real-time notifications
+  /*
   useEffect(() => {
     if (user && user.id && selectedTask?.id && activeTab === "comments") {
       console.log('🔌 Initializing Socket.IO connection for TaskInfo comments:', selectedTask.id);
 
       const socketConnection = io(config.socket.url, {
         transports: ['websocket', 'polling'],
-        timeout: 20000,
-        forceNew: true
+        timeout: 45000,
+        forceNew: true,
+        reconnection: true,
+        reconnectionAttempts: 10,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        randomizationFactor: 0.5
       });
 
       setSocket(socketConnection);
 
       socketConnection.on('connect', () => {
         console.log('✅ TaskInfo Socket.IO connected successfully:', socketConnection.id);
-        // Join task-specific room for comments
         socketConnection.emit('join-task-room', selectedTask.id);
       });
 
@@ -570,6 +576,23 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
 
       socketConnection.on('disconnect', (reason) => {
         console.log('🔌 TaskInfo Socket.IO disconnected:', reason);
+        if (reason === 'io server disconnect') {
+          setTimeout(() => {
+            socketConnection.connect();
+          }, 1000);
+        }
+      });
+
+      socketConnection.on('reconnect', (attemptNumber) => {
+        console.log('🔄 TaskInfo Socket.IO reconnected after', attemptNumber, 'attempts');
+      });
+
+      socketConnection.on('reconnect_error', (error) => {
+        console.error('❌ TaskInfo Socket.IO reconnection failed:', error);
+      });
+
+      socketConnection.on('reconnect_failed', () => {
+        console.error('❌ TaskInfo Socket.IO reconnection failed permanently');
       });
 
       // Listen for real-time new comments
@@ -577,7 +600,6 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
         console.log('💬 New comment received via Socket.IO:', data);
         const { comment, taskId } = data;
 
-        // Only add if it's for this task and not from current user (to avoid duplicates)
         if (taskId === selectedTask.id && comment.user_id !== user.id) {
           setComments(prev => sortByCreatedAt([...prev, comment]));
         }
@@ -587,7 +609,6 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
       socketConnection.on('user-typing', (data) => {
         const { userId, userName, taskId, isTyping } = data;
 
-        // Only show typing for this task and not for current user
         if (taskId === selectedTask.id && userId !== user.id) {
           setTypingUsers(prev => {
             const newMap = new Map(prev);
@@ -601,7 +622,6 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
         }
       });
 
-      // Cleanup on unmount or task change
       return () => {
         console.log('🔌 Cleaning up TaskInfo Socket.IO connection');
         socketConnection.emit('leave-task-room', selectedTask.id);
@@ -609,6 +629,7 @@ const TaskInfo = ({ selectedTask, onClose, onTaskUpdate }) => {
       };
     }
   }, [user, selectedTask?.id, activeTab]);
+  */
 
   // Handle typing indicators
   const handleInputChange = (e) => {

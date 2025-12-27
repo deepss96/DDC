@@ -78,7 +78,9 @@ app.get('/api/health/db', (req, res) => {
   });
 });
 
-// Socket.IO connection handling
+// Socket.IO connection handling - DISABLED
+// Uncomment below code if you want to enable real-time notifications
+/*
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
 
@@ -133,6 +135,7 @@ io.on('connection', (socket) => {
 
 // Make io accessible from controllers
 global.io = io;
+*/
 
 server.listen(PORT, config.server.host, () => {
   console.log(`Server running on port ${PORT}`);
